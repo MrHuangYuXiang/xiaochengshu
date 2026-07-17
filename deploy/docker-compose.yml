@@ -1,4 +1,4 @@
-# 生产环境docker-compose配置
+# 开发环境docker-compose配置
 
 version: '3'
 
@@ -8,13 +8,15 @@ networks:
 
 services:
   frontend:
-    image: crpi-7ne6ei2idz781dqm.cn-chengdu.personal.cr.aliyuncs.com/hyx-xiaochengshu/frontend
     container_name: frontend
+    build:
+      context: ../frontend
+      dockerfile: ../frontend/build/Dockerfile
     ports:
       - 80:80
       - 443:443
     volumes:
-      - ./frontend/dev.conf:/etc/nginx/nginx.conf
+      - ./frontend/nginx.conf:/etc/nginx/nginx.conf
       - /var/opt/xiaochengshu/upload:/var/opt/upload
       - /var/opt/xiaochengshu/frontend/logs:/var/log/nginx
     networks:
@@ -34,15 +36,16 @@ services:
     networks:
       - dev
 
-  # 启动前需要按照config/back.env.temp模板创建.env文件
-  # 并通过volume挂载到容器中
   backend:
-    image: crpi-7ne6ei2idz781dqm.cn-chengdu.personal.cr.aliyuncs.com/hyx-xiaochengshu/backend
     container_name: backend
+    build:
+      context: ../backend
+      dockerfile: ../backend/build/Dockerfile
     ports:
       - 8080:8080
       - 8081:8081
     volumes:
+      - ../backend:/opt/xiaochengshu # 开发环境挂载代码目录热更新
       - /var/opt/xiaochengshu/upload:/var/opt/upload # 挂载静态文件目录,和frontend容器共享,用于存储静态资源
     env_file:
       - ./backend/.env
