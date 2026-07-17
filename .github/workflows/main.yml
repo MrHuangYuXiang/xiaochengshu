@@ -53,7 +53,6 @@ jobs:
           # 替换前端环境变量
           sed -i "s/localhost/${SERVER_HOST}/g" ./frontend/.env
 
-
       # 拷贝项目到服务器
       - name: Copy files via SSH
         uses: appleboy/scp-action@v1
