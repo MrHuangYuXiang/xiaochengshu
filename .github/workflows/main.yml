@@ -32,15 +32,15 @@ jobs:
           SERVER_SSH_USERNAME: ${{ secrets.SERVER_SSH_USERNAME }}
         run: |
           # 替换后端环境变量模板
-          sed -i "s|{{ENV}}|${BACKEND_ENV}|g" ./deploy/backend/temp.env
-          sed -i "s|{{DB_HOST}}|${BACKEND_DB_HOST}|g" ./deploy/backend/temp.env
-          sed -i "s|{{DB_PORT}}|${BACKEND_DB_PORT}|g" ./deploy/backend/temp.env
-          sed -i "s|{{DB_USER}}|${BACKEND_DB_USER}|g" ./deploy/backend/temp.env
-          sed -i "s|{{DB_PASSWORD}}|${BACKEND_DB_PASSWORD}|g" ./deploy/backend/temp.env
-          sed -i "s|{{DB_DATABASE}}|${BACKEND_DB_DATABASE}|g" ./deploy/backend/temp.env
-          sed -i "s|{{UPLOAD_DIR}}|${BACKEND_UPLOAD_DIR}|g" ./deploy/backend/temp.env
-          sed -i "s|{{PERSISTENT_HEARTBEAT_INTERVAL}}|${BACKEND_PERSISTENT_HEARTBEAT_INTERVAL}|g" ./deploy/backend/temp.env
-          sed -i "s|{{JWT_SECRET}}|${BACKEND_JWT_SECRET}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_ENV}}|${BACKEND_ENV}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_HOST}}|${BACKEND_DB_HOST}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_PORT}}|${BACKEND_DB_PORT}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_USER}}|${BACKEND_DB_USER}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_PASSWORD}}|${BACKEND_DB_PASSWORD}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_DATABASE}}|${BACKEND_DB_DATABASE}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_UPLOAD_DIR}}|${BACKEND_UPLOAD_DIR}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_PERSISTENT_HEARTBEAT_INTERVAL}}|${BACKEND_PERSISTENT_HEARTBEAT_INTERVAL}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_JWT_SECRET}}|${BACKEND_JWT_SECRET}|g" ./deploy/backend/temp.env
           mv ./deploy/backend/temp.env ./deploy/backend/.env
           echo "后端环境变量模板替换完成"
           cat ./deploy/backend/.env
