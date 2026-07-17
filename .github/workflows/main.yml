@@ -42,16 +42,24 @@ jobs:
           sed -i "s|{{PERSISTENT_HEARTBEAT_INTERVAL}}|${BACKEND_PERSISTENT_HEARTBEAT_INTERVAL}|g" ./deploy/backend/temp.env
           sed -i "s|{{JWT_SECRET}}|${BACKEND_JWT_SECRET}|g" ./deploy/backend/temp.env
           mv ./deploy/backend/temp.env ./deploy/backend/.env
+          echo "后端环境变量模板替换完成"
+          cat ./deploy/backend/.env
       
           # 替换数据库环境变量模板
           sed -i "s|{{MYSQL_ROOT_PASSWORD}}|${MYSQL_ROOT_PASSWORD}|g" ./deploy/mysql/temp.env
           mv ./deploy/mysql/temp.env ./deploy/mysql/.env
+          echo "数据库环境变量模板替换完成"
+          cat ./deploy/mysql/.env
       
           # 替换 nginx 配置文件
           sed -i "s|localhost|${SERVER_HOST}|g" ./deploy/frontend/nginx.conf
+          echo "nginx 配置文件替换完成"
+          cat ./deploy/frontend/nginx.conf
       
           # 替换前端环境变量
           sed -i "s|localhost|${SERVER_HOST}|g" ./frontend/.env
+          echo "前端环境变量模板替换完成"
+          cat ./frontend/.env
 
       # 拷贝项目到服务器
       - name: Copy files via SSH
