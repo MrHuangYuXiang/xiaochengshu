@@ -31,6 +31,7 @@ jobs:
           SERVER_SSH_PASSWORD: ${{ secrets.SERVER_SSH_PASSWORD }}
           SERVER_SSH_USERNAME: ${{ secrets.SERVER_SSH_USERNAME }}
         run:
+          chmod 733 ./deploy/replace_secret.sh
           ./deploy/replace_secret.sh
 
       # 拷贝项目到服务器
