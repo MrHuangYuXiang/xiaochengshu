@@ -1,0 +1,85 @@
+name: xiaochengshu-actions
+
+on: 
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  copy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      # 拉取代码
+      - name: Pull repository code
+        uses: actions/checkout@v4
+
+      # 通过github secret替换相关模板文件以及配置文件
+      - name: Replace secret
+        env:
+          BACKEND_DB_DATABASE: ${{ secrets.BACKEND_DB_DATABASE }}
+          BACKEND_DB_HOST: ${{ secrets.BACKEND_DB_HOST }}
+          BACKEND_DB_PASSWORD: ${{ secrets.BACKEND_DB_PASSWORD }}
+          BACKEND_DB_PORT: ${{ secrets.BACKEND_DB_PORT }}
+          BACKEND_DB_USER: ${{ secrets.BACKEND_DB_USER }}
+          BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
+          BACKEND_JWT_SECRET: ${{ secrets.BACKEND_JWT_SECRET }}
+          BACKEND_PERSISTENT_HEARTBEAT_INTERVAL: ${{ secrets.BACKEND_PERSISTENT_HEARTBEAT_INTERVAL }}
+          BACKEND_UPLOAD_DIR: ${{ secrets.BACKEND_UPLOAD_DIR }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_SSH_PASSWORD: ${{ secrets.SERVER_SSH_PASSWORD }}
+          SERVER_SSH_USERNAME: ${{ secrets.SERVER_SSH_USERNAME }}
+        run: |
+          # 替换后端环境变量模板
+          sed -i "s|{{BACKEND_ENV}}|${BACKEND_ENV}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_HOST}}|${BACKEND_DB_HOST}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_PORT}}|${BACKEND_DB_PORT}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_USER}}|${BACKEND_DB_USER}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_PASSWORD}}|${BACKEND_DB_PASSWORD}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_DB_DATABASE}}|${BACKEND_DB_DATABASE}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_UPLOAD_DIR}}|${BACKEND_UPLOAD_DIR}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_PERSISTENT_HEARTBEAT_INTERVAL}}|${BACKEND_PERSISTENT_HEARTBEAT_INTERVAL}|g" ./deploy/backend/temp.env
+          sed -i "s|{{BACKEND_JWT_SECRET}}|${BACKEND_JWT_SECRET}|g" ./deploy/backend/temp.env
+          mv ./deploy/backend/temp.env ./deploy/backend/.env
+          echo "后端环境变量模板替换完成"
+          cat ./deploy/backend/.env
+      
+          # 替换数据库环境变量模板
+          sed -i "s|{{MYSQL_ROOT_PASSWORD}}|${MYSQL_ROOT_PASSWORD}|g" ./deploy/mysql/temp.env
+          mv ./deploy/mysql/temp.env ./deploy/mysql/.env
+          echo "数据库环境变量模板替换完成"
+          cat ./deploy/mysql/.env
+      
+          # 替换 nginx 配置文件
+          sed -i "s|localhost|${SERVER_HOST}|g" ./deploy/frontend/nginx.conf
+          echo "nginx 配置文件替换完成"
+          cat ./deploy/frontend/nginx.conf
+      
+          # 替换前端环境变量
+          sed -i "s|localhost|${SERVER_HOST}|g" ./frontend/.env
+          echo "前端环境变量模板替换完成"
+          cat ./frontend/.env
+
+      # 拷贝项目到服务器
+      - name: Copy files via SSH
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_SSH_USERNAME }}
+          password: ${{ secrets.SERVER_SSH_PASSWORD }}
+          port: 22
+          source: "."
+          target: /opt/xiaochengshu/
+      
+      # 通过ssh连接到部署
+      - name: Deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_SSH_USERNAME }}
+          password: ${{ secrets.SERVER_SSH_PASSWORD }}
+          port: 22
+          script: |
+            cd /opt/xiaochengshu/deploy
+            docker compose up -d --build
