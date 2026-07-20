@@ -27,7 +27,7 @@ import { httpResponseMap } from "../../http_event.js";
 import { heartbeatHttpEvent, HttpEventType } from "../dto/http_event.js";
 import { newLocalMutex } from "../../io/adapter/mutex.js";
 import { AppError } from "../../error.js";
-import { getPageParams } from "../../helper/http.js";
+import { getImageExt, getPageParams } from "../../helper/http.js";
 import { getFollowRelationSubQuery } from "./common.js";
 import type { FileStoragePort } from "../../io/port/file_storage.js";
 import { newNginxFileStorage } from "../../io/adapter/file_storage.js";
@@ -177,12 +177,16 @@ export class UserService {
     async uploadUserAvatar(req: Request, res: EnhancedResponse<null, null>) {
         const current = getCurrent()
         const formParser = new FormParser(req)
-        const avatarPathName = `/avatars/${current.userId}.jpeg`
-        const fsStream = await this.fileStorage.getWritableStream(avatarPathName)
+        let fileName = ""
 
-        await formParser.exec(fsStream)
+        await formParser.exec(async (fieldType) => {
+            const ext = getImageExt(fieldType)
+            fileName = `/avatars/${current.userId}${ext}`
+            return await this.fileStorage.getWritableStream(fileName)
+        })
+        
         await current.tx.update(userTable).set({
-            avatar_url: this.fileStorage.getFilePath(avatarPathName),
+            avatar_url: fileName,
         }).where(eq(userTable.id, current.userId))
     }
 
