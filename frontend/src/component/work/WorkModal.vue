@@ -1,7 +1,7 @@
 <template>
   <BaseModal ref="modalRef">
     <div class="work-modal">
-      <div class="left" :style="{'background-image': `url(${Config.SERVER_URL}${work?.images[currentImageIndex]?.image_url || ''})`}">
+      <div class="left" :style="{'background-image': `url(${uploadUrl}${work?.images[currentImageIndex]?.image_url || ''})`}">
         <div class="switch-btn switch-prev" v-show="currentImageIndex > 0" @click="currentImageIndex -= 1">
           <AppIcon type="chevron-left" :fill="'white'" />
         </div>
@@ -133,8 +133,8 @@
   import { axiosProxy } from '@/api/axios.ts';
   import { EnhancedList } from '@/lib/list.ts';
   import { ElMessage } from 'element-plus';
-  import { Config } from '@/config.ts';
 
+  const uploadUrl = import.meta.env.VITE_UPLOAD_URL
   const textareaRef = useTemplateRef('textareaRef')
   const scrollContainerRef = useTemplateRef('scrollContainerRef')
   const modalRef = useTemplateRef('modalRef')

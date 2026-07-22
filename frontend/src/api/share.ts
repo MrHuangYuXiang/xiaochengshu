@@ -2,7 +2,6 @@
  * 浏览器环境下,需要借助SharedWorker实现多标签页共享tcp连接
  */
 
-import { Config } from "@/config"
 import { genErrorMessage } from "./type.ext"
 
 const ports: MessagePort[] = []
@@ -25,6 +24,7 @@ self.addEventListener("connect", (e: any) => {
         if (!isConnected) {
           isConnected = true
           try {
+            console.log(e.data.jwt, e.data.url)
             await connect(e.data.jwt, e.data.url)
           } catch (error: unknown) {
             if (error instanceof Error) {
@@ -58,6 +58,7 @@ let buffer = new Uint8Array(0)
 const connect = async (jwt: string, url: string) => {
   try {
     const res = await fetch(url, {
+      method: "POST",
       headers: {
         "Authorization": jwt
       },

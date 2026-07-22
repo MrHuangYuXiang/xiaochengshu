@@ -7,10 +7,13 @@
     :style="{'grid-row-end': `span ${cssVarMap[work.work.id]}`}"
     >
       <div class="real-card" ref="cardContainerRefs" :id="work.work.id">
-        <img
-          :src="Config.SERVER_URL + work.cover_image.image_url"
-          @click="async () => await workModalRef?.show(work.work.id)"
-        />
+        <div class="work-image">
+          <ImageContainer
+            :src="`${uploadUrl}${work.cover_image.image_url}`"
+            @click="async () => await workModalRef?.show(work.work.id)"
+            size="cover"
+          />
+        </div>
         <div class="text" ref="textRefs">
           <div class="title">{{ work.work.title }}</div>
           <div class="bottom">
@@ -31,13 +34,14 @@
 <script setup lang="ts">
   import UserAvatar from '../user/UserAvatar.vue';
   import WorkModal from '../work/WorkModal.vue';
+  import ImageContainer from '../common/ImageContainer.vue';
   import { EnhancedList } from '@/lib/list';
   import type { WorksSchema } from '@/api/type.ext';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen.ts';
   import { axiosProxy } from '@/api/axios.ts';
-  import { Config } from '@/config.ts';
 
+  const uploadUrl = import.meta.env.VITE_UPLOAD_URL
   const works = ref(new EnhancedList<WorksSchema>((work) => work.work.id, 10))
   const targetUserId = ref("")
   const worksType = ref("self")
@@ -137,17 +141,15 @@
       .real-card {
         display: flex;
         flex-direction: column;
-        img {
+        .work-image {
           width: 100%;
-          border-radius: 15px;
           min-height:160px;
           max-height: 280px;
           height: auto;
-          object-fit: cover;
           transition: all 0.3s ease-in-out;
           cursor: pointer;
         }
-        img:hover {
+        .work-image:hover {
           filter: brightness(0.85);
         }
         .text {

@@ -86,7 +86,7 @@ export class Server implements ServerPort {
          */
 
         /** 用户模块 */
-        routerProxy.get('/user/connect', null, null, userService.connect.bind(userService), true) // 建立长连接
+        routerProxy.post('/user/connect', null, null, userService.connect.bind(userService), true) // 建立长连接
         routerProxy.get('/user/init-data', null, getInitDataOutput, userService.getInitData.bind(userService)) // 获取初始化数据
         routerProxy.post('/sms/send', smsSendInput, null, userService.smsSend.bind(userService)) // 发送短信验证码
         routerProxy.post('/login', loginInput, loginOutput, userService.login.bind(userService)) // 登录
