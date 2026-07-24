@@ -1,11 +1,24 @@
 <template>
-  <div class="image-preview" @click.self="imagePreview.url.value = ''" v-show="imagePreview.url.value !== ''">
+  <div class="image-preview" v-show="imagePreview.url.value !== ''">
     <img :src="imagePreview.url.value" alt="预览图片" />
+    <div class="close-btn" @click="imagePreview.url.value = ''">
+      <AppIcon
+        type="close" 
+        size="30px" 
+        :fill="closeFillColor"
+        @mouseenter="closeFillColor = 'var(--root-gray-dark)'"
+        @mouseleave="closeFillColor = 'black'">
+      </AppIcon>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { imagePreview } from './global';
+  import AppIcon from '@/component/common/AppIcon.vue';
+  import { imagePreview } from '@/component/global/global';
+  import { ref } from 'vue';
+
+  const closeFillColor = ref('black');
 </script>
 
 <style scoped lang="scss">
@@ -15,15 +28,22 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.3);
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2;
     img {
       max-width: 90%;
       max-height: 90%;
       object-fit: contain;
+    }
+    .close-btn {
+      position: absolute;
+      top: 50px;
+      right: 50px;
+      cursor: pointer;
     }
   }
 </style>

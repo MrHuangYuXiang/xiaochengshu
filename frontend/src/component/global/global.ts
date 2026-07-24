@@ -8,8 +8,7 @@ class ImagePreview {
   }
 
   show(url: string): void {
-    this.url.value = url
-    console.log("显示预览图片:", url)
+    this.url.value = import.meta.env.VITE_UPLOAD_URL + url
   }
 }
 

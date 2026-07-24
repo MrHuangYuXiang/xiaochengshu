@@ -1,13 +1,16 @@
 <template>
   <BaseModal ref="modalRef">
     <div class="work-modal">
-      <div class="left" :style="{'background-image': `url(${uploadUrl}${work?.images[currentImageIndex]?.image_url || ''})`}">
-        <div class="switch-btn switch-prev" v-show="currentImageIndex > 0" @click="currentImageIndex -= 1">
-          <AppIcon type="chevron-left" :fill="'white'" />
-        </div>
-        <div class="switch-btn switch-next" v-show="currentImageIndex < work?.images.length! - 1" @click="currentImageIndex += 1">
-          <AppIcon type="chevron-right" :fill="'white'" />
-        </div>
+      <div class="left">
+        <ImageContainer
+          :src="work?.images[currentImageIndex]?.image_url || ''"
+          size="contain"
+          height="100%"
+          :enable-preview="true"
+          :enable-switch="true"
+          :total-count="work?.images.length"
+          @switch="(index) => { currentImageIndex = index }"
+        />
       </div>
       <div class="right">
         <div class="user">
@@ -125,6 +128,7 @@
   import CommentCard from './CommentCard.vue';
   import AppInput from '../common/AppInput.vue';
   import ScrollContainer from '../common/ScrollContainer.vue';
+  import ImageContainer from '../common/ImageContainer.vue';
   import { formatTime } from '@/helper/format';
   import { ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen';
@@ -134,7 +138,6 @@
   import { EnhancedList } from '@/lib/list.ts';
   import { ElMessage } from 'element-plus';
 
-  const uploadUrl = import.meta.env.VITE_UPLOAD_URL
   const textareaRef = useTemplateRef('textareaRef')
   const scrollContainerRef = useTemplateRef('scrollContainerRef')
   const modalRef = useTemplateRef('modalRef')
@@ -311,51 +314,9 @@
     display: flex;
     .left {
       flex: 7;
-      position: relative;
       height: 100%;
-      background-position: center center;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-color: var(--root-bg-gray);
       border-right: 1px solid #e5e5e5;
-      .switch-btn {
-        transition: all 0.3s ease-in-out;
-        position: absolute;
-        width: 30px;
-        aspect-ratio: 1 / 1;
-        top: 50%;
-        transform: translateY(-50%);
-        border-radius: 50%;
-        cursor: pointer;
-        visibility: hidden;
-        opacity: 0;
-        background: rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(1px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .switch-next {
-        right: 10px;
-        transform: translateX(7px);
-      }
-      .switch-prev {
-        left: 10px;
-        transform: translateX(-7px);
-      }
-      .switch-btn:hover {
-        background: rgba(0, 0, 0, 0.3);
-        transform: scale(1.1);
-      }
     }
-    .left:hover {
-      .switch-btn {
-        visibility: visible;
-        opacity: 1;
-        transform: translateX(0%);
-      }
-    }
-
     .right {
       position: relative;
       flex: 4;

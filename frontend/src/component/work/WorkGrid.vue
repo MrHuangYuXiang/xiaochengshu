@@ -7,13 +7,13 @@
     :style="{'grid-row-end': `span ${cssVarMap[work.work.id]}`}"
     >
       <div class="real-card" ref="cardContainerRefs" :id="work.work.id">
-        <div class="work-image">
-          <ImageContainer
-            :src="`${uploadUrl}${work.cover_image.image_url}`"
-            @click="async () => await workModalRef?.show(work.work.id)"
-            size="cover"
-          />
-        </div>
+        <ImageContainer
+          :src="`${work.cover_image.image_url}`"
+          minHeight="160px"
+          maxHeight="280px"
+          :enableHover="true"
+          @click="async () => await workModalRef?.show(work.work.id)"
+        />
         <div class="text" ref="textRefs">
           <div class="title">{{ work.work.title }}</div>
           <div class="bottom">
@@ -41,7 +41,6 @@
   import type { paths } from '@/api/gen.ts';
   import { axiosProxy } from '@/api/axios.ts';
 
-  const uploadUrl = import.meta.env.VITE_UPLOAD_URL
   const works = ref(new EnhancedList<WorksSchema>((work) => work.work.id, 10))
   const targetUserId = ref("")
   const worksType = ref("self")
@@ -141,17 +140,6 @@
       .real-card {
         display: flex;
         flex-direction: column;
-        .work-image {
-          width: 100%;
-          min-height:160px;
-          max-height: 280px;
-          height: auto;
-          transition: all 0.3s ease-in-out;
-          cursor: pointer;
-        }
-        .work-image:hover {
-          filter: brightness(0.85);
-        }
         .text {
           padding: 10px 15px;
           display: flex;

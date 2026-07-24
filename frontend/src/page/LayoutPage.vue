@@ -71,8 +71,6 @@
   const errorDialogContent = ref("")
   const errorDialogRef = useTemplateRef("errorDialogRef")
 
-  /** 以下为初始化逻辑 */
-
   const clickMenuItem = async (id: number) => {
     switch (id) {
       // 修改个人信息
