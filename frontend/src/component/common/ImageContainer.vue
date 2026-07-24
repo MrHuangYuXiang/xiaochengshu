@@ -11,10 +11,10 @@
         }"
         @click.self="clickImage"
     >
-        <div class="switch-btn switch-prev" v-show="currentIndex > 0" @click="switchImage(currentIndex - 1)">
+        <div class="switch-btn switch-prev" v-show="props.currentIndex > 0" @click="emits('switch', props.currentIndex - 1)">
           <AppIcon type="chevron-left" :fill="'white'" />
         </div>
-        <div class="switch-btn switch-next" v-show="currentIndex < props.totalCount - 1" @click="switchImage(currentIndex + 1)">
+        <div class="switch-btn switch-next" v-show="props.currentIndex < props.totalCount - 1" @click="emits('switch', props.currentIndex + 1)">
           <AppIcon type="chevron-right" :fill="'white'" />
         </div>
     </div>
@@ -23,9 +23,7 @@
 <script setup lang="ts">
     import AppIcon from '../common/AppIcon.vue';
     import { imagePreview } from "@/component/global/global"
-    import { ref } from "vue"
 
-    const currentIndex = ref(0)
     const uploadUrl = import.meta.env.VITE_UPLOAD_URL
     const props = defineProps({
         src: {
@@ -65,6 +63,11 @@
             type: Boolean,
             default: false,
         },
+        // 当前显示的图片索引
+        currentIndex: {
+            type: Number,
+            default: 0,
+        },
         // 图片总数量,开启切换功能必须传入!
         totalCount: {
             type: Number,
@@ -81,12 +84,6 @@
         if (props.enablePreview && props.src) {
             imagePreview.show(props.src)
         }
-    }
-
-    // 点击切换按钮
-    const switchImage = (index: number) => {
-        currentIndex.value = index
-        emits('switch', index)
     }
 </script>
 

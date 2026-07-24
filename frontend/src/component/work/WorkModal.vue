@@ -8,6 +8,7 @@
           height="100%"
           :enable-preview="true"
           :enable-switch="true"
+          :current-index="currentImageIndex"
           :total-count="work?.images.length"
           @switch="(index) => { currentImageIndex = index }"
         />
@@ -130,13 +131,20 @@
   import ScrollContainer from '../common/ScrollContainer.vue';
   import ImageContainer from '../common/ImageContainer.vue';
   import { formatTime } from '@/helper/format';
-  import { ref, useTemplateRef } from 'vue';
+  import { onMounted, ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen';
   import type { workCommentSchema, WorkSchema } from '@/api/type.ext'
   import { Forest } from '@/lib/tree';
   import { axiosProxy } from '@/api/axios.ts';
   import { EnhancedList } from '@/lib/list.ts';
   import { ElMessage } from 'element-plus';
+
+  const props = defineProps({
+    workId: {
+      type: String,
+      default: '',
+    },
+  })
 
   const textareaRef = useTemplateRef('textareaRef')
   const scrollContainerRef = useTemplateRef('scrollContainerRef')
