@@ -9,10 +9,9 @@
       <div class="real-card" ref="cardContainerRefs" :id="work.work.id">
         <ImageContainer
           :src="`${work.cover_image.image_url}`"
-          minHeight="160px"
-          maxHeight="280px"
+          class="image"
           :enableHover="true"
-          @click="async () => await workModalRef?.show(work.work.id)"
+          @click="currentWorkId = work.work.id; showWorkModal = true"
         />
         <div class="text" ref="textRefs">
           <div class="title">{{ work.work.title }}</div>
@@ -28,7 +27,7 @@
   </div>
 
   <!-- 作品弹窗 -->
-  <WorkModal ref="workModalRef"/>
+  <WorkModal v-if="showWorkModal" :workId="currentWorkId" @close="showWorkModal = false" />
 </template>
 
 <script setup lang="ts">
@@ -44,9 +43,10 @@
   const works = ref(new EnhancedList<WorksSchema>((work) => work.work.id, 10))
   const targetUserId = ref("")
   const worksType = ref("self")
-  const workModalRef = useTemplateRef("workModalRef")
+  const showWorkModal = ref(false)
+  const currentWorkId = ref("")
 
-   onMounted(async () => {
+  onMounted(async () => {
     // 监听子节点数量改变,实时计算dom元素高度
     mutationObserver.observe(workGridRef.value!, {
       childList: true,
@@ -140,6 +140,12 @@
       .real-card {
         display: flex;
         flex-direction: column;
+        .image {
+          width: 100%;
+          max-height: 280px;
+          min-height: 160px;
+          background-size: cover;
+        }
         .text {
           padding: 10px 15px;
           display: flex;

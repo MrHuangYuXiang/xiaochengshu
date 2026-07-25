@@ -8,7 +8,7 @@ class ImagePreview {
   }
 
   show(url: string): void {
-    this.url.value = import.meta.env.VITE_UPLOAD_URL + url
+    this.url.value = url
   }
 }
 

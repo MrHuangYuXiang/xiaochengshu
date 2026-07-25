@@ -2,12 +2,7 @@
     <div 
         :class="{'image': true, 'hoverable': props.enableHover}"
         :style="{
-            backgroundImage: `url(${uploadUrl}${props.src})`,
-            backgroundSize: props.size,
-            backgroundPosition: 'center',
-            height: props.height,
-            maxHeight: props.maxHeight,
-            minHeight: props.minHeight,
+            backgroundImage: `url(${getImageUrl()})`,
         }"
         @click.self="clickImage"
     >
@@ -17,6 +12,7 @@
         <div class="switch-btn switch-next" v-show="props.currentIndex < props.totalCount - 1" @click="emits('switch', props.currentIndex + 1)">
           <AppIcon type="chevron-right" :fill="'white'" />
         </div>
+        <slot></slot>
     </div>
 </template>
 
@@ -28,22 +24,12 @@
     const props = defineProps({
         src: {
              type: String,
+             default: "",
         },
-        size: {
-            type: String,
-            default: "cover",
-        },
-        height: {
-            type: String,
-            default: "auto"
-        },
-        maxHeight: {
-            type: String,
-            default: "auto"
-        },
-        minHeight: {
-            type: String,
-            default: "auto"
+        // 是否为后端upload图片
+        isUploadImage: {
+            type: Boolean,
+            default: true,
         },
 
         // 是否开启hover效果
@@ -82,7 +68,16 @@
     // 点击图片
     const clickImage = () => {
         if (props.enablePreview && props.src) {
-            imagePreview.show(props.src)
+            imagePreview.show(getImageUrl())
+        }
+    }
+
+    // 图片url
+    const getImageUrl = () => {
+        if (props.isUploadImage) {
+            return `${uploadUrl}${props.src}`
+        } else {
+            return props.src
         }
     }
 </script>
@@ -90,7 +85,6 @@
 <style scoped lang="scss">
     .image {
         position: relative;
-        width: 100%;
         border-radius: 15px;
         transition: all 0.3s ease-in-out;
         background-position: center center;

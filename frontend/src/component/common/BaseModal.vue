@@ -1,5 +1,5 @@
 <template>
-  <div @click.self="() => {if (props.canClose) close()}"  :class="{'show': isShow, 'modal-background': true}" v-show="isShow">
+  <div @click.self="close"  class="modal-background">
     <div
     class='modal'
     :style="{ width: width, height: height }"
@@ -13,9 +13,6 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-
-  const isShow = ref(false)
   const props = defineProps({
     // 模态框是否可以关闭
     canClose: {
@@ -42,22 +39,12 @@
     }
   })
 
-  // 以下为组件暴露方法
+  const emits = defineEmits(['close'])
 
-  /** 关闭弹窗 */
+  // 点击弹窗外部关闭弹窗
   const close = () => {
-    isShow.value = false
+    if (props.canClose) emits('close')
   }
-
-  /** 显示弹窗 */
-  const show = () => {
-    isShow.value = true
-  }
-
-  defineExpose({
-    close,
-    show
-  })
 </script>
 
 <style scoped lang="scss">
@@ -107,9 +94,5 @@
         }
       }
     }
-  }
-  .modal-background.show {
-    // visibility: visible;
-    // opacity: 1;
   }
 </style>

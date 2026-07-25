@@ -4,7 +4,7 @@
     <div
       class="avatar"
       :style="{
-        backgroundImage: `url(${uploadUrl}${props.imgUrl})`,
+        backgroundImage: `url(${getAvatarUrl()})`,
       }"
       @click="click"
     >
@@ -17,7 +17,6 @@
 <script setup lang="ts">
   import { useTemplateRef } from 'vue';
   import { useRouter } from 'vue-router';
-  import ImageContainer from '@/component/common/ImageContainer.vue'
 
   const uploadUrl = import.meta.env.VITE_UPLOAD_URL
   const router = useRouter()
@@ -63,6 +62,10 @@
   const change = () => {
     const file = inputRef.value!.files![0]
     emits('change', file)
+  }
+
+  const getAvatarUrl = () => {
+    return props.imgUrl === "" ? "'/images/defaultAvatar.png'" : `${uploadUrl}${props.imgUrl}`
   }
 
 </script>

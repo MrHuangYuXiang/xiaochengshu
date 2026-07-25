@@ -12,30 +12,34 @@
         </div>
         <div class="form-item">
           <div class="item-label">设置封面</div>
-          <div :class="{'cover-image': true, 'none': coverImage === null}" :style="{ backgroundImage: `url(${coverImage?.url || ''})` }">
+          <div
+            :class="{'cover-image': true, 'none': coverImage === null}" 
+            :style="{ backgroundImage: `url(${coverImage?.url || ''})` }"
+          >
             <span v-show="coverImage === null">请选择封面图片</span>
-          </div>
+        </div>
         </div>
         <div class="form-item">
           <div class="item-label">文章图片</div>
           <div class="image-uploader">
             <input type="file" accept="image/jpeg"  style="display: none;" ref="inputRef" @change="changeFile" multiple />
-            <div
+            <ImageContainer
             class="item image"
             v-for="(file, index) in files"
             :key="file.url!"
-            :style="{ backgroundImage: `url(${file.url})` }"
+            :src="file.url"
+            :is-upload-image="false"
             >
               <div class="image-options" @click.self="imagePreview.show(file.url)">
                   <div class="image-option" @click="setCover(file.file, file.url, index)">设为封面</div>
                   <div class="image-option" @click="deleteImage(file.file, file.url, index)">删除</div>
               </div>
-            </div>
+            </ImageContainer>
             <div
-            class="item upload-btn"
-            @mouseenter="uploadBtnFill = 'var(--root-orange)'"
-            @mouseleave="uploadBtnFill = 'var(--root-gray)'"
-            @click="inputRef?.click()"
+              class="item upload-btn"
+              @mouseenter="uploadBtnFill = 'var(--root-orange)'"
+              @mouseleave="uploadBtnFill = 'var(--root-gray)'"
+              @click="inputRef?.click()"
             >
               <AppIcon type="plus" :fill="uploadBtnFill" />
             </div>
@@ -64,10 +68,11 @@
   import AppSegment from '@/component/common/AppSegment.vue';
   import AppButton from '@/component/common/AppButton.vue';
   import AppIcon from '@/component/common/AppIcon.vue';
+  import ImageContainer from '@/component/common/ImageContainer.vue';
   import { ElMessage } from 'element-plus';
   import { axiosProxy } from '@/api/axios';
   import { imagePreview } from '@/component/global/global';
-import { validateForm } from '@/helper/form';
+  import { validateForm } from '@/helper/form';
 
   const titleInputRef = useTemplateRef("titleInputRef");
   const contentInputRef = useTemplateRef("contentInputRef");
@@ -246,6 +251,7 @@ import { validateForm } from '@/helper/form';
           max-width: 150px;
           flex: 1;
           border-radius: 10px;
+          background-size: cover;
         }
         .upload-btn {
           display: flex;

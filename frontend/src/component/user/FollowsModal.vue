@@ -1,5 +1,5 @@
 <template>
-  <BaseModal ref="baseModalRef">
+  <BaseModal @close="emits('close')">
     <ScrollContainer ref="scrollContainerRef" :load-more-callback="getUserFollows">
       <div class="follows-modal">
         <div class="top">{{ type === "following" ? "关注" : "粉丝" }} {{ `(${allCount})` }}</div>
@@ -21,13 +21,30 @@
 <script setup lang="ts">
   import UserCard from './UserCard.vue';
   import ScrollContainer from '../common/ScrollContainer.vue';
-  import { ref, useTemplateRef } from 'vue';
-  import BaseModal from '../modal/BaseModal.vue';
+  import { onMounted, ref, useTemplateRef } from 'vue';
+  import BaseModal from '../common/BaseModal.vue';
   import { axiosProxy } from '@/api/axios.ts';
   import type { paths } from '@/api/gen.ts';
   import { EnhancedList } from '@/lib/list.ts';
 
-  const baseModalRef = useTemplateRef("baseModalRef")
+  const props = defineProps({
+    /** 
+     * 弹窗类型
+     * following: 关注
+     * follower: 粉丝
+     */
+    type: {
+      type: String,
+      default: "following",
+    },
+    userId: {
+      type: String,
+      default: "",
+    }
+  })
+
+  const emits = defineEmits(["close"])
+
   const scrollContainerRef = useTemplateRef("scrollContainerRef")
   const users = ref<EnhancedList<
     paths["/user/follows"]["get"]["responses"]["200"]["content"]["application/json"]["users"][number]
@@ -39,8 +56,6 @@
       10,
     )
   )
-  const type = ref("following")
-  const userId = ref("")
   const allCount = ref(0)
 
   const getUserFollows = async () => {
@@ -51,8 +66,8 @@
       >(`/user/follows`, {
         page: currentPage,
         pageSize: pageSize,
-        type: type.value,
-        userId: userId.value,
+        type: props.type,
+        userId: props.userId,
       })
       allCount.value = res.count
       return res.users
@@ -65,17 +80,9 @@
     users.value.update(res.user.id, res.user)
   }
 
-  /** 以下为组件暴露方法 */
-  const show = async (typeString: "following" | "follower", userIdString: string) => {
-    type.value = typeString
-    userId.value = userIdString
-    users.value.clear()
+  // 挂载后获取关注/粉丝信息
+  onMounted(async () => {
     await getUserFollows()
-    baseModalRef.value!.show()
-  }
-
-  defineExpose({
-    show,
   })
 </script>
 

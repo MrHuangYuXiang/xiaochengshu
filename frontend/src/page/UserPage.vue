@@ -1,6 +1,12 @@
 <template>
   <!-- 关注/粉丝列表弹窗 -->
-  <FollowsModal ref="followsModalRef" width="30vw" />
+  <FollowsModal 
+    v-if="enableFollowsModalShow" 
+    width="30vw"
+    :type="followsModalType" 
+    :userId="user?.user.id" 
+    @close="enableFollowsModalShow = false"
+  />
 
   <ScrollContainer :loadMoreCallback="loadMore" ref="scrollContainerRef">
     <div class="container">
@@ -56,10 +62,12 @@
   const route = useRoute();
   const user = ref<paths["/user"]["get"]["responses"]["200"]["content"]["application/json"]>()
   const workGridRef = useTemplateRef("workGridRef")
-  const followsModalRef = useTemplateRef("followsModalRef")
   const scrollContainerRef = useTemplateRef("scrollContainerRef")
   // 当前作品类型
   const currentWorksType = ref("self")
+  const enableFollowsModalShow = ref(false)
+  // 关注/粉丝弹窗类型
+  const followsModalType = ref("following")
 
   // 挂载钩子
   onMounted(async () => {
@@ -92,7 +100,8 @@
 
   // 展示关注/粉丝列表弹窗
   const showFollowsModal = async (type: "following" | "follower", userId: string) => {
-    await followsModalRef.value?.show(type, userId)
+    followsModalType.value = type
+    enableFollowsModalShow.value = true
   }
 
   // 关注

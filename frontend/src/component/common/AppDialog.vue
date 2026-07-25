@@ -3,20 +3,18 @@
     :can-close="false"
     width="30vw"
     height="30vh"
-    ref="baseModalRef"
   >
     <div class="dialog">
       <div>{{ props.content }}</div>
       <div class="btn-group">
-        <AppButton text="确定" @click="confirm" />
+        <AppButton text="确定" @click="emits('close')" />
       </div>
     </div>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
-  import { useTemplateRef } from 'vue';
-  import BaseModal from '../modal/BaseModal.vue';
+  import BaseModal from './BaseModal.vue';
   import AppButton from './AppButton.vue';
 
   const props = defineProps({
@@ -24,27 +22,7 @@
       type: String,
     },
   })
-  const emits = defineEmits(['confirm'])
-  const baseModalRef = useTemplateRef("baseModalRef")
-
-  const confirm = () => {
-    emits('confirm')
-    close()
-  }
-
-  /** 以下为组件暴露方法 */
-  const close = () => {
-    baseModalRef.value?.close()
-  }
-
-  const show = () => {
-    baseModalRef.value?.show()
-  }
-
-  defineExpose({
-    close,
-    show,
-  })
+  const emits = defineEmits(['close'])
 </script>
 
 <style scoped lang="css">

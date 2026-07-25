@@ -1,11 +1,16 @@
+<!--
+  所有弹窗相关组件使用v-if控制渲染,提供close事件,
+  通过setup直接重置初始数据,防止手动控制各种复杂字
+  段状态导致的问题
+-->
+
 <template>
-  <BaseModal ref="modalRef">
+  <BaseModal @close="emits('close')">
     <div class="work-modal">
       <div class="left">
         <ImageContainer
+          class="image"
           :src="work?.images[currentImageIndex]?.image_url || ''"
-          size="contain"
-          height="100%"
           :enable-preview="true"
           :enable-switch="true"
           :current-index="currentImageIndex"
@@ -122,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-  import BaseModal from '../modal/BaseModal.vue';
+  import BaseModal from '../common/BaseModal.vue';
   import UserCard from '../user/UserCard.vue';
   import AppIcon from '../common/AppIcon.vue';
   import AppButton from '../common/AppButton.vue';
@@ -146,9 +151,10 @@
     },
   })
 
+  const emits = defineEmits(['close'])
+
   const textareaRef = useTemplateRef('textareaRef')
   const scrollContainerRef = useTemplateRef('scrollContainerRef')
-  const modalRef = useTemplateRef('modalRef')
   const work = ref<WorkSchema>()
   const comments = ref(
     new EnhancedList<workCommentSchema>((item: workCommentSchema) => {
@@ -190,7 +196,7 @@
       >(`/work/comments`, {
         page: currentPage,
         pageSize: pageSize,
-        workId: work.value!.work.id,
+        workId: props.workId,
         type: "top",
         rootCommentId: '',
       })
@@ -285,34 +291,19 @@
     }
   }
 
-  // 以下为组件暴露方法
-
-  /** 显示弹窗 */
-  const show = async (workId: string) => {
-    // 清理旧资源
-    comments.value.clear()
-    repliesMap.value.clear()
-    currentImageIndex.value = 0
-    scrollContainerRef.value?.reset()
-
+  // 挂载后加载作品和评论信息
+  onMounted(async () => {
     // 获取作品详情
     work.value = await axiosProxy.get<
       paths["/work"]["get"]["parameters"]["query"],
       paths["/work"]["get"]["responses"]["200"]["content"]["application/json"]
     >(`/work`, {
-      workId: workId
+      workId: props.workId
     })
 
     // 获取评论
     await getTopComments()
-
-    modalRef.value?.show()
-  }
-
-  defineExpose({
-    show
   })
-
 </script>
 
 <style scoped lang="scss">
@@ -324,6 +315,11 @@
       flex: 7;
       height: 100%;
       border-right: 1px solid #e5e5e5;
+      .image {
+        width: 100%;
+        height: 100%;
+        background-size: contain;
+      }
     }
     .right {
       position: relative;

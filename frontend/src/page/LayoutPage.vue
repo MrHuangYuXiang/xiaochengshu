@@ -1,10 +1,10 @@
 <template>
   <!-- 初始化用户弹窗 -->
-  <InitUserModal ref="initUserModalRef"></InitUserModal>
+  <InitUserModal v-if="enableInitUserModalShow" @close="enableInitUserModalShow = false"></InitUserModal>
   <!-- 更新用户信息弹窗 -->
-  <UpdateUserModal ref="updateUserModalRef"></UpdateUserModal>
+  <UpdateUserModal v-if="enableUpdateUserModalShow" @close="enableUpdateUserModalShow = false"></UpdateUserModal>
   <!-- 事件推送错误对话框 -->
-  <AppDialog ref="errorDialogRef" :content="errorDialogContent" @confirm="confirmErrorDialog"></AppDialog>
+  <AppDialog v-if="enableErrorDialogShow" :content="errorDialogContent" @close="confirmErrorDialog"></AppDialog>
 
   <div class="layout">
     <div class="top">
@@ -64,18 +64,18 @@
     { id: 1, label: "个人信息" },
     { id: 2, label: "退出登录" },
   ]
-  const initUserModalRef = useTemplateRef("initUserModalRef")
-  const updateUserModalRef = useTemplateRef("updateUserModalRef")
-
+  const enableInitUserModalShow = ref(false)
+  const enableUpdateUserModalShow = ref(false)
+  const enableErrorDialogShow = ref(false)
   // 错误对话框内容
   const errorDialogContent = ref("")
-  const errorDialogRef = useTemplateRef("errorDialogRef")
+
 
   const clickMenuItem = async (id: number) => {
     switch (id) {
       // 修改个人信息
       case 1:
-        updateUserModalRef.value?.show()
+        enableUpdateUserModalShow.value = true
         break
 
       // 退出登录
@@ -88,6 +88,7 @@
   }
 
   const confirmErrorDialog = async () => {
+    enableErrorDialogShow.value = false
     await router.push({ name: "LoginPage" });
   }
 
@@ -101,7 +102,7 @@
         // 接收到错误,清理相关资源,由于后端主动断开tcp连接,客户端不需要主动断
         errorDialogContent.value = (data as components["schemas"]["errorHttpEvent"]).msg
         storage.clear()
-        errorDialogRef.value?.show()
+        enableErrorDialogShow.value = true
       }
     )
 
@@ -126,7 +127,7 @@
     // 如果新用户个人信息未完善,显示弹窗
     if (storage.initData.value?.user.is_profile_completed === 0) {
       setTimeout(() => {
-        initUserModalRef.value?.show()
+        enableInitUserModalShow.value = true
       },500)
     }
   })

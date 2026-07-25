@@ -1,5 +1,5 @@
 <template>
-  <BaseModal ref="baseModalRef" width="50vw" height="90vh" :stepTotal="3" :stepIndex="activeIndex" :canClose="false">
+  <BaseModal width="50vw" height="90vh" :stepTotal="3" :stepIndex="activeIndex" :canClose="false">
     <div class="container">
       <div :class="{'step': true, 'active': activeIndex === 1}">
         <div>先起一个名字吧!</div>
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
   import { ref, useTemplateRef } from 'vue';
-  import BaseModal from '../modal/BaseModal.vue';
+  import BaseModal from '../common/BaseModal.vue';
   import UserAvatar from './UserAvatar.vue';
   import AppInput from '../common/AppInput.vue';
   import AppButton from '../common/AppButton.vue';
@@ -42,8 +42,9 @@
   import { axiosProxy } from '@/api/axios.ts';
   import type { paths } from '@/api/gen.ts';
 
+  const emits = defineEmits(['close'])
+
   const activeIndex = ref(1)
-  const baseModalRef = useTemplateRef("baseModalRef")
   const form = ref<
   {
     name: string,
@@ -96,7 +97,7 @@
           paths["/update/user/info"]["post"]["requestBody"]["content"]["application/json"],
           paths["/update/user/info"]["post"]["responses"]["200"]["content"]["application/json"]
         >('/update/user/info', form.value)
-        baseModalRef.value?.close()
+        emits('close')
         break
     }
   }
@@ -107,18 +108,6 @@
     await axiosProxy.post('/upload/user/avatar', formData)
     storage.updateUserAvatarUrl()
   }
-
-  /**
-   * 以下为组件暴露方法
-   */
-  const show = () => {
-    baseModalRef.value?.show()
-  }
-
-  defineExpose({
-    show,
-    close
-  })
 </script>
 
 <style scoped lang="scss">
