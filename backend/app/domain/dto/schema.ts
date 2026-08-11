@@ -83,34 +83,23 @@ export const workCommentSchema = {
     root_comment_id: stringType,
 }
 
-// 聊天会话模型
-export const chatConversationSchema = objectType({
+// 会话模型
+export const chatSessionSchema = objectType({
     ...baseSchema,
-    type: numberType,
-    last_chat_message: stringType,
 })
 
-// 聊天会话成员模型
-export const chatConversationMemberSchema = objectType({
+// 会话成员模型
+export const chatSessionMemberSchema = objectType({
     ...baseSchema,
-    conversation_id: stringType,
+    session_id: stringType,
     user_id: stringType,
     last_read_time: dateType,
-    unread_message_count: numberType,
 })
 
-// 聊天消息模型
-export const chatConversionMessageSchema = objectType({
+// 消息模型
+export const chatMessageSchema = objectType({
     ...baseSchema,
-    conversation_id: stringType,
-    conversion_member_id: stringType,
-    user_id: stringType,
+    session_id: stringType,
+    session_member_id: stringType,
     content: stringType,
 })
-
-// 聊天消息聚合模型
-export const chatMessageAggSchema = {
-    message: chatConversionMessageSchema,
-    user: userSchema,
-    isCurrentUserMessage: numberType,
-}

@@ -1,6 +1,7 @@
 import { corsMiddleware, middlewareWrapper } from "./middleware.js"
-import { newUserService, UserService } from "./domain/service/user.js"
-import { newWorkService } from "./domain/service/work.js"
+import { UserService } from "./domain/service/user.js"
+import { ChatService } from "./domain/service/chat.js"
+import { WorkService } from "./domain/service/work.js"
 import {
     getWorksInput,
     createWorkCommentInput,
@@ -35,6 +36,8 @@ import { doc } from "./doc.js"
 import { z } from "zod"
 import { newLocalMutex } from "./io/adapter/mutex.js"
 import { newNginxFileStorage } from "./io/adapter/file_storage.js"
+import { MemIncGenerator } from "./io/adapter/IncGenerator.js"
+import { createSessionInput, createSessionOutput, getSessionsInput, getSessionsOutput } from "./domain/dto/chat.js"
 
 export interface ServerPort {
     Run(): void
@@ -70,11 +73,14 @@ export class Server implements ServerPort {
     async Run() {
         const app = express()
         const routerProxy = new RouterProxy()
-        
+
         const mutex = newLocalMutex()
         const fileStorage = newNginxFileStorage()
-        const userService = await newUserService(mutex, fileStorage)
-        const workService = await newWorkService(fileStorage)
+        const incGenerator = new MemIncGenerator()
+
+        const chatService = new ChatService(incGenerator)
+        const userService = new UserService(mutex, fileStorage)
+        const workService = new WorkService(fileStorage)
 
         // express中间件注册
         routerProxy.router.use(express.json())
@@ -107,7 +113,9 @@ export class Server implements ServerPort {
         // routerProxy.post('/collect/work/:workId', collectWorkInput, null, workService.collectWork.bind(workService)) // 收藏作品
         // routerProxy.post('/like/work/:workId/comment/:commentId', likeWorkCommentInput, null, workService.likeWorkComment.bind(workService)) // 点赞评论
 
-        /** 聊天模块 TODO: 待开发*/
+        /** 聊天模块 */
+        routerProxy.post('/create/chat/session', createSessionInput, createSessionOutput, chatService.createSession.bind(chatService)) // 创建会话
+        routerProxy.get('/chat/sessions', getSessionsInput, getSessionsOutput, chatService.getSessions.bind(chatService)) // 查询会话
 
         /** 直播模块 TODO: 待开发 */
 

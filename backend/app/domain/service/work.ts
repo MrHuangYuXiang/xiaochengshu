@@ -22,10 +22,8 @@ import { v4 as uuidv4 } from "uuid";
 import { getPageParams } from "../../helper/http.js";
 import { handleRawSqlRes } from "../../helper/sql.js";
 import { FormParser, MemoryWritableStream } from "../../form_parser.js";
-import { getEnv } from "../../helper/env.js";
 import { getFollowRelationSubQuery } from "./common.js";
 import type { FileStoragePort } from "../../io/port/file_storage.js";
-import { newNginxFileStorage } from "../../io/adapter/file_storage.js";
 
 export class WorkService {
   private fileStorage: FileStoragePort
@@ -533,9 +531,4 @@ export class WorkService {
 
     res.json(null)
   }
-}
-
-export async function newWorkService(fileStorage: FileStoragePort) {
-  const workService = new WorkService(fileStorage)
-  return workService
 }

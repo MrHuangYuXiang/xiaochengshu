@@ -25,12 +25,10 @@ import type { MutexPort } from "../../io/port/mutex.js";
 import { v4 as uuidv4 } from "uuid";
 import { httpResponseMap } from "../../http_event.js";
 import { heartbeatHttpEvent, HttpEventType } from "../dto/http_event.js";
-import { newLocalMutex } from "../../io/adapter/mutex.js";
 import { AppError } from "../../error.js";
 import { getPageParams } from "../../helper/http.js";
 import { getFollowRelationSubQuery } from "./common.js";
 import type { FileStoragePort } from "../../io/port/file_storage.js";
-import { newNginxFileStorage } from "../../io/adapter/file_storage.js";
 
 export class UserService {
     private mutex: MutexPort
@@ -336,8 +334,4 @@ export class UserService {
         }
         return user[0]
     }
-}
-
-export const newUserService = async (mutex: MutexPort, fileStorage: FileStoragePort) => {
-    return new UserService(mutex, fileStorage)
 }
