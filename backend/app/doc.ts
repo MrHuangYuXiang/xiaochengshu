@@ -1,6 +1,6 @@
 import { z } from "zod"
 import fs from "fs"
-import { httpEvents } from "./domain/dto/http_event.js"
+import { httpEvents } from "./domain/dto/client.js"
 
 class Doc {
     private doc: {

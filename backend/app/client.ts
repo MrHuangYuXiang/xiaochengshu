@@ -1,10 +1,10 @@
 /*
-该文件用来定义http事件推送相关,包括消息类型枚举和http响应实例映射表 
+该文件用来定义客户端事件推送相关,包括消息类型枚举和express响应实例映射表
 */
 
 import type { Response } from "express"
 
-class HttpResponseMap {
+class ClientResponseMap {
     public map: Map<string, Response>;
 
     constructor() {
@@ -41,4 +41,4 @@ class HttpResponseMap {
     }
 }
 
-export const httpResponseMap = new HttpResponseMap();
+export const clientResponseMap = new ClientResponseMap();

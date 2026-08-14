@@ -23,8 +23,8 @@ import { getEnv } from "../../helper/env.js";
 import { FormParser } from "../../form_parser.js";
 import type { MutexPort } from "../../io/port/mutex.js";
 import { v4 as uuidv4 } from "uuid";
-import { httpResponseMap } from "../../http_event.js";
-import { heartbeatHttpEvent, HttpEventType } from "../dto/http_event.js";
+import { clientResponseMap } from "../../client.js";
+import { heartbeatClientEvent, HttpEventType } from "../dto/client.js";
 import { AppError } from "../../error.js";
 import { getPageParams } from "../../helper/http.js";
 import { getFollowRelationSubQuery } from "./common.js";
@@ -105,19 +105,19 @@ export class UserService {
 
         // 在线状态通过httpResponseMap维护,加锁避免高并发单用户同时在线问题
         await this.mutex.withLock(`online:${current.userId}`, async () => {
-            if (!httpResponseMap.get(current.userId)) {
-                httpResponseMap.add(current.userId, res)
+            if (!clientResponseMap.get(current.userId)) {
+                clientResponseMap.add(current.userId, res)
             } else {
                 throw new AppError("用户已在线")
             }
         })
 
         // 后端维持心跳,同时续约jwt
-        httpResponseMap.push(current.userId, HttpEventType.heartbeat, heartbeatHttpEvent.parse({
+        clientResponseMap.push(current.userId, HttpEventType.heartbeat, heartbeatClientEvent.parse({
             jwt: genJWT(current.userId),
         }))
         const n = setInterval(() => {
-            httpResponseMap.push(current.userId, HttpEventType.heartbeat, heartbeatHttpEvent.parse({
+            clientResponseMap.push(current.userId, HttpEventType.heartbeat, heartbeatClientEvent.parse({
                 jwt: genJWT(current.userId),
             }))
         }, parseInt(getEnv("PERSISTENT_HEARTBEAT_INTERVAL")))
@@ -125,7 +125,7 @@ export class UserService {
         // 监听客户端关闭连接,清理相关资源
         req.on("close", () => {
             console.log(`用户${current.userId}的长连接已关闭`);
-            httpResponseMap.del(current.userId)
+            clientResponseMap.del(current.userId)
             clearInterval(n)
         });
     }

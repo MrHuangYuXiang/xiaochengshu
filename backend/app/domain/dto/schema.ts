@@ -96,10 +96,12 @@ export const chatSessionMemberSchema = objectType({
     last_read_time: dateType,
 })
 
-// 消息模型
+// 聊天消息模型
 export const chatMessageSchema = objectType({
     ...baseSchema,
     session_id: stringType,
     session_member_id: stringType,
+    user_id: stringType,
     content: stringType,
+    inc_seq: numberType,
 })
