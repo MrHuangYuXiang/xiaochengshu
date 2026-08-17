@@ -19,11 +19,13 @@ import {
   createWorkCommentInput,
 } from "../dto/work.js";
 import { v4 as uuidv4 } from "uuid";
-import { getPageParams } from "../../helper/http.js";
+import { getImageExt, getPageParams } from "../../helper/http.js";
 import { handleRawSqlRes } from "../../helper/sql.js";
 import { FormParser, MemoryWritableStream } from "../../form_parser.js";
 import { getFollowRelationSubQuery } from "./common.js";
 import type { FileStoragePort } from "../../io/port/file_storage.js";
+import type { FormFieldHeader } from "../../form_parser.js";
+import { AppError } from "../../error.js";
 
 export class WorkService {
   private fileStorage: FileStoragePort
@@ -215,38 +217,33 @@ export class WorkService {
     const contentStream = new MemoryWritableStream()
     const permissionStream = new MemoryWritableStream()
     const workImageCountStream = new MemoryWritableStream()
+    const images: Array<typeof workImageTable.$inferInsert> = []
 
-    await formParser.exec(titleStream)
-    await formParser.exec(contentStream)
-    await formParser.exec(permissionStream)
-    await formParser.exec(workImageCountStream)
+    await formParser.exec(async () => titleStream)
+    await formParser.exec(async () => contentStream)
+    await formParser.exec(async () => permissionStream)
+    await formParser.exec(async () => workImageCountStream)
     const workImageCount = workImageCountStream.getNumber()
 
     if (workImageCount === 0) {
-      throw new Error("至少上传一张图片")
+      throw new AppError("请至少上传一张图片")
     }
 
     // 解析图片流并写入文件
     for (let i = 0; i < workImageCount; i++) {
-      const imagePath = `/work_images/${workId}_${i}.jpg`
-      const workImageStream = await this.fileStorage.getWritableStream(imagePath)
-      await formParser.exec(workImageStream)
+      await formParser.exec(async (fieldHeader: FormFieldHeader) => {
+        const ext = await getImageExt(fieldHeader)
+        const fileName = `/work_images/${workId}_${i}${ext}`
+        images.push({
+          id: i === 0 ? coverImageId : uuidv4(),
+          work_id: workId,
+          image_url: fileName,
+        })
+        return await this.fileStorage.getWritableStream(fileName)
+      })
     }
 
     // 数据库插入图片信息
-    const images = []
-    for (let i = 0; i < workImageCount; i++) {
-      const image = {
-        id: uuidv4(),
-        work_id: workId,
-        image_url: this.fileStorage.getFilePath(`/work_images/${workId}_${i}.jpg`),
-      }
-
-      if (i === 0) {
-        image.id = coverImageId
-      }
-      images.push(image)
-    }
     await current.tx.insert(workImageTable).values(images)
 
     // 数据库插入作品

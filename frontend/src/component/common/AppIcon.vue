@@ -1,5 +1,8 @@
 <template>
-  <div class="icon" :style="{ fill: props.fill }">
+  <div 
+    class="icon"
+    :style="{ fill: props.fill, width: props.size, height: props.size }"
+  >
     <svg class="heart" viewBox="0 0 16 16" v-if="props.type === 'heart'" transform="translate(0, 1.2)">
       <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
     </svg>
@@ -42,6 +45,9 @@
     <svg class="male" viewBox="0 0 16 16" v-if="props.type === 'male'">
       <path fill-rule="evenodd" d="M9.5 2a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V2.707L9.871 6.836a5 5 0 1 1-.707-.707L13.293 2zM6 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8"/>
     </svg>
+    <svg class="bi bi-x-lg" viewBox="0 0 16 16" v-if="props.type === 'close'">
+      <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+    </svg>
   </div>
 </template>
 
@@ -57,6 +63,12 @@
     fill: {
       type: String,
       default: 'var(--root-gray)'
+    },
+
+    // 图标大小(单位px)
+    size: {
+      type: String,
+      default: '12px'
     }
   })
 </script>
@@ -66,10 +78,5 @@
     display: flex;
     align-items: center;
     gap: 2px;
-    transition: all 0.3s ease-in-out;
-    svg {
-      width: 12px;
-      height: 12px;
-    }
   }
 </style>

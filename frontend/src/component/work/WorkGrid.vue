@@ -7,9 +7,11 @@
     :style="{'grid-row-end': `span ${cssVarMap[work.work.id]}`}"
     >
       <div class="real-card" ref="cardContainerRefs" :id="work.work.id">
-        <img
-          :src="Config.SERVER_URL + work.cover_image.image_url"
-          @click="async () => await workModalRef?.show(work.work.id)"
+        <ImageContainer
+          :src="`${work.cover_image.image_url}`"
+          class="image"
+          :enableHover="true"
+          @click="currentWorkId = work.work.id; showWorkModal = true"
         />
         <div class="text" ref="textRefs">
           <div class="title">{{ work.work.title }}</div>
@@ -25,25 +27,26 @@
   </div>
 
   <!-- 作品弹窗 -->
-  <WorkModal ref="workModalRef"/>
+  <WorkModal v-if="showWorkModal" :workId="currentWorkId" @close="showWorkModal = false" />
 </template>
 
 <script setup lang="ts">
   import UserAvatar from '../user/UserAvatar.vue';
   import WorkModal from '../work/WorkModal.vue';
+  import ImageContainer from '../common/ImageContainer.vue';
   import { EnhancedList } from '@/lib/list';
   import type { WorksSchema } from '@/api/type.ext';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen.ts';
   import { axiosProxy } from '@/api/axios.ts';
-  import { Config } from '@/config.ts';
 
   const works = ref(new EnhancedList<WorksSchema>((work) => work.work.id, 10))
   const targetUserId = ref("")
   const worksType = ref("self")
-  const workModalRef = useTemplateRef("workModalRef")
+  const showWorkModal = ref(false)
+  const currentWorkId = ref("")
 
-   onMounted(async () => {
+  onMounted(async () => {
     // 监听子节点数量改变,实时计算dom元素高度
     mutationObserver.observe(workGridRef.value!, {
       childList: true,
@@ -137,18 +140,11 @@
       .real-card {
         display: flex;
         flex-direction: column;
-        img {
+        .image {
           width: 100%;
-          border-radius: 15px;
-          min-height:160px;
           max-height: 280px;
-          height: auto;
-          object-fit: cover;
-          transition: all 0.3s ease-in-out;
-          cursor: pointer;
-        }
-        img:hover {
-          filter: brightness(0.85);
+          min-height: 160px;
+          background-size: cover;
         }
         .text {
           padding: 10px 15px;

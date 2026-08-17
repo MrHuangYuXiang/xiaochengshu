@@ -9,7 +9,6 @@ class ImagePreview {
 
   show(url: string): void {
     this.url.value = url
-    console.log("显示预览图片:", url)
   }
 }
 

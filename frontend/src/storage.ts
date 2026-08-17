@@ -17,8 +17,11 @@ class Storage {
 
   setInitData(initData: paths["/user/init-data"]["get"]["responses"]["200"]["content"]["application/json"]) {
     this.initData.value = initData;
-    // 对头像加随机时间戳防止浏览器缓存
-    this.initData.value!.user.avatar_url += '?timestamp=' + Date.now()
+    
+    // 如果用户有头像,对头像加随机时间戳防止浏览器缓存
+    if (this.initData.value!.user.avatar_url){
+          this.initData.value!.user.avatar_url += '?timestamp=' + Date.now()
+    }
   }
 
   // 更新用户头像URL时间戳,避免浏览器缓存

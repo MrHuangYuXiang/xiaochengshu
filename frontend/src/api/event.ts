@@ -1,7 +1,5 @@
-import { Config } from "@/config";
 import { storage } from "../storage";
 import SharedWorker from "./share.ts?sharedworker"
-import { logger } from "@/logger";
 
 /**
  * 后端事件推送类
@@ -30,7 +28,7 @@ class HttpEvent {
     this.worker.port.postMessage({
       type: "connect",
       jwt: storage.token.value,
-      url: Config.API_URL + "/user/connect"
+      url: import.meta.env.VITE_API_URL + "/user/connect"
     })
   }
 

@@ -4,7 +4,7 @@
         <div class="qr">
           <div style="font-size: 18px; font-weight: bold;">打开小橙书app</div>
           <div style="font-size: 13px; color: var(--root-gray);">扫描下方二维码登录</div>
-          <img src="@/static/images/loginQrCode.png"/>
+          <img src="/images/loginQrCode.png"/>
           <div class="download-app">点击下载小橙书app</div>
         </div>
         <div class="border"></div>
@@ -92,7 +92,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: url('@/static/images/loginPageBackground.png') no-repeat center center;
+      background: url('/images/loginPageBackground.png') no-repeat center center;
       background-size: cover;
       .login-card {
         width: 800px;

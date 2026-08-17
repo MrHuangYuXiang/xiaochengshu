@@ -1,5 +1,5 @@
 <template>
-  <BaseModal width="50vw" ref="baseModalRef">
+  <BaseModal width="50vw" @close="emits('close')">
     <div class="form-body">
       <UserAvatar :is-uploadable="true" width="30%" :img-url="storage.initData.value?.user?.avatar_url" @change="changeAvatar"></UserAvatar>
       <div class="form-item">
@@ -24,19 +24,22 @@
 </template>
 
 <script setup lang="ts">
-  import BaseModal from '../modal/BaseModal.vue';
+  import BaseModal from '../common/BaseModal.vue';
   import UserAvatar from './UserAvatar.vue';
   import AppInput from '../common/AppInput.vue';
   import AppButton from '../common/AppButton.vue';
   import GenderRadio from './GenderRadio.vue';
-  import { ref, toRaw, useTemplateRef } from 'vue';
+  import { onMounted, ref, toRaw, useTemplateRef } from 'vue';
   import { storage } from '@/storage.ts';
   import { validateForm } from '@/helper/form.ts';
   import { axiosProxy } from '@/api/axios.ts';
   import { ElMessage } from 'element-plus';
   import type { paths } from '@/api/gen.ts';
 
-  const baseModalRef = useTemplateRef("baseModalRef")
+  const emits = defineEmits<{
+    (e: 'close'): void
+  }>()
+
   const nameInput = useTemplateRef("nameInput")
   const birthdayInput = useTemplateRef("birthdayInput")
   const descInput = useTemplateRef("descInput")
@@ -78,13 +81,15 @@
       paths["/update/user/info"]["post"]["requestBody"]["content"]["application/json"],
       paths["/update/user/info"]["post"]["responses"]["200"]["content"]["application/json"]
     >('/update/user/info', form.value)
-    storage.setInitData(await axiosProxy.get<
+
+    const initData = await axiosProxy.get<
       paths["/user/init-data"]["get"]["parameters"]["query"],
       paths["/user/init-data"]["get"]["responses"]["200"]["content"]["application/json"]
-    >('/user/init-data', undefined))
+    >('/user/init-data', undefined)
+    storage.setInitData(initData)
 
     ElMessage("保存成功")
-    baseModalRef.value?.close()
+    emits('close')
   }
 
   // 更新头像
@@ -96,15 +101,9 @@
     ElMessage("头像保存成功")
   }
 
-  /** 以下是组件暴露方法 */
-  const show = () => {
+  onMounted(() => {
     // 深拷贝防止赋值引用,ref响应式对象需要用toRaw拿到原生对象
     form.value = structuredClone(toRaw(storage.initData.value!.user))
-    baseModalRef.value?.show()
-  }
-
-  defineExpose({
-    show
   })
 </script>
 

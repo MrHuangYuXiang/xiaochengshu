@@ -7,7 +7,7 @@
   },
   "paths": {
     "/user/connect": {
-      "get": {
+      "post": {
         "parameters": [],
         "responses": {
           "200": {
