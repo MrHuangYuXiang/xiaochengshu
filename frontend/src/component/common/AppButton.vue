@@ -31,9 +31,9 @@
 
 <style scoped lang="scss">
   button {
-    width: 100%;
+    width: 3rem;
     border: none;
-    padding: 10px 25px;
+    padding: 0.7rem 1rem;
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;

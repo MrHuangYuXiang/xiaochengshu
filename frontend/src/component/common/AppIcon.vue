@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     class="icon"
     :style="{ fill: props.fill, width: props.size, height: props.size }"
   >
@@ -47,6 +47,10 @@
     </svg>
     <svg class="bi bi-x-lg" viewBox="0 0 16 16" v-if="props.type === 'close'">
       <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+    </svg>
+    <svg class="image" viewBox="0 0 16 16" v-if="props.type === 'image'">
+      <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+      <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z"/>
     </svg>
   </div>
 </template>

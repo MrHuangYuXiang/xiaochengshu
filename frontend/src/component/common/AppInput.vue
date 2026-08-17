@@ -135,7 +135,7 @@
     textarea {
       width: 100%;
       border-radius: 15px;
-      padding: 10px;
+      padding: 1rem;
       border: none;
       transition: all 0.2s ease-in-out;
     }
