@@ -15,7 +15,7 @@ import {
 import { chatMessageAggregate } from "./chat.js";
 
 // 事件枚举定义
-export const HttpEventType = {
+export const ClientEventType = {
     // 错误
     error: "error",
 

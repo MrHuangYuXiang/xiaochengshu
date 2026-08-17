@@ -8,15 +8,12 @@ import { v4 as uuidv4 } from "uuid";
 import { and, count, desc, eq, getTableColumns, gt, inArray, max, not, sql } from "drizzle-orm";
 import { getPageParams } from "../../helper/http.js";
 import type { IncGeneratorPort } from "../../io/port/IncGenerator.js";
-import { httpEvents, pushChatMessageClientEvent } from "../dto/client.js";
+import { httpEvents, ClientEventType, pushChatMessageClientEvent } from "../dto/client.js";
 import { clientResponseMap } from "../../client.js";
 
 // TODO: 当前仅支持私聊会话
 export class ChatService {
-    private incGenerator: IncGeneratorPort;
-
-    constructor(incGenerator: IncGeneratorPort) {
-        this.incGenerator = incGenerator;
+    constructor() {
     }
 
     // 创建会话
@@ -36,11 +33,11 @@ export class ChatService {
                 session_id: sessionId,
                 user_id: current.userId,
                 last_read_seq: 0,
-                other_user_id: res.locals.body.userId,
+                other_user_id: res.locals.body!.userId,
             },
             {
                 session_id: sessionId,
-                user_id: res.locals.body.userId,
+                user_id: res.locals.body!.userId,
                 last_read_seq: 0,
                 other_user_id: current.userId,
             },
@@ -80,19 +77,17 @@ export class ChatService {
 
         // 未读消息子查询
         const unreadMessageSubQuery = current.tx.select({
-            session_member_id: chatSessionMemberTable.id,
+            session_id: chatSessionMemberTable.session_id,
             unreadCount: count(chatMessageTable.id).as("unreadCount"),
         }).
             from(chatSessionMemberTable).
-            leftJoin(chatMessageTable, and(
-                eq(chatSessionMemberTable.session_id, chatMessageTable.session_id),
-                not(eq(chatSessionMemberTable.user_id, current.userId)),
-            )).
+            leftJoin(chatMessageTable, eq(chatSessionMemberTable.session_id, chatMessageTable.session_id)).
             where(and(
+                eq(chatSessionMemberTable.user_id, current.userId),
+                not(eq(chatMessageTable.user_id, current.userId)),
                 gt(chatMessageTable.inc_seq, chatSessionMemberTable.last_read_seq),
-                not(eq(chatSessionMemberTable.user_id, current.userId))
             )).
-            groupBy(chatSessionMemberTable.id).
+            groupBy(chatSessionMemberTable.session_id).
             as("unreadMessageSubQuery");
 
         // 最新消息子查询
@@ -101,7 +96,6 @@ export class ChatService {
             maxIncSeq: max(chatMessageTable.inc_seq).as("maxIncSeq"),
         }).
             from(chatMessageTable).
-            where(eq(chatMessageTable.user_id, current.userId)).
             groupBy(chatMessageTable.session_id).
             as("latestMessageSubQuery");
 
@@ -119,7 +113,7 @@ export class ChatService {
                 eq(chatSessionMemberTable.user_id, current.userId),
             )).
             leftJoin(userTable, eq(userTable.id, chatSessionMemberTable.other_user_id)).
-            leftJoin(unreadMessageSubQuery, eq(unreadMessageSubQuery.session_member_id, chatSessionMemberTable.id)).
+            leftJoin(unreadMessageSubQuery, eq(unreadMessageSubQuery.session_id, chatSessionTable.id)).
             leftJoin(latestMessageSubQuery, eq(latestMessageSubQuery.session_id, chatSessionTable.id)).
             leftJoin(chatMessageTable, eq(chatMessageTable.inc_seq, latestMessageSubQuery.maxIncSeq)).
             where(and(
@@ -135,45 +129,68 @@ export class ChatService {
     // 发送消息
     async sendMessage(req: Request, res: EnhancedResponse<null, typeof sendMessageInput>) {
         const current = getCurrent();
+        const msgId = uuidv4();
 
         // 创建消息
         await current.tx.insert(chatMessageTable).values({
-            session_id: res.locals.body.sessionId,
-            session_member_id: res.locals.body.sessionMemberId,
+            id: msgId,
+            session_id: res.locals.body!.sessionId,
+            session_member_id: res.locals.body!.sessionMemberId,
             user_id: current.userId,
-            content: res.locals.body.content,
-            inc_seq: await this.incGenerator.gen(`chatMessage:${res.locals.body.sessionId}`),
+            content: res.locals.body!.content,
         });
 
         // 查询会话成员信息
-        const members = await current.tx.select().
-            from(chatSessionMemberTable).
-            where(eq(chatSessionMemberTable.session_id, res.locals.body.sessionId)).
-            leftJoin(userTable, eq(userTable.id, chatSessionMemberTable.user_id))
+        const data = await current.tx.select({
+            member: getTableColumns(chatSessionMemberTable),
+            user: getTableColumns(userTable),
+            message: getTableColumns(chatMessageTable),
+        }).
+            from(chatMessageTable).
+            leftJoin(userTable, eq(userTable.id, chatMessageTable.user_id)).
+            leftJoin(chatSessionMemberTable, eq(chatSessionMemberTable.session_id, chatMessageTable.session_id)).
+            where(eq(chatMessageTable.id, msgId))
 
         // 推送消息给对应用户客户端
-        for (const member of members) {
-            if (member.user) {
+        for (const item of data) {
+            if (item.member && item.user && item.member.user_id !== current.userId) {
                 clientResponseMap.push(
-                    member.user.id,
-                    "chatMessage",
-                    pushChatMessageClientEvent.parse(member)
+                    item.member.user_id,
+                    ClientEventType.pushChatMessage,
+                    pushChatMessageClientEvent.parse({
+                        message: item.message,
+                        user: item.user,
+                    })
                 );
             }
         }
     }
 
     // 查询消息
-    async getMessages(req: Request, res: EnhancedResponse<null, typeof getMessagesInput>) {
+    async getMessages(req: Request, res: EnhancedResponse<typeof getMessagesInput, null>) {
         const current = getCurrent();
         const page = getPageParams(res);
 
-        const messages = await current.tx.select().
+        const messages = await current.tx.select({
+            user: getTableColumns(userTable),
+            message: getTableColumns(chatMessageTable),
+        }).
             from(chatMessageTable).
-            where(eq(chatMessageTable.session_id, res.locals.body.sessionId)).
+            leftJoin(userTable, eq(userTable.id, chatMessageTable.user_id)).
+            where(eq(chatMessageTable.session_id, res.locals.query!.sessionId)).
             orderBy(desc(chatMessageTable.inc_seq)).
             limit(page.limit).
             offset(page.offset);
+
+        // 更新最后阅读时间
+        if (messages[0]) {
+            await current.tx.update(chatSessionMemberTable).set({
+                last_read_seq: messages[0].message.inc_seq,
+            }).where(and(
+                eq(chatSessionMemberTable.session_id, res.locals.query!.sessionId),
+                eq(chatSessionMemberTable.user_id, current.userId),
+            ));
+        }
 
         res.json(getMessagesOutput.parse({
             messages: messages,

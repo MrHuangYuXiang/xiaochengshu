@@ -23,8 +23,8 @@ import type { Request, Response } from "express";
 
 export interface EnhancedResponse<QuerySchema extends z.ZodObject | null, BodySchema extends z.ZodObject | null> extends Response {
     locals: {
-        query: z.infer<QuerySchema>
-        body: z.infer<BodySchema>
+        query?: z.infer<QuerySchema>
+        body?: z.infer<BodySchema>
     }
 }
 

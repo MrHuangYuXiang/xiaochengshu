@@ -24,7 +24,7 @@ import { FormParser } from "../../form_parser.js";
 import type { MutexPort } from "../../io/port/mutex.js";
 import { v4 as uuidv4 } from "uuid";
 import { clientResponseMap } from "../../client.js";
-import { heartbeatClientEvent, HttpEventType } from "../dto/client.js";
+import { heartbeatClientEvent, ClientEventType } from "../dto/client.js";
 import { AppError } from "../../error.js";
 import { getPageParams } from "../../helper/http.js";
 import { getFollowRelationSubQuery } from "./common.js";
@@ -113,11 +113,11 @@ export class UserService {
         })
 
         // 后端维持心跳,同时续约jwt
-        clientResponseMap.push(current.userId, HttpEventType.heartbeat, heartbeatClientEvent.parse({
+        clientResponseMap.push(current.userId, ClientEventType.heartbeat, heartbeatClientEvent.parse({
             jwt: genJWT(current.userId),
         }))
         const n = setInterval(() => {
-            clientResponseMap.push(current.userId, HttpEventType.heartbeat, heartbeatClientEvent.parse({
+            clientResponseMap.push(current.userId, ClientEventType.heartbeat, heartbeatClientEvent.parse({
                 jwt: genJWT(current.userId),
             }))
         }, parseInt(getEnv("PERSISTENT_HEARTBEAT_INTERVAL")))

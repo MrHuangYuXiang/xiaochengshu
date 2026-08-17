@@ -5,7 +5,7 @@ import { getEnv } from "./helper/env.js";
 import { localStorage } from "./local_stroage.js";
 import { getTx } from "./db/db.js";
 import { clientResponseMap } from "./client.js";
-import { errorClientEvent, HttpEventType } from "./domain/dto/client.js";
+import { errorClientEvent, ClientEventType } from "./domain/dto/client.js";
 import { AppError } from "./error.js";
 
 /**
@@ -51,7 +51,7 @@ export const middlewareWrapper = (handler: (req: Request, res: Response) => Prom
 
             // 长连接通过推送错误信息并关闭连接
             if (isPersistent) {
-                clientResponseMap.pushByResponse(res, HttpEventType.error, errorClientEvent.parse({ msg: msg }))
+                clientResponseMap.pushByResponse(res, ClientEventType.error, errorClientEvent.parse({ msg: msg }))
             }
             // 非长连接设置响应头
             else {

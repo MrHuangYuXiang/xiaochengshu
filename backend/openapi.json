@@ -1329,7 +1329,7 @@
         }
       }
     },
-    "/create/chat/session": {
+    "/chat/create/session": {
       "post": {
         "parameters": [],
         "responses": {
@@ -1341,6 +1341,7 @@
                   "type": "object",
                   "required": [
                     "session",
+                    "sessionMember",
                     "user",
                     "latestMessage",
                     "unreadCount"
@@ -1362,6 +1363,37 @@
                         },
                         "updated_at": {
                           "type": "string"
+                        }
+                      }
+                    },
+                    "sessionMember": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "session_id",
+                        "user_id",
+                        "last_read_seq"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "session_id": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "type": "string"
+                        },
+                        "last_read_seq": {
+                          "type": "integer"
                         }
                       }
                     },
@@ -1439,7 +1471,7 @@
         }
       }
     },
-    "/chat/sessions": {
+    "/chat/get/sessions": {
       "get": {
         "parameters": [
           {
@@ -1476,6 +1508,7 @@
                         "type": "object",
                         "required": [
                           "session",
+                          "sessionMember",
                           "user",
                           "latestMessage",
                           "unreadCount"
@@ -1497,6 +1530,37 @@
                               },
                               "updated_at": {
                                 "type": "string"
+                              }
+                            }
+                          },
+                          "sessionMember": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "session_id",
+                              "user_id",
+                              "last_read_seq"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "session_id": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "type": "string"
+                              },
+                              "last_read_seq": {
+                                "type": "integer"
                               }
                             }
                           },
@@ -1557,11 +1621,197 @@
           }
         }
       }
+    },
+    "/chat/send/message": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId",
+                  "sessionMemberId",
+                  "content"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "sessionMemberId": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/get/messages": {
+      "get": {
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "messages"
+                  ],
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "message",
+                          "user"
+                        ],
+                        "properties": {
+                          "message": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "session_id",
+                              "session_member_id",
+                              "user_id",
+                              "content",
+                              "inc_seq"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "session_id": {
+                                "type": "string"
+                              },
+                              "session_member_id": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              },
+                              "inc_seq": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "user": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "name",
+                              "desc",
+                              "birthday",
+                              "gender",
+                              "avatar_url",
+                              "is_profile_completed"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "desc": {
+                                "type": "string"
+                              },
+                              "birthday": {
+                                "type": "string"
+                              },
+                              "gender": {
+                                "type": "integer"
+                              },
+                              "avatar_url": {
+                                "type": "string"
+                              },
+                              "is_profile_completed": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
-      "heartbeatHttpEvent": {
+      "heartbeatClientEvent": {
         "type": "object",
         "required": [
           "jwt"
@@ -1572,7 +1822,7 @@
           }
         }
       },
-      "errorHttpEvent": {
+      "errorClientEvent": {
         "type": "object",
         "required": [
           "msg"
@@ -1580,6 +1830,97 @@
         "properties": {
           "msg": {
             "type": "string"
+          }
+        }
+      },
+      "pushChatMessageEvent": {
+        "type": "object",
+        "required": [
+          "message",
+          "user"
+        ],
+        "properties": {
+          "message": {
+            "type": "object",
+            "required": [
+              "id",
+              "created_at",
+              "updated_at",
+              "session_id",
+              "session_member_id",
+              "user_id",
+              "content",
+              "inc_seq"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "session_id": {
+                "type": "string"
+              },
+              "session_member_id": {
+                "type": "string"
+              },
+              "user_id": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "inc_seq": {
+                "type": "integer"
+              }
+            }
+          },
+          "user": {
+            "type": "object",
+            "required": [
+              "id",
+              "created_at",
+              "updated_at",
+              "name",
+              "desc",
+              "birthday",
+              "gender",
+              "avatar_url",
+              "is_profile_completed"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "desc": {
+                "type": "string"
+              },
+              "birthday": {
+                "type": "string"
+              },
+              "gender": {
+                "type": "integer"
+              },
+              "avatar_url": {
+                "type": "string"
+              },
+              "is_profile_completed": {
+                "type": "integer"
+              }
+            }
           }
         }
       }

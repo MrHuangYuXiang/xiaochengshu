@@ -35,5 +35,5 @@ export const chatMessageTable = mysqlTable("chat_message", {
     user_id: varchar({ length: 255 }).notNull(),
     content: varchar({ length: 200 }).notNull(),
     // 自增序列号
-    inc_seq: int().notNull(),
+    inc_seq: int().primaryKey().autoincrement(),
 })
