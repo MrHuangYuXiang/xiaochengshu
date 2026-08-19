@@ -39,6 +39,10 @@ class Doc {
 
     // 创建openapi对象主逻辑
     private createOpenApiObjectMain(key: string, obj: any, current: any) {
+        // 获取zod原始类型
+        obj = this.getOriginalType(obj)
+
+        // 对象类型处理逻辑
         if (obj instanceof z.ZodObject) {
             current[key] = {
                 type: obj.meta()?.openapiType,
@@ -50,28 +54,34 @@ class Doc {
                 current[key].required.push(propKey)
                 this.createOpenApiObjectMain(propKey, obj.shape[propKey], current[key].properties)
             }
-        } else if (obj instanceof z.ZodArray) {
+        }
+        // 数组类型处理逻辑
+        else if (obj instanceof z.ZodArray) {
             current[key] = {
                 type: obj.meta()?.openapiType,
             }
             // 对于Array类型需要通过unwrap拿到内部类型
             this.createOpenApiObjectMain("items", obj.unwrap(), current[key])
-        } else {
+        }
+        // 基础类型处理逻辑
+        else {
             current[key] = {
-                type: this.getOriginalType(obj).meta()?.openapiType,
+                type: obj.meta()?.openapiType,
             }
         }
     }
 
     // 获取schema原始类型
     private getOriginalType(obj: any): any {
+        // 对于Pipe类型,需要通过in拿到内部类型
         if (obj instanceof z.ZodPipe) {
-            // 对于Pipe类型,需要通过in拿到内部类型
             return this.getOriginalType(obj.in)
-        } else if (obj instanceof z.ZodDefault) {
-            // 对于Default类型,需要通过unwrap拿到内部类型
+        }
+        // 对于Default类型,需要通过unwrap拿到内部类型
+        else if (obj instanceof z.ZodDefault || obj instanceof z.ZodNullable) {
             return this.getOriginalType(obj.unwrap())
-        } else {
+        }
+        else {
             return obj
         }
     }

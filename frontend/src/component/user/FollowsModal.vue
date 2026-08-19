@@ -28,7 +28,7 @@
   import { EnhancedList } from '@/lib/list.ts';
 
   const props = defineProps({
-    /** 
+    /**
      * 弹窗类型
      * following: 关注
      * follower: 粉丝
@@ -72,7 +72,7 @@
       allCount.value = res.count
       return res.users
     })
-    scrollContainerRef.value!.setEnd(users.value.isEnd)
+    return users.value.isEnd
   }
 
   // UserCard组件更新用户信息

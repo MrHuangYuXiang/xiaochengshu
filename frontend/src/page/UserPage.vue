@@ -1,10 +1,10 @@
 <template>
   <!-- 关注/粉丝列表弹窗 -->
-  <FollowsModal 
-    v-if="enableFollowsModalShow" 
+  <FollowsModal
+    v-if="enableFollowsModalShow"
     width="30vw"
-    :type="followsModalType" 
-    :userId="user?.user.id" 
+    :type="followsModalType"
+    :userId="user?.user.id"
     @close="enableFollowsModalShow = false"
   />
 
@@ -94,8 +94,7 @@
 
   // 滚动底部加载更多回调
   const loadMore = async () => {
-    const isEnd = await workGridRef.value!.getMore()
-    if (isEnd) scrollContainerRef.value!.setEnd()
+    return await workGridRef.value!.getMore()
   }
 
   // 展示关注/粉丝列表弹窗

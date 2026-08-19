@@ -1440,7 +1440,45 @@
                         }
                       }
                     },
-                    "latestMessage": {},
+                    "latestMessage": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "session_id",
+                        "session_member_id",
+                        "user_id",
+                        "content",
+                        "inc_seq"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "session_id": {
+                          "type": "string"
+                        },
+                        "session_member_id": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "inc_seq": {
+                          "type": "integer"
+                        }
+                      }
+                    },
                     "unreadCount": {
                       "type": "integer"
                     }
@@ -1607,7 +1645,45 @@
                               }
                             }
                           },
-                          "latestMessage": {},
+                          "latestMessage": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "session_id",
+                              "session_member_id",
+                              "user_id",
+                              "content",
+                              "inc_seq"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "session_id": {
+                                "type": "string"
+                              },
+                              "session_member_id": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              },
+                              "inc_seq": {
+                                "type": "integer"
+                              }
+                            }
+                          },
                           "unreadCount": {
                             "type": "integer"
                           }

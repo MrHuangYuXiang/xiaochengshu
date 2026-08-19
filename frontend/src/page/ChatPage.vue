@@ -1,36 +1,39 @@
 <template>
   <div class="chat-page">
     <div class="sessions">
-      <SessionCard
-        v-for="session in sessions"
-        :key="session.userId"
-        :user-id="session.userId"
-        :user-avatar-url="session.userAvatarUrl"
-        :session-name="session.sessionName"
-        :latest-msg="session.latestMsg"
-        :msg-time="session.msgTime"
+      <ScrollContainer :load-more-callback="loadMoreSessionsCb">
+        <SessionCard
+          v-for="session in sessions"
+          :key="session.session.id"
+          :user-id="session.user.id"
+          :user-avatar-url="session.user.avatar_url"
+          :session-name="session.user.name"
+          :latest-msg="session.latestMessage.content"
+          :msg-time="session.latestMessage.created_at"
+          @click="switchSelectedSession(session.session.id)"
         />
+      </ScrollContainer>
     </div>
-    <div class="chat-panel" v-show="selectedSessionId === ''">
+    <div class="chat-panel" v-show="selectedSessionId !== ''">
       <ChatSender :style="{ 'margin-top': '2rem' }"/>
       <div
         v-for="msg in messages"
-        :key="msg.userId"
+        :key="msg.message.id"
         class="chat-message"
         :style="{
-          'align-self': msg.userId === storage.initData.value?.user.id ? 'end' : 'start',
-          'flex-direction': msg.userId === storage.initData.value?.user.id ? 'row-reverse' : 'row',
+          'align-self': msg.user.id === storage.initData.value?.user.id ? 'end' : 'start',
+          'flex-direction': msg.user.id === storage.initData.value?.user.id ? 'row-reverse' : 'row',
         }"
       >
-        <UserAvatar :user-id="msg.userId" width="3rem" />
+        <UserAvatar :user-id="msg.user.id" width="3rem" :img-url="msg.user.avatar_url" />
         <div
           class="msg-content"
           :style="{
-            'color': msg.userId === storage.initData.value?.user.id ? 'white' : 'black',
-            'background-color': msg.userId === storage.initData.value?.user.id ? '#0084ff' : 'var(--root-bg-gray)'
+            'color': msg.user.id === storage.initData.value?.user.id ? 'white' : 'black',
+            'background-color': msg.user.id === storage.initData.value?.user.id ? '#0084ff' : 'var(--root-bg-gray)'
           }"
         >
-          {{ msg.content }}
+          {{ msg.message.content }}
         </div>
       </div>
     </div>
@@ -41,30 +44,64 @@
   import SessionCard from '@/component/chat/SessionCard.vue';
   import ChatSender from '@/component/chat/ChatSender.vue';
   import UserAvatar from '@/component/user/UserAvatar.vue';
+  import ScrollContainer from '@/component/common/ScrollContainer.vue';
   import { storage } from '@/storage';
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
+  import type { SessionSchema, MessageSchema } from '@/api/type.ext';
+  import { EnhancedList } from '@/lib/list';
+  import { axiosProxy } from '@/api/axios';
+  import type { paths } from '@/api/gen';
 
-  const sessions = ref([
-    { userId: '123', userAvatarUrl: 'https://img2.baidu.com/it/u=3422224222,2822822222&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', sessionName: '用户1', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-    { userId: '456', userAvatarUrl: 'https://example.com/avatar2.jpg', sessionName: '用户2', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-        { userId: '123', userAvatarUrl: 'https://img2.baidu.com/it/u=3422224222,2822822222&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', sessionName: '用户1', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-    { userId: '456', userAvatarUrl: 'https://example.com/avatar2.jpg', sessionName: '用户2', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-        { userId: '123', userAvatarUrl: 'https://img2.baidu.com/it/u=3422224222,2822822222&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', sessionName: '用户1', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-    { userId: '456', userAvatarUrl: 'https://example.com/avatar2.jpg', sessionName: '用户2', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-        { userId: '123', userAvatarUrl: 'https://img2.baidu.com/it/u=3422224222,2822822222&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', sessionName: '用户1', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-    { userId: '456', userAvatarUrl: 'https://example.com/avatar2.jpg', sessionName: '用户2', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-        { userId: '123', userAvatarUrl: 'https://img2.baidu.com/it/u=3422224222,2822822222&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', sessionName: '用户1', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-    { userId: '456', userAvatarUrl: 'https://example.com/avatar2.jpg', sessionName: '用户2', latestMsg: '你好', msgTime: '2023-08-01 12:00:00' },
-  ])
-  const messages = ref([
-    { userId: '1', userName: '用户1', content: '你好' },
-    { userId: '456', userName: '用户2', content: '你好' },
-    { userId: '1', userName: '用户1', content: '你好' },
-    { userId: '456', userName: '用户2', content: '你好' },
-  ])
+  const sessions = ref<EnhancedList<SessionSchema>>(new EnhancedList(
+    (item) => item.session.id,
+    10,
+  ))
+  const messages = ref<EnhancedList<MessageSchema>>(new EnhancedList(
+    (item) => item.message.id,
+    10,
+  ))
 
   // 当前选中会话
   const selectedSessionId = ref("");
+
+  // 查询会话
+  const getSessions = async () => {
+    await sessions.value.pagePush(async (page: number, size: number) => {
+      const data = await axiosProxy.get<
+        paths["/chat/get/sessions"]["get"]["parameters"]["query"],
+        paths["/chat/get/sessions"]["get"]["responses"]["200"]["content"]["application/json"]
+      >("/chat/get/sessions", { page: page, pageSize: size })
+      return data.sessions
+    })
+  }
+
+  // 查询消息
+  const getMessages = async () => {
+    await messages.value.pagePush(async (page: number, size: number) => {
+      const data = await axiosProxy.get<
+        paths["/chat/get/messages"]["get"]["parameters"]["query"],
+        paths["/chat/get/messages"]["get"]["responses"]["200"]["content"]["application/json"]
+      >("/chat/get/messages", { page: page, pageSize: size, sessionId: selectedSessionId.value })
+      return data.messages
+    })
+  }
+
+   // 会话列表滚动底部回调
+  const loadMoreSessionsCb = async () => {
+    await getSessions()
+    return sessions.value.isEnd
+  }
+
+  // 切换当前选中会话
+  const switchSelectedSession = async (sessionId: string) => {
+    selectedSessionId.value = sessionId
+    messages.value.clear()
+    await getMessages()
+  }
+
+  onMounted(async () => {
+    await getSessions()
+  })
 </script>
 
 <style scoped lang="css">

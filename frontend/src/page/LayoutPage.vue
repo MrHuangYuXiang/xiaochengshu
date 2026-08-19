@@ -52,7 +52,7 @@
   import InitUserModal from '@/component/user/InitUserModal.vue';
   import UpdateUserModal from '@/component/user/UpdateUserModal.vue';
   import AppDialog from '@/component/common/AppDialog.vue';
-  import { onBeforeMount, ref, useTemplateRef } from 'vue';
+  import { onBeforeMount, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { storage } from '@/storage';
   import { httpEvent } from '@/api/event';

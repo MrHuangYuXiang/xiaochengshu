@@ -11,7 +11,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -31,8 +33,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -794,15 +794,299 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/chat/create/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        userId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            session: {
+                                id: string;
+                                created_at: string;
+                                updated_at: string;
+                            };
+                            sessionMember: {
+                                id: string;
+                                created_at: string;
+                                updated_at: string;
+                                session_id: string;
+                                user_id: string;
+                                last_read_seq: number;
+                            };
+                            user: {
+                                id: string;
+                                created_at: string;
+                                updated_at: string;
+                                name: string;
+                                desc: string;
+                                birthday: string;
+                                gender: number;
+                                avatar_url: string;
+                                is_profile_completed: number;
+                            };
+                            latestMessage: {
+                                id: string;
+                                created_at: string;
+                                updated_at: string;
+                                session_id: string;
+                                session_member_id: string;
+                                user_id: string;
+                                content: string;
+                                inc_seq: number;
+                            };
+                            unreadCount: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/chat/get/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    page: number;
+                    pageSize: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            sessions: {
+                                session: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                };
+                                sessionMember: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    session_id: string;
+                                    user_id: string;
+                                    last_read_seq: number;
+                                };
+                                user: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    name: string;
+                                    desc: string;
+                                    birthday: string;
+                                    gender: number;
+                                    avatar_url: string;
+                                    is_profile_completed: number;
+                                };
+                                latestMessage: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    session_id: string;
+                                    session_member_id: string;
+                                    user_id: string;
+                                    content: string;
+                                    inc_seq: number;
+                                };
+                                unreadCount: number;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/chat/send/message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        sessionId: string;
+                        sessionMemberId: string;
+                        content: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/chat/get/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    page: number;
+                    pageSize: number;
+                    sessionId: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            messages: {
+                                message: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    session_id: string;
+                                    session_member_id: string;
+                                    user_id: string;
+                                    content: string;
+                                    inc_seq: number;
+                                };
+                                user: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    name: string;
+                                    desc: string;
+                                    birthday: string;
+                                    gender: number;
+                                    avatar_url: string;
+                                    is_profile_completed: number;
+                                };
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        heartbeatHttpEvent: {
+        heartbeatClientEvent: {
             jwt: string;
         };
-        errorHttpEvent: {
+        errorClientEvent: {
             msg: string;
+        };
+        pushChatMessageEvent: {
+            message: {
+                id: string;
+                created_at: string;
+                updated_at: string;
+                session_id: string;
+                session_member_id: string;
+                user_id: string;
+                content: string;
+                inc_seq: number;
+            };
+            user: {
+                id: string;
+                created_at: string;
+                updated_at: string;
+                name: string;
+                desc: string;
+                birthday: string;
+                gender: number;
+                avatar_url: string;
+                is_profile_completed: number;
+            };
         };
     };
     responses: never;

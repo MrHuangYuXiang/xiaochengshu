@@ -10,7 +10,8 @@
   import { ref } from 'vue';
 
   const props = defineProps<{
-    loadMoreCallback: () => Promise<void>
+    // 滚动到底部触发回调函数, 返回是否还有更多数据
+    loadMoreCallback: () => Promise<boolean>
   }>()
 
   // 加载中标志位
@@ -25,7 +26,7 @@
     const target = e.target as HTMLElement
     if (target.scrollTop + target.clientHeight >= target.scrollHeight - 1) {
       isLoading.value = true
-      await props.loadMoreCallback()
+      isEnd.value = await props.loadMoreCallback()
       isLoading.value = false
     }
   }

@@ -209,10 +209,7 @@
       return res.comments
     })
 
-    // 设置结束状态
-    if (comments.value.isEnd) {
-      scrollContainerRef.value?.setEnd()
-    }
+    return comments.value.isEnd
   }
 
   // 点击评论下方回复按钮或评论作品时触发,设置相关变量

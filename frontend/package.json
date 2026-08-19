@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "gen-openapi": "openapi-typescript ../back/openapi.json -o ./src/api/gen.ts",
+    "gen-api-schema": "openapi-typescript ../backend/openapi.json -o ./src/api/gen.ts",
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
