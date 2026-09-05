@@ -36,7 +36,7 @@ import { doc } from "./doc.js"
 import { z } from "zod"
 import { newLocalMutex } from "./io/adapter/mutex.js"
 import { newNginxFileStorage } from "./io/adapter/file_storage.js"
-import { createSessionInput, createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput } from "./domain/dto/chat.js"
+import { createSessionInput, createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput, sendMessageOutput } from "./domain/dto/chat.js"
 
 export interface ServerPort {
     Run(): void
@@ -114,7 +114,7 @@ export class Server implements ServerPort {
         /** 聊天模块 */
         routerProxy.post('/chat/create/session', createSessionInput, createSessionOutput, chatService.createSession.bind(chatService)) // 创建会话
         routerProxy.get('/chat/get/sessions', getSessionsInput, getSessionsOutput, chatService.getSessions.bind(chatService)) // 查询会话
-        routerProxy.post('/chat/send/message', sendMessageInput, null, chatService.sendMessage.bind(chatService)) // 发送消息
+        routerProxy.post('/chat/send/message', sendMessageInput, sendMessageOutput, chatService.sendMessage.bind(chatService)) // 发送消息
         routerProxy.get('/chat/get/messages', getMessagesInput, getMessagesOutput, chatService.getMessages.bind(chatService)) // 查询消息
 
         /** 直播模块 TODO: 待开发 */

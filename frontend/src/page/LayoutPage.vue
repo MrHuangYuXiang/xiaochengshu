@@ -100,7 +100,7 @@
       "error",
       async (data) => {
         // 接收到错误,清理相关资源,由于后端主动断开tcp连接,客户端不需要主动断
-        errorDialogContent.value = (data as components["schemas"]["errorHttpEvent"]).msg
+        errorDialogContent.value = (data as components["schemas"]["errorClientEvent"]).msg
         storage.clear()
         enableErrorDialogShow.value = true
       }
@@ -111,7 +111,7 @@
       "heartbeat",
       async (data) => {
         // jwt续约
-        storage.setToken((data as components["schemas"]["heartbeatHttpEvent"]).jwt)
+        storage.setToken((data as components["schemas"]["heartbeatClientEvent"]).jwt)
      })
 
     // 连接后端事件推送

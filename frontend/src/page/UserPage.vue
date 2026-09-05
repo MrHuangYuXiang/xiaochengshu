@@ -8,7 +8,10 @@
     @close="enableFollowsModalShow = false"
   />
 
-  <ScrollContainer :loadMoreCallback="loadMore" ref="scrollContainerRef">
+  <ScrollContainer
+    :loadMoreCallback="loadMore" ref="scrollContainerRef"
+    trigger-type="bottom"
+  >
     <div class="container">
       <div class="top">
         <div class="avatar"><UserAvatar  :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>

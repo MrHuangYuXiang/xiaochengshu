@@ -2,7 +2,7 @@ import type { Request } from "express";
 import type { EnhancedResponse } from "../dto/index.js";
 import { chatSessionTable, chatSessionMemberTable, chatMessageTable } from "../../db/schema/chat.js";
 import { userTable } from "../../db/schema/user.js";
-import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput, type createSessionInput } from "../dto/chat.js";
+import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput, sendMessageOutput, type createSessionInput } from "../dto/chat.js";
 import { getCurrent } from "../../local_stroage.js";
 import { v4 as uuidv4 } from "uuid";
 import { and, count, desc, eq, getTableColumns, gt, inArray, max, not, sql } from "drizzle-orm";
@@ -164,6 +164,12 @@ export class ChatService {
                 );
             }
         }
+
+        // 返回发送的消息
+        res.json(sendMessageOutput.parse({
+            message: data[0]!.message,
+            user: data[0]!.user,
+        }));
     }
 
     // 查询消息

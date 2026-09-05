@@ -1707,8 +1707,95 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "required": [],
-                  "properties": {}
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "user"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "session_id",
+                        "session_member_id",
+                        "user_id",
+                        "content",
+                        "inc_seq"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "session_id": {
+                          "type": "string"
+                        },
+                        "session_member_id": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "inc_seq": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_profile_completed"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_profile_completed": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

@@ -1,7 +1,10 @@
 <template>
   <div class="chat-page">
     <div class="sessions">
-      <ScrollContainer :load-more-callback="loadMoreSessionsCb">
+      <ScrollContainer
+        trigger-type="bottom"
+        :load-more-callback="loadMoreSessionsCb"
+      >
         <SessionCard
           v-for="session in sessions"
           :key="session.session.id"
@@ -14,8 +17,14 @@
         />
       </ScrollContainer>
     </div>
-    <div class="chat-panel" v-show="selectedSessionId !== ''">
-      <ChatSender :style="{ 'margin-top': '2rem' }"/>
+    <!-- <ChatSender @send-msg="sendMsg" class="chat-sender"/> -->
+    <ScrollContainer
+      trigger-type="reverse-top"
+      :load-more-callback="loadMoreMessagesCb"
+      ref="msgScrollRef"
+      class="chat-panel"
+      v-show="selectedSessionId !== ''"
+    >
       <div
         v-for="msg in messages"
         :key="msg.message.id"
@@ -36,7 +45,7 @@
           {{ msg.message.content }}
         </div>
       </div>
-    </div>
+    </ScrollContainer>
   </div>
 </template>
 
@@ -46,11 +55,12 @@
   import UserAvatar from '@/component/user/UserAvatar.vue';
   import ScrollContainer from '@/component/common/ScrollContainer.vue';
   import { storage } from '@/storage';
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, useTemplateRef } from 'vue';
   import type { SessionSchema, MessageSchema } from '@/api/type.ext';
   import { EnhancedList } from '@/lib/list';
   import { axiosProxy } from '@/api/axios';
   import type { paths } from '@/api/gen';
+  import { logger } from '@/logger';
 
   const sessions = ref<EnhancedList<SessionSchema>>(new EnhancedList(
     (item) => item.session.id,
@@ -63,6 +73,7 @@
 
   // 当前选中会话
   const selectedSessionId = ref("");
+  const msgScrollRef = useTemplateRef("msgScrollRef")
 
   // 查询会话
   const getSessions = async () => {
@@ -73,6 +84,7 @@
       >("/chat/get/sessions", { page: page, pageSize: size })
       return data.sessions
     })
+    return sessions.value.isEnd
   }
 
   // 查询消息
@@ -84,19 +96,43 @@
       >("/chat/get/messages", { page: page, pageSize: size, sessionId: selectedSessionId.value })
       return data.messages
     })
+    return messages.value.isEnd
   }
 
    // 会话列表滚动底部回调
   const loadMoreSessionsCb = async () => {
-    await getSessions()
-    return sessions.value.isEnd
+    return await getSessions()
+  }
+
+  // 消息列表滚动底部回调
+  const loadMoreMessagesCb = async () => {
+    logger.debug("触发加载更多消息")
+    return await getMessages()
   }
 
   // 切换当前选中会话
   const switchSelectedSession = async (sessionId: string) => {
+    if (selectedSessionId.value === sessionId) {
+      return
+    }
+
     selectedSessionId.value = sessionId
     messages.value.clear()
+    msgScrollRef.value?.reset()
     await getMessages()
+  }
+
+  // 发送消息
+  const sendMsg = async (content: string) => {
+    const message = await axiosProxy.post<
+      paths["/chat/send/message"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/chat/send/message"]["post"]["responses"]["200"]["content"]["application/json"]
+    >("/chat/send/message", {
+      sessionId: selectedSessionId.value,
+      sessionMemberId: storage.initData.value!.user.id,
+      content: content,
+    })
+    messages.value.unshift(message)
   }
 
   onMounted(async () => {
@@ -118,9 +154,9 @@
   }
   .chat-panel {
     height: 100%;
-    padding: 1.5rem 5rem;
+    padding: 3rem 5rem;
+    gap: 0.5rem;
     display: flex;
-    gap: 0.8rem;
     flex-direction: column-reverse;
     justify-content: end;
     align-items: center;

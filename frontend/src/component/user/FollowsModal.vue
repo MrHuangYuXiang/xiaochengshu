@@ -1,6 +1,10 @@
 <template>
   <BaseModal @close="emits('close')">
-    <ScrollContainer ref="scrollContainerRef" :load-more-callback="getUserFollows">
+    <ScrollContainer
+      ref="scrollContainerRef"
+      :load-more-callback="getUserFollows"
+      trigger-type="bottom"
+    >
       <div class="follows-modal">
         <div class="top">{{ type === "following" ? "关注" : "粉丝" }} {{ `(${allCount})` }}</div>
         <div v-for="user in users" :key="user.id">

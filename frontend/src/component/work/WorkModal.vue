@@ -30,7 +30,11 @@
           />
         </div>
         <div class="work">
-          <ScrollContainer ref="scrollContainerRef" :loadMoreCallback="getTopComments">
+          <ScrollContainer
+            ref="scrollContainerRef"
+            :loadMoreCallback="getTopComments"
+            trigger-type="bottom"
+          >
             <div class="work-body">
               <div class="title">{{ work?.work.title }}</div>
               <div class="content">{{ work?.work.content }}</div>

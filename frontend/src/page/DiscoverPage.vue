@@ -1,5 +1,9 @@
 <template>
-  <ScrollContainer :loadMoreCallback="loadMore" ref="scrollContainerRef">
+  <ScrollContainer
+    trigger-type="bottom"
+    :loadMoreCallback="loadMore"
+    ref="scrollContainerRef"
+  >
     <div class="discover-page">
       <AppSegment
         :fields="[{text: '推荐', key: 'recommend'}, {text: '关注', key: 'following'}]"
@@ -33,8 +37,7 @@
 
   // 加载更多回调
   const loadMore = async () => {
-    const isEnd = await workGridRef.value!.getMore()
-    if (isEnd) scrollContainerRef.value!.setEnd()
+    return await workGridRef.value!.getMore()
   }
 </script>
 

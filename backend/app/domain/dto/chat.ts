@@ -56,6 +56,9 @@ export const sendMessageInput = objectType({
     content: stringType,
 });
 
+// 发送消息输出
+export const sendMessageOutput = objectType(chatMessageAggregate);
+
 // 查询消息输入
 export const getMessagesInput = objectType({
     ...page,

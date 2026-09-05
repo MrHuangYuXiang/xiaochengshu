@@ -981,7 +981,29 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": unknown;
+                        "application/json": {
+                            message: {
+                                id: string;
+                                created_at: string;
+                                updated_at: string;
+                                session_id: string;
+                                session_member_id: string;
+                                user_id: string;
+                                content: string;
+                                inc_seq: number;
+                            };
+                            user: {
+                                id: string;
+                                created_at: string;
+                                updated_at: string;
+                                name: string;
+                                desc: string;
+                                birthday: string;
+                                gender: number;
+                                avatar_url: string;
+                                is_profile_completed: number;
+                            };
+                        };
                     };
                 };
             };
