@@ -30,7 +30,6 @@
 <style scoped lang="css">
   .chat-sender {
     padding-top: 1rem;
-    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 1rem;

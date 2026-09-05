@@ -1,5 +1,5 @@
 <template>
-  <div class="session-card">
+  <div class="session-card" :class="{'active': selectedId === props.sessionId}">
     <UserAvatar :user-id="props.userId" :img-url="props.userAvatarUrl" width="60px" />
     <div class="session-content">
       <div class="session-name">{{ props.sessionName }}</div>
@@ -8,6 +8,7 @@
         <div class="msg-time">{{ formatTime(props.msgTime) }}</div>
       </div>
     </div>
+    <div v-if="props.unreadCount > 0" class="unread-count">{{ props.unreadCount }}</div>
   </div>
 </template>
 
@@ -15,28 +16,26 @@
   import { formatTime } from '@/helper/format.ts';
   import UserAvatar from '../user/UserAvatar.vue';
 
-  const props = defineProps({
-    userId: {
-      type: String,
-    },
-    userAvatarUrl: {
-      type: String,
-    },
-    sessionName: {
-      type: String,
-    },
-    latestMsg: {
-      type: String,
-    },
-    msgTime: {
-      type: String,
-      default: "",
-    },
+  const props = defineProps<{
+    userId: string;
+    userAvatarUrl: string;
+    sessionId: string;
+    sessionName: string;
+    latestMsg: string;
+    msgTime: string;
+    unreadCount: number;
+  }>()
+
+  // 卡片选中标志位
+  const selectedId = defineModel('selectedId', {
+    type: String,
+    default: '',
   })
 </script>
 
 <style lang="css" scoped>
   .session-card {
+    position: relative;
     cursor: pointer;
     width: calc(100% - 20px);
     display: flex;
@@ -68,9 +67,30 @@
         }
       }
     }
+    .unread-count {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      right: 1rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+      height: 1.4rem;
+      width: 1.4rem;
+      color: white;
+      background-color: red;
+      border-radius: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
+
+  .session-card:hover,
+  .session-card.active {
+    background-color: var(--root-bg-gray);
+  }
+
   .session-card:hover {
     transform: translateX(20px);
-    background-color: var(--root-bg-gray);
   }
 </style>

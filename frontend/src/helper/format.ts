@@ -11,12 +11,12 @@ export const formatBirthday = (birthday: string): string => {
 
 // 转换时间格式为距离当前时间
 export const formatTime = (time: string): string => {
-  if (!time) return '刚刚';
+  if (!time) return '';
 
   const now = Date.now();
   const target = new Date(time).getTime();
 
-  if (isNaN(target)) return '时间错误';
+  if (isNaN(target)) return '';
 
   // 时间差（毫秒）
   const diff = now - target;

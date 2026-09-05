@@ -19,6 +19,8 @@
   --root-male-color: #1E88E5;
   --root-female-color: #E53935;
 
-  --root-max-height: 900px;
-  --root-max-width: 1600px;
+  /* 顶部视口高度(上方搜索框高度) */
+  --root-topview-height: 7rem;
+  /* 主要视口高度(不包含上方搜索框高度) */
+  --root-mainview-height: calc(100vh - var(--root-topview-height));
 }

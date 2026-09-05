@@ -1,51 +1,54 @@
 <template>
   <div class="chat-page">
-    <div class="sessions">
-      <ScrollContainer
-        trigger-type="bottom"
-        :load-more-callback="loadMoreSessionsCb"
-      >
-        <SessionCard
-          v-for="session in sessions"
-          :key="session.session.id"
-          :user-id="session.user.id"
-          :user-avatar-url="session.user.avatar_url"
-          :session-name="session.user.name"
-          :latest-msg="session.latestMessage.content"
-          :msg-time="session.latestMessage.created_at"
-          @click="switchSelectedSession(session.session.id)"
-        />
-      </ScrollContainer>
-    </div>
-    <!-- <ChatSender @send-msg="sendMsg" class="chat-sender"/> -->
     <ScrollContainer
-      trigger-type="reverse-top"
-      :load-more-callback="loadMoreMessagesCb"
-      ref="msgScrollRef"
-      class="chat-panel"
-      v-show="selectedSessionId !== ''"
+      trigger-type="bottom"
+      :load-more-callback="getSessions"
+      class="sessions"
     >
-      <div
-        v-for="msg in messages"
-        :key="msg.message.id"
-        class="chat-message"
-        :style="{
-          'align-self': msg.user.id === storage.initData.value?.user.id ? 'end' : 'start',
-          'flex-direction': msg.user.id === storage.initData.value?.user.id ? 'row-reverse' : 'row',
-        }"
+      <SessionCard
+        v-for="session in sessions"
+        v-model:selected-id="selectedSessionId"
+        :key="session.session.id"
+        :sessionId="session.session.id"
+        :userId="session.user.id"
+        :userAvatarUrl="session.user.avatar_url"
+        :sessionName="session.user.name"
+        :latestMsg="session.latestMessage ? session.latestMessage.content : ''"
+        :msgTime="session.latestMessage ? session.latestMessage.created_at : ''"
+        :unreadCount="session.unreadCount"
+        @click="switchSelectedSession(session.session.id)"
+      />
+    </ScrollContainer>
+    <div class="chat-panel" v-show="selectedSessionId !== ''">
+      <ChatSender @send-msg="sendMsg" class="chat-sender"/>
+      <ScrollContainer
+        trigger-type="reverse-top"
+        :load-more-callback="getMessages"
+        ref="msgScrollRef"
+        class="chat-messages"
       >
-        <UserAvatar :user-id="msg.user.id" width="3rem" :img-url="msg.user.avatar_url" />
         <div
-          class="msg-content"
+          v-for="msg in messages"
+          :key="msg.message.id"
+          class="chat-message"
           :style="{
-            'color': msg.user.id === storage.initData.value?.user.id ? 'white' : 'black',
-            'background-color': msg.user.id === storage.initData.value?.user.id ? '#0084ff' : 'var(--root-bg-gray)'
+            'align-self': msg.user.id === storage.initData.value?.user.id ? 'end' : 'start',
+            'flex-direction': msg.user.id === storage.initData.value?.user.id ? 'row-reverse' : 'row',
           }"
         >
-          {{ msg.message.content }}
+          <UserAvatar :user-id="msg.user.id" width="3rem" :img-url="msg.user.avatar_url" />
+          <div
+            class="msg-content"
+            :style="{
+              'color': msg.user.id === storage.initData.value?.user.id ? 'white' : 'black',
+              'background-color': msg.user.id === storage.initData.value?.user.id ? '#0084ff' : 'var(--root-bg-gray)'
+            }"
+          >
+            {{ msg.message.content }}
+          </div>
         </div>
-      </div>
-    </ScrollContainer>
+      </ScrollContainer>
+    </div>
   </div>
 </template>
 
@@ -60,7 +63,9 @@
   import { EnhancedList } from '@/lib/list';
   import { axiosProxy } from '@/api/axios';
   import type { paths } from '@/api/gen';
-  import { logger } from '@/logger';
+  import { useRoute } from 'vue-router';
+
+  const route = useRoute()
 
   const sessions = ref<EnhancedList<SessionSchema>>(new EnhancedList(
     (item) => item.session.id,
@@ -99,17 +104,6 @@
     return messages.value.isEnd
   }
 
-   // 会话列表滚动底部回调
-  const loadMoreSessionsCb = async () => {
-    return await getSessions()
-  }
-
-  // 消息列表滚动底部回调
-  const loadMoreMessagesCb = async () => {
-    logger.debug("触发加载更多消息")
-    return await getMessages()
-  }
-
   // 切换当前选中会话
   const switchSelectedSession = async (sessionId: string) => {
     if (selectedSessionId.value === sessionId) {
@@ -136,8 +130,29 @@
   }
 
   onMounted(async () => {
+    // 加载当前用户会话数据
     await getSessions()
+    // 创建新会话(通过传递url参数触发)
+    await onMountedCreateSession()
   })
+
+  // 挂载钩子创建会话逻辑
+  const onMountedCreateSession = async () => {
+    if (!route.query.targetUserId) return
+
+    const targetUserId = route.query.targetUserId as string
+    
+    // 创建会话
+    const sessionData = await axiosProxy.post<
+      paths["/chat/create/session"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/chat/create/session"]["post"]["responses"]["200"]["content"]["application/json"]
+    >(`/chat/create/session`, {
+      userId: targetUserId,
+    })
+    sessions.value.unshift(sessionData)
+    // 切换选中会话为新创建的会话
+    selectedSessionId.value = sessionData.session.id
+}
 </script>
 
 <style scoped lang="css">
@@ -145,31 +160,47 @@
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 2.5fr;
+  grid-template-columns: 1fr 3fr;
+
   .sessions {
     height: 100%;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
   }
+  
   .chat-panel {
-    height: 100%;
-    padding: 3rem 5rem;
-    gap: 0.5rem;
-    display: flex;
-    flex-direction: column-reverse;
-    justify-content: end;
-    align-items: center;
-    .chat-message {
+    height: var(--root-mainview-height);
+    position: relative;
+    .chat-messages {
+      height: calc(100% - 12rem);
+      width: 100%;
+      overflow-y: auto;
+      gap: 0.5rem;
+      padding: 0 5%;
       display: flex;
+      flex-direction: column-reverse;
+      justify-content: end;
       align-items: center;
-      gap: 0.6rem;
-      .msg-content {
-        font-size: 0.9rem;
-        font-weight: 500;
-        padding: 0.7rem 1.1rem;
-        border-radius: 15px;
+      .chat-message {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        .msg-content {
+          font-size: 0.9rem;
+          font-weight: 500;
+          padding: 0.7rem 1.1rem;
+          border-radius: 15px;
+        }
       }
+    }
+    .chat-sender {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 11rem;
     }
   }
 }

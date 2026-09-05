@@ -135,12 +135,11 @@
 
 <style scoped lang="scss">
   .layout {
-    width: 100%;
-    height: 100%;
     .top {
       padding: 0 40px;
       display: flex;
-      height: 80px;
+      height: var(--root-topview-height);
+      width: 100vw;
       justify-content: end;
       align-items: center;
       .current {
@@ -174,7 +173,8 @@
       }
     }
     .bottom {
-      height: calc(100% - 80px);
+      height: var(--root-mainview-height);
+      width: 100vw;
       display: flex;
       justify-content: center;
       align-items: center;

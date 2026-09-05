@@ -10,7 +10,7 @@
   import { ref } from 'vue';
 
   const props = defineProps<{
-    // 触发类型 bottom: 底部触发 top: 顶部触发
+    // 触发类型 bottom: 底部触发 reverse-top: 逆顶部触发
     triggerType: 'bottom' | 'reverse-top',
 
     // 触发回调函数, 返回值为是否还有更多数据布尔值

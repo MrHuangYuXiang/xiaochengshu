@@ -20,7 +20,7 @@
             <div class="text">{{ user?.user.name }}</div>
             <div class="btn-group" v-if="user?.user.id !== storage.initData.value?.user.id">
               <AppButton :text="formatFollowStatus(user?.user.is_follow || 0, user?.user.is_followed || 0)" @click="follow"/>
-              <AppButton text="私信" color="default" @click="ElMessage('该功能正在开发中')" />
+              <AppButton text="私信" @click="redirectToChatPage" />
             </div>
           </div>
           <div class="tag">
@@ -48,6 +48,7 @@
 
 <script setup lang="ts">
   import { ref, useTemplateRef } from 'vue'
+  import { useRoute } from 'vue-router';
   import UserAvatar from '@/component/user/UserAvatar.vue'
   import WorkGrid from '@/component/work/WorkGrid.vue'
   import AppSegment from '@/component/common/AppSegment.vue';
@@ -58,9 +59,9 @@
   import { axiosProxy } from '@/api/axios';
   import { formatBirthday, formatFollowStatus } from '@/helper/format'
   import type { paths } from '@/api/gen'
-  import { useRoute } from 'vue-router';
   import { storage } from '@/storage';
   import { ElMessage } from 'element-plus';
+import router from '@/router';
 
   const route = useRoute();
   const user = ref<paths["/user"]["get"]["responses"]["200"]["content"]["application/json"]>()
@@ -106,7 +107,7 @@
     enableFollowsModalShow.value = true
   }
 
-  // 关注
+  // 关注用户
   const follow = async () => {
     await axiosProxy.post<
     paths["/follow/user"]["post"]["requestBody"]["content"]["application/json"],
@@ -124,6 +125,31 @@
     })
 
     ElMessage("操作成功")
+  }
+
+  /**
+   * 私信用户,重定向到聊天页面
+   * 通过url参数传递用户id,让调用创建会话接口在聊天页面调用
+   */
+  const redirectToChatPage = async () => {
+    if (!user.value) return
+
+    // // 创建会话
+    // const data = await axiosProxy.post<
+    //   paths["/chat/create/session"]["post"]["requestBody"]["content"]["application/json"],
+    //   paths["/chat/create/session"]["post"]["responses"]["200"]["content"]["application/json"]
+    // >(`/chat/create/session`, {
+    //   userId: user.value?.user.id,
+    // })
+
+    // 重定向聊天页面
+    router.push({ 
+      name: "ChatPage",
+      query: {
+        // 该参数用于在聊天页面创建会话时对应的用户id
+        targetUserId: user.value?.user.id,
+      }
+    })
   }
 
  </script>
