@@ -30,7 +30,7 @@
             :src="file.url"
             :is-upload-image="false"
             >
-              <div class="image-options" @click.self="imagePreview.show(file.url)">
+              <div class="image-options" @click.self="imagePreviewCom.show(file.url)">
                   <div class="image-option" @click="setCover(file.file, file.url, index)">设为封面</div>
                   <div class="image-option" @click="deleteImage(file.file, file.url, index)">删除</div>
               </div>
@@ -71,7 +71,7 @@
   import ImageContainer from '@/component/common/ImageContainer.vue';
   import { ElMessage } from 'element-plus';
   import { axiosProxy } from '@/api/axios';
-  import { imagePreview } from '@/component/global/global';
+  import { imagePreviewCom } from '@/component/global/global';
   import { validateForm } from '@/helper/form';
 
   const titleInputRef = useTemplateRef("titleInputRef");

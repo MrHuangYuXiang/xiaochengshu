@@ -3,26 +3,29 @@
     :can-close="false"
     width="30vw"
     height="30vh"
+    v-show="errorDialogCom.content.value !== ''"
   >
     <div class="dialog">
-      <div>{{ props.content }}</div>
+      <div>{{ errorDialogCom.content }}</div>
       <div class="btn-group">
-        <AppButton text="确定" @click="emits('close')" />
+        <AppButton text="确定" @click="confirmErrorDialog" />
       </div>
     </div>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
-  import BaseModal from './BaseModal.vue';
-  import AppButton from './AppButton.vue';
+  import BaseModal from '../common/BaseModal.vue';
+  import AppButton from '../common/AppButton.vue';
+  import { errorDialogCom } from './global.ts';
+  import { useRouter } from 'vue-router';
 
-  const props = defineProps({
-    content: {
-      type: String,
-    },
-  })
-  const emits = defineEmits(['close'])
+  const router = useRouter()
+
+  const confirmErrorDialog = async () => {
+    errorDialogCom.close()
+    await router.push({ name: "LoginPage" });
+  }
 </script>
 
 <style scoped lang="css">

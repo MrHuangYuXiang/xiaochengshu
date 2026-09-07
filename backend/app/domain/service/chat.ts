@@ -5,10 +5,9 @@ import { userTable } from "../../db/schema/user.js";
 import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput, sendMessageOutput, type createSessionInput } from "../dto/chat.js";
 import { getCurrent } from "../../local_stroage.js";
 import { v4 as uuidv4 } from "uuid";
-import { and, count, desc, eq, getTableColumns, gt, inArray, max, not, sql } from "drizzle-orm";
+import { and, count, desc, eq, getTableColumns, gt, inArray, lt, max, not, sql } from "drizzle-orm";
 import { getPageParams } from "../../helper/http.js";
-import type { IncGeneratorPort } from "../../io/port/IncGenerator.js";
-import { httpEvents, ClientEventType, pushChatMessageClientEvent } from "../dto/client.js";
+import { ClientEventType, pushChatMessageClientEvent } from "../dto/client.js";
 import { clientResponseMap } from "../../client.js";
 
 // TODO: 当前仅支持私聊会话
@@ -188,13 +187,17 @@ export class ChatService {
             limit(page.limit).
             offset(page.offset);
 
-        // 更新最后阅读时间
+        /** 
+         * 更新最后阅读时间
+         * FIX: 仅更新小于当前消息序列号的记录
+         */
         if (messages[0]) {
             await current.tx.update(chatSessionMemberTable).set({
                 last_read_seq: messages[0].message.inc_seq,
             }).where(and(
                 eq(chatSessionMemberTable.session_id, res.locals.query!.sessionId),
                 eq(chatSessionMemberTable.user_id, current.userId),
+                lt(chatSessionMemberTable.last_read_seq, messages[0].message.inc_seq),
             ));
         }
 

@@ -1,10 +1,13 @@
 <template>
+  <!-- 全局组件挂载区 -->
+  <ImagePreview />
+  <MsgTip />
+  <ErrorDialog></ErrorDialog>
+
   <!-- 初始化用户弹窗 -->
   <InitUserModal v-if="enableInitUserModalShow" @close="enableInitUserModalShow = false"></InitUserModal>
   <!-- 更新用户信息弹窗 -->
   <UpdateUserModal v-if="enableUpdateUserModalShow" @close="enableUpdateUserModalShow = false"></UpdateUserModal>
-  <!-- 事件推送错误对话框 -->
-  <AppDialog v-if="enableErrorDialogShow" :content="errorDialogContent" @close="confirmErrorDialog"></AppDialog>
 
   <div class="layout">
     <div class="top">
@@ -51,12 +54,14 @@
   import UserAvatar from '@/component/user/UserAvatar.vue';
   import InitUserModal from '@/component/user/InitUserModal.vue';
   import UpdateUserModal from '@/component/user/UpdateUserModal.vue';
-  import AppDialog from '@/component/common/AppDialog.vue';
+  import ErrorDialog from '@/component/global/ErrorDialog.vue';
+  import MsgTip from '@/component/global/MsgTip.vue';
+  import ImagePreview from '@/component/global/ImagePreview.vue';
   import { onBeforeMount, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { storage } from '@/storage';
-  import { httpEvent } from '@/api/event';
-  import type { components, paths } from '@/api/gen';
+  import { clientEvent } from '@/api/event';
+  import type { paths } from '@/api/gen';
   import { axiosProxy } from '@/api/axios';
 
   const router = useRouter();
@@ -66,10 +71,6 @@
   ]
   const enableInitUserModalShow = ref(false)
   const enableUpdateUserModalShow = ref(false)
-  const enableErrorDialogShow = ref(false)
-  // 错误对话框内容
-  const errorDialogContent = ref("")
-
 
   const clickMenuItem = async (id: number) => {
     switch (id) {
@@ -81,41 +82,15 @@
       // 退出登录
       case 2:
         storage.clear();
-        httpEvent.disconnect()
+        clientEvent.disconnect()
         await router.push({ name: "LoginPage" });
         break
     }
   }
 
-  const confirmErrorDialog = async () => {
-    enableErrorDialogShow.value = false
-    await router.push({ name: "LoginPage" });
-  }
-
   onBeforeMount(async () => {
-    /** 注册后端事件推送回调函数 */
-
-    // 错误事件
-    httpEvent.registerCallback(
-      "error",
-      async (data) => {
-        // 接收到错误,清理相关资源,由于后端主动断开tcp连接,客户端不需要主动断
-        errorDialogContent.value = (data as components["schemas"]["errorClientEvent"]).msg
-        storage.clear()
-        enableErrorDialogShow.value = true
-      }
-    )
-
-    // 心跳续约
-    httpEvent.registerCallback(
-      "heartbeat",
-      async (data) => {
-        // jwt续约
-        storage.setToken((data as components["schemas"]["heartbeatClientEvent"]).jwt)
-     })
-
     // 连接后端事件推送
-    await httpEvent.connect()
+    await clientEvent.connect()
 
     // 获取初始化数据
     storage.setInitData(

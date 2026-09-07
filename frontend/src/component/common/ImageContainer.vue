@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
     import AppIcon from '../common/AppIcon.vue';
-    import { imagePreview } from "@/component/global/global"
+    import { imagePreviewCom } from "@/component/global/global"
 
     const uploadUrl = import.meta.env.VITE_UPLOAD_URL
     const props = defineProps({
@@ -68,7 +68,7 @@
     // 点击图片
     const clickImage = () => {
         if (props.enablePreview && props.src) {
-            imagePreview.show(getImageUrl())
+            imagePreviewCom.show(getImageUrl())
         }
     }
 

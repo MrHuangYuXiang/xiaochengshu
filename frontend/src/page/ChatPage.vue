@@ -50,6 +50,8 @@
       </ScrollContainer>
     </div>
   </div>
+
+  <div style="width: 2rem; height: 2rem; background-color: black;" @click="msgTipCom.show('userAvatarUrl', 'userName', 'msgContent')"></div>
 </template>
 
 <script lang="ts" setup>
@@ -64,6 +66,7 @@
   import { axiosProxy } from '@/api/axios';
   import type { paths } from '@/api/gen';
   import { useRoute } from 'vue-router';
+  import { msgTipCom } from '@/component/global/global';
 
   const route = useRoute()
 
