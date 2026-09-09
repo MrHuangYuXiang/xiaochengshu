@@ -42,6 +42,11 @@
       type: Boolean,
       default: false
     },
+    // 是否允许点击跳转用户详情页
+    enableRedirectable: {
+      type: Boolean,
+      default: true
+    },
   })
   const inputRef = useTemplateRef("inputRef")
   const emits = defineEmits(['change'])
@@ -49,14 +54,13 @@
   const click = async () => {
     if (props.isUploadable) {
       inputRef.value!.click()
-    } else {
+    } else if (props.enableRedirectable) {
       await router.push({
         name: 'UserPage',
         params: {
           userId: props.userId
-      }
-    })
-    }
+      }})
+    } else {}
   }
 
   const change = () => {

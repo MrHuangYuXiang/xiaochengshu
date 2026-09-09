@@ -1,26 +1,64 @@
 <template>
     <div 
-        v-show="msgTipCom.data.value"
         class="msg-tip"
+        :class="{ 'active': msgTipCom.showFlag.value }"
+        @click="redirect"
     >
-        <div>{{ msgTipCom.data.value?.userName }}</div>
-        <div>{{ msgTipCom.data.value?.msgContent }}</div>
+        <UserAvatar 
+            :user-id="msgTipCom.data.value?.userId"
+            :img-url="msgTipCom.data.value?.userAvatarUrl"
+            width="3rem"
+            :enable-redirectable="false"
+        />
+        <div class="msg">
+            <div class="user">{{ msgTipCom.data.value?.userName }}</div>
+            <div class="msg-content">{{ msgTipCom.data.value?.msgContent }}</div>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
+    import UserAvatar from '../user/UserAvatar.vue';
     import { msgTipCom } from './global';
+    import { useRouter } from 'vue-router';
+
+    const router = useRouter()
+    const redirect = () => {
+        router.push({ 
+            name: "ChatPage",
+            query: {
+                switchOptionSessionId: msgTipCom.data.value?.sessionId,
+            }
+        })
+    }
 </script>
 
 <style scoped lang="scss">
     .msg-tip {
+        visibility: hidden;
+        opacity: 0;
         position: fixed;
-        bottom: 0;
+        z-index: 1;
+        top: 0;
         right: 0;
-        padding: 2rem;
+        background-color: white;
+        box-shadow: 0px 3px 20px rgba($color: black, $alpha: 0.2);
+        padding: 1rem;
         border-radius: 10px;
+        gap: 1rem;
+        transition: visibility 0.3s ease-in-out,
+                    opacity 0.3s ease-in-out;
         display: flex;
         align-items: center;
-        gap: 1rem;
+        cursor: pointer;
+        .msg {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+    }
+    .msg-tip.active {
+        visibility: visible;
+        opacity: 1;
     }
 </style>

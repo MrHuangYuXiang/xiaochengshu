@@ -50,8 +50,6 @@
       </ScrollContainer>
     </div>
   </div>
-
-  <div style="width: 2rem; height: 2rem; background-color: black;" @click="msgTipCom.show('userAvatarUrl', 'userName', 'msgContent')"></div>
 </template>
 
 <script lang="ts" setup>
@@ -66,7 +64,7 @@
   import { axiosProxy } from '@/api/axios';
   import type { paths } from '@/api/gen';
   import { useRoute } from 'vue-router';
-  import { msgTipCom } from '@/component/global/global';
+  import { logger } from '@/logger';
 
   const route = useRoute()
 
@@ -79,7 +77,7 @@
     10,
   ))
 
-  // 当前选中会话
+  // 当前选中会话id
   const selectedSessionId = ref("");
   const msgScrollRef = useTemplateRef("msgScrollRef")
 
@@ -121,12 +119,16 @@
 
   // 发送消息
   const sendMsg = async (content: string) => {
+    // 从会话数据中获取成员id
+    const memberId = sessions.value.get(selectedSessionId.value)?.sessionMember.id
+    if (!memberId) return
+
     const message = await axiosProxy.post<
       paths["/chat/send/message"]["post"]["requestBody"]["content"]["application/json"],
       paths["/chat/send/message"]["post"]["responses"]["200"]["content"]["application/json"]
     >("/chat/send/message", {
       sessionId: selectedSessionId.value,
-      sessionMemberId: storage.initData.value!.user.id,
+      sessionMemberId: memberId,
       content: content,
     })
     messages.value.unshift(message)
@@ -135,27 +137,39 @@
   onMounted(async () => {
     // 加载当前用户会话数据
     await getSessions()
-    // 创建新会话(通过传递url参数触发)
+    // 创建新会话
     await onMountedCreateSession()
+    // 切换至指定会话
+    await onMountedSwitchSession()
   })
 
-  // 挂载钩子创建会话逻辑
+  // 挂载钩子:创建会话逻辑
   const onMountedCreateSession = async () => {
-    if (!route.query.targetUserId) return
+    if (!route.query.createOptionUserId) return
 
-    const targetUserId = route.query.targetUserId as string
+    const userId = route.query.createOptionUserId as string
     
     // 创建会话
     const sessionData = await axiosProxy.post<
       paths["/chat/create/session"]["post"]["requestBody"]["content"]["application/json"],
       paths["/chat/create/session"]["post"]["responses"]["200"]["content"]["application/json"]
     >(`/chat/create/session`, {
-      userId: targetUserId,
+      userId,
     })
     sessions.value.unshift(sessionData)
     // 切换选中会话为新创建的会话
     selectedSessionId.value = sessionData.session.id
-}
+  }
+
+  // 挂载钩子:切换至指定会话逻辑
+  const onMountedSwitchSession = async () => {
+    if (!route.query.switchOptionSessionId) return
+
+    const sessionId = route.query.switchOptionSessionId as string
+    await switchSelectedSession(sessionId)
+    logger.debug(`切换至会话: ${sessionId}`)
+  }
+
 </script>
 
 <style scoped lang="css">

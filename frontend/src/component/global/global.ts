@@ -1,4 +1,3 @@
-import { logger } from "@/logger"
 import { type Ref, ref } from "vue"
 
 /**
@@ -23,24 +22,46 @@ class ImagePreviewCom {
 class MsgTipCom {
   public data: Ref<{
     userAvatarUrl: string
+    userId: string
     userName: string
+    sessionId: string
     msgContent: string
-  } | undefined>
+  }>
+  // 是否显示标志位
+  public showFlag: Ref<boolean>
 
   constructor() {
-    this.data = ref(undefined)
+    this.data = ref({
+      userAvatarUrl: "",
+      userId: "",
+      userName: "",
+      sessionId: "",
+      msgContent: ""
+    })
+    this.showFlag = ref(false)
   }
 
-  show(userAvatarUrl: string, userName: string, msgContent: string): void {
+  show(
+    userAvatarUrl: string,
+    userId: string,
+    userName: string,
+    sessionId: string,
+    msgContent: string
+  ): void {
+    if (this.showFlag.value) return
+
     this.data.value = {
       userAvatarUrl,
+      userId,
       userName,
+      sessionId,
       msgContent
     }
+    this.showFlag.value = true
 
     // 延时3秒自动隐藏
     setTimeout(() => {
-      this.data.value = undefined
+      this.showFlag.value = false
     }, 3000)
   }
 }

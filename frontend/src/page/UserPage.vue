@@ -129,25 +129,17 @@ import router from '@/router';
 
   /**
    * 私信用户,重定向到聊天页面
-   * 通过url参数传递用户id,让调用创建会话接口在聊天页面调用
+   * 通过url参数传递用户id,由聊天页面调用后端api
    */
   const redirectToChatPage = async () => {
     if (!user.value) return
-
-    // // 创建会话
-    // const data = await axiosProxy.post<
-    //   paths["/chat/create/session"]["post"]["requestBody"]["content"]["application/json"],
-    //   paths["/chat/create/session"]["post"]["responses"]["200"]["content"]["application/json"]
-    // >(`/chat/create/session`, {
-    //   userId: user.value?.user.id,
-    // })
 
     // 重定向聊天页面
     router.push({ 
       name: "ChatPage",
       query: {
         // 该参数用于在聊天页面创建会话时对应的用户id
-        targetUserId: user.value?.user.id,
+        createOptionUserId: user.value?.user.id,
       }
     })
   }

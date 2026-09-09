@@ -23,7 +23,12 @@ const heartbeatCallback = async (data: unknown) => {
 /** 聊天消息推送 */
 const chatMessagePushCallback = async (data: unknown) => {
   const message = data as components["schemas"]["pushChatMessageEvent"]
-  msgTipCom.show(message.user.avatar_url, message.user.name, message.message.content)
+  msgTipCom.show(
+    message.user.avatar_url,
+    message.user.id,
+    message.user.name,
+    message.message.session_id,
+    message.message.content)
 }
 
 /**
