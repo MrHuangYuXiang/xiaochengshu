@@ -64,7 +64,6 @@
   import { axiosProxy } from '@/api/axios';
   import type { paths } from '@/api/gen';
   import { useRoute } from 'vue-router';
-  import { logger } from '@/logger';
 
   const route = useRoute()
 
@@ -137,10 +136,8 @@
   onMounted(async () => {
     // 加载当前用户会话数据
     await getSessions()
-    // 创建新会话
+    // 创建新会话(该接口会幂等返回已存在的会话)
     await onMountedCreateSession()
-    // 切换至指定会话
-    await onMountedSwitchSession()
   })
 
   // 挂载钩子:创建会话逻辑
@@ -159,15 +156,8 @@
     sessions.value.unshift(sessionData)
     // 切换选中会话为新创建的会话
     selectedSessionId.value = sessionData.session.id
-  }
-
-  // 挂载钩子:切换至指定会话逻辑
-  const onMountedSwitchSession = async () => {
-    if (!route.query.switchOptionSessionId) return
-
-    const sessionId = route.query.switchOptionSessionId as string
-    await switchSelectedSession(sessionId)
-    logger.debug(`切换至会话: ${sessionId}`)
+    // 获取该会话消息
+    await getMessages()
   }
 
 </script>

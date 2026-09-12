@@ -18,7 +18,7 @@
         router.push({ 
             name: "ChatPage",
             query: {
-                switchOptionSessionId: msgTipCom.data.value?.sessionId,
+                createOptionUserId: msgTipCom.data.value?.userId,
             }
         })
     }
