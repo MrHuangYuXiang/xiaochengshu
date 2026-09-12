@@ -30,6 +30,7 @@ import { getImageExt, getPageParams } from "../../helper/http.js";
 import { getFollowRelationSubQuery } from "./common.js";
 import type { FileStoragePort } from "../../io/port/file_storage.js";
 
+// FIXME: 该服务下的接口需要重写加锁逻辑,锁需要放在事务外面,避免mvcc快照导致锁失效
 export class UserService {
     private mutex: MutexPort
     private fileStorage: FileStoragePort
@@ -61,28 +62,25 @@ export class UserService {
             throw new AppError("验证码错误")
         }
 
-        // 上锁避免手机号重复注册
-        await this.mutex.withLock(`login:${res.locals.body!.phoneNumber}`, async () => {
-            const user = await current.tx.select().from(userTable).where(eq(userTable.phone_number, res.locals.body!.phoneNumber))
+        const user = await current.tx.select().from(userTable).where(eq(userTable.phone_number, res.locals.body!.phoneNumber))
 
-            // 用户不存在自动注册注册
-            if (user.length == 0) {
-                userId = uuidv4()
-                await current.tx.insert(userTable).values({
-                    id: userId,
-                    phone_number: res.locals.body!.phoneNumber,
-                    name: res.locals.body!.phoneNumber,
-                    desc: "",
-                    birthday: new Date(),
-                    gender: 1,
-                    avatar_url: "",
-                    // 未填写个人信息
-                    is_profile_completed: 0,
-                })
-            } else {
-                userId = user[0]!.id
-            }
-        })
+        // 用户不存在自动注册注册
+        if (user.length == 0) {
+            userId = uuidv4()
+            await current.tx.insert(userTable).values({
+                id: userId,
+                phone_number: res.locals.body!.phoneNumber,
+                name: res.locals.body!.phoneNumber,
+                desc: "",
+                birthday: new Date(),
+                gender: 1,
+                avatar_url: "",
+                // 未填写个人信息
+                is_profile_completed: 0,
+            })
+        } else {
+            userId = user[0]!.id
+        }
 
         res.json(loginOutput.parse({
             token: genJWT(userId),
@@ -103,14 +101,12 @@ export class UserService {
         res.setHeader('Cache-Control', 'no-cache')
         res.setHeader('Connection', 'keep-alive')
 
-        // 在线状态通过httpResponseMap维护,加锁避免高并发单用户同时在线问题
-        await this.mutex.withLock(`online:${current.userId}`, async () => {
-            if (!clientResponseMap.get(current.userId)) {
-                clientResponseMap.add(current.userId, res)
-            } else {
-                throw new AppError("用户已在线")
-            }
-        })
+        // 在线状态通过httpResponseMap维护
+        if (!clientResponseMap.get(current.userId)) {
+            clientResponseMap.add(current.userId, res)
+        } else {
+            throw new AppError("用户已在线")
+        }
 
         // 后端维持心跳,同时续约jwt
         clientResponseMap.push(current.userId, ClientEventType.heartbeat, heartbeatClientEvent.parse({

@@ -78,7 +78,11 @@ class Doc {
             return this.getOriginalType(obj.in)
         }
         // 对于Default类型,需要通过unwrap拿到内部类型
-        else if (obj instanceof z.ZodDefault || obj instanceof z.ZodNullable) {
+        else if (
+            obj instanceof z.ZodDefault ||
+            obj instanceof z.ZodNullable ||
+            obj instanceof z.ZodOptional
+        ) {
             return this.getOriginalType(obj.unwrap())
         }
         else {

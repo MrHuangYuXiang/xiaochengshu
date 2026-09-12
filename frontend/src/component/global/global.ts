@@ -21,7 +21,6 @@ class ImagePreviewCom {
 
 class MsgTipCom {
   public data: Ref<{
-    userAvatarUrl: string
     userId: string
     userName: string
     sessionId: string
@@ -32,7 +31,6 @@ class MsgTipCom {
 
   constructor() {
     this.data = ref({
-      userAvatarUrl: "",
       userId: "",
       userName: "",
       sessionId: "",
@@ -42,7 +40,6 @@ class MsgTipCom {
   }
 
   show(
-    userAvatarUrl: string,
     userId: string,
     userName: string,
     sessionId: string,
@@ -51,7 +48,6 @@ class MsgTipCom {
     if (this.showFlag.value) return
 
     this.data.value = {
-      userAvatarUrl,
       userId,
       userName,
       sessionId,

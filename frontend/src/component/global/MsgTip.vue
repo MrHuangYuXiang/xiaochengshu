@@ -4,21 +4,12 @@
         :class="{ 'active': msgTipCom.showFlag.value }"
         @click="redirect"
     >
-        <UserAvatar 
-            :user-id="msgTipCom.data.value?.userId"
-            :img-url="msgTipCom.data.value?.userAvatarUrl"
-            width="3rem"
-            :enable-redirectable="false"
-        />
-        <div class="msg">
-            <div class="user">{{ msgTipCom.data.value?.userName }}</div>
-            <div class="msg-content">{{ msgTipCom.data.value?.msgContent }}</div>
-        </div>
+        <div class="user">{{ msgTipCom.data.value?.userName }}</div>
+        <div class="msg-content">{{ msgTipCom.data.value?.msgContent }}</div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import UserAvatar from '../user/UserAvatar.vue';
     import { msgTipCom } from './global';
     import { useRouter } from 'vue-router';
 
@@ -49,13 +40,9 @@
         transition: visibility 0.3s ease-in-out,
                     opacity 0.3s ease-in-out;
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        justify-content: center;
         cursor: pointer;
-        .msg {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
     }
     .msg-tip.active {
         visibility: visible;
