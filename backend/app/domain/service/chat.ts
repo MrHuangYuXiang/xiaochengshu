@@ -1,13 +1,13 @@
 import type { Request } from "express";
-import type { EnhancedResponse } from "../dto/index.js";
+import type { EnhancedResponse } from "../model/dto/index.js";
 import { chatSessionTable, chatSessionMemberTable, chatMessageTable } from "../../db/schema/chat.js";
 import { userTable } from "../../db/schema/user.js";
-import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput, sendMessageOutput, type createSessionInput } from "../dto/chat.js";
+import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput, sendMessageOutput, type createSessionInput } from "../model/dto/chat.js";
 import { getCurrent } from "../../local_stroage.js";
 import { v4 as uuidv4 } from "uuid";
 import { and, count, desc, eq, getTableColumns, gt, inArray, lt, max, not, sql } from "drizzle-orm";
 import { getPageParams } from "../../helper/http.js";
-import { ClientEventType, pushChatMessageClientEvent } from "../dto/client.js";
+import { ClientEventType, pushChatMessageClientEvent } from "../model/dto/client.js";
 import { clientResponseMap } from "../../client.js";
 
 // TODO: 当前仅支持私聊会话

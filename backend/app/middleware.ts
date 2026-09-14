@@ -5,7 +5,7 @@ import { getEnv } from "./helper/env.js";
 import { localStorage } from "./local_stroage.js";
 import { getTx } from "./db/db.js";
 import { clientResponseMap } from "./client.js";
-import { errorClientEvent, ClientEventType } from "./domain/dto/client.js";
+import { errorClientEvent, ClientEventType } from "./domain/model/dto/client.js";
 import { AppError } from "./error.js";
 
 /**

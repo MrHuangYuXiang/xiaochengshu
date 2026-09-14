@@ -112,3 +112,10 @@ export const collectWorkInput = objectType({
 export const likeWorkCommentInput = objectType({
     isLiked: numberType,
 })
+
+// 举报作品输入
+export const reportWorkInput = objectType({
+    workId: stringType,
+    reportType: numberType,
+    reason: stringType.min(1, "举报原因至少为1个字符").max(200, "举报原因最多为200个字符"),
+})
