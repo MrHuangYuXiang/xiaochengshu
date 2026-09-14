@@ -14,7 +14,7 @@ import {
     likeWorkInput,
     collectWorkInput,
     likeWorkCommentInput,
-} from "./domain/dto/work.js"
+} from "./domain/model/dto/work.js"
 import {
     smsSendInput,
     loginInput,
@@ -29,14 +29,14 @@ import {
     removeFollowerInput,
     followUserOutput,
     removeFollowerOutput,
-} from "./domain/dto/user.js"
+} from "./domain/model/dto/user.js"
 import express from "express"
 import { routeMap } from "./route_map.js"
 import { doc } from "./doc.js"
 import { z } from "zod"
 import { newLocalMutex } from "./io/adapter/mutex.js"
 import { newNginxFileStorage } from "./io/adapter/file_storage.js"
-import { createSessionInput, createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput, sendMessageOutput } from "./domain/dto/chat.js"
+import { createSessionInput, createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, sendMessageInput, sendMessageOutput } from "./domain/model/dto/chat.js"
 
 export interface ServerPort {
     Run(): void

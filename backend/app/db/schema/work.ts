@@ -55,3 +55,15 @@ export const workCommentLikeTable = mysqlTable('work_comment_like', {
     comment_id: varchar({ length: 255 }).notNull(),
     user_id: varchar({ length: 255 }).notNull(),
 });
+
+// 作品举报表
+export const workReportTable = mysqlTable('work_report', {
+    ...baseTable,
+    work_id: varchar({ length: 255 }).notNull(),
+    // 举报人(发起举报的用户)id
+    reporter_id: varchar({ length: 255 }).notNull(),
+    // 举报类型
+    report_type: tinyint().notNull(),
+    // 举报原因
+    reason: varchar({ length: 200 }).notNull(),
+});

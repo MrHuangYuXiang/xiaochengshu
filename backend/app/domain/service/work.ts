@@ -1,9 +1,9 @@
 import { db } from "../../db/db.js";
 import { getCurrent } from "../../local_stroage.js";
 import { followTable, userTable } from "../../db/schema/user.js";
-import { workTable, workCollectTable, workCommentTable, workLikeTable, workCommentLikeTable, workImageTable } from "../../db/schema/work.js";
+import { workTable, workCollectTable, workCommentTable, workLikeTable, workCommentLikeTable, workImageTable, workReportTable } from "../../db/schema/work.js";
 import { and, eq, getTableColumns, count, inArray, not, sql, desc, like } from "drizzle-orm";
-import type { EnhancedResponse } from "../dto/index.js";
+import type { EnhancedResponse } from "../model/dto/index.js";
 import type { Request } from "express";
 import {
   getWorkDetailInput,
@@ -17,7 +17,8 @@ import {
   collectWorkInput,
   likeWorkCommentInput,
   createWorkCommentInput,
-} from "../dto/work.js";
+  reportWorkInput,
+} from "../model/dto/work.js";
 import { v4 as uuidv4 } from "uuid";
 import { getImageExt, getPageParams } from "../../helper/http.js";
 import { handleRawSqlRes } from "../../helper/sql.js";
@@ -26,6 +27,7 @@ import { getFollowRelationSubQuery } from "./common.js";
 import type { FileStoragePort } from "../../io/port/file_storage.js";
 import type { FormFieldHeader } from "../../form_parser.js";
 import { AppError } from "../../error.js";
+import { reportTypeEnum } from "../model/enum/work.js";
 
 export class WorkService {
   private fileStorage: FileStoragePort
@@ -527,5 +529,22 @@ export class WorkService {
     }
 
     res.json(null)
+  }
+
+  // 举报作品
+  async reportWork(req: Request, res: EnhancedResponse<null, typeof reportWorkInput>) {
+    const current = getCurrent()
+
+    // 验证举报类型是否存在
+    if (!Object.values(reportTypeEnum).includes(res.locals.body!.reportType)) {
+      throw new AppError("不存在的举报类型")
+    }
+
+    await current.tx.insert(workReportTable).values({
+      work_id: res.locals.body!.workId,
+      reporter_id: current.userId,
+      report_type: res.locals.body!.reportType,
+      reason: res.locals.body!.reason,
+    })
   }
 }

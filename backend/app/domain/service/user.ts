@@ -15,8 +15,8 @@ import {
     getUserFollowsOutput,
     removeFollowerInput,
     followUserOutput,
-} from "../dto/user.js";
-import type { EnhancedResponse } from "../dto/index.js";
+} from "../model/dto/user.js";
+import type { EnhancedResponse } from "../model/dto/index.js";
 import type { Request, Response } from "express";
 import { genJWT } from "../../helper/jwt.js";
 import { getEnv } from "../../helper/env.js";
@@ -24,7 +24,7 @@ import { FormParser } from "../../form_parser.js";
 import type { MutexPort } from "../../io/port/mutex.js";
 import { v4 as uuidv4 } from "uuid";
 import { clientResponseMap } from "../../client.js";
-import { heartbeatClientEvent, ClientEventType } from "../dto/client.js";
+import { heartbeatClientEvent, ClientEventType } from "../model/dto/client.js";
 import { AppError } from "../../error.js";
 import { getImageExt, getPageParams } from "../../helper/http.js";
 import { getFollowRelationSubQuery } from "./common.js";
@@ -178,7 +178,7 @@ export class UserService {
             fileName = `/avatars/${current.userId}${ext}`
             return await this.fileStorage.getWritableStream(fileName)
         })
-        
+
         await current.tx.update(userTable).set({
             avatar_url: fileName,
         }).where(eq(userTable.id, current.userId))
