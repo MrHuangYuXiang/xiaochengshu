@@ -20,6 +20,15 @@
               <UserAvatar :width="'25px'" :userId="work.user.id" :imgUrl="work.user.avatar_url" />
               <div>{{ work.user.name }}</div>
             </div>
+            <div class="more">
+              <AppIcon 
+                :style="{cursor: 'pointer'}"
+                type="more" 
+                size="1rem" 
+                @click="showFloating(work.work.id)"
+              />
+              <SelectPanel :options="['举报该作品']" direction="right" :enableShow="enablePanelShowMap[work.work.id] || false" />
+            </div>
           </div>
         </div>
       </div>
@@ -34,6 +43,8 @@
   import UserAvatar from '../user/UserAvatar.vue';
   import WorkModal from '../work/WorkModal.vue';
   import ImageContainer from '../common/ImageContainer.vue';
+  import AppIcon from '../common/AppIcon.vue';
+  import SelectPanel from '../common/SelectPanel.vue';
   import { EnhancedList } from '@/lib/list';
   import type { WorksSchema } from '@/api/type.ext';
   import { onMounted, ref, useTemplateRef } from 'vue';
@@ -41,9 +52,14 @@
   import { axiosProxy } from '@/api/axios.ts';
 
   const works = ref(new EnhancedList<WorksSchema>((work) => work.work.id, 10))
+  const reportTypes = ref<paths["/report/types"]["get"]["responses"]["200"]["content"]["application/json"]>({
+    types: []
+  })
   const targetUserId = ref("")
   const worksType = ref("self")
   const showWorkModal = ref(false)
+  // 是否显示作品更多浮动框(值为对应的作品id)
+  const enablePanelShowMap = ref<Record<string, boolean>>({})
   const currentWorkId = ref("")
 
   onMounted(async () => {
@@ -56,10 +72,10 @@
     })
   })
 
-  // 封装获取作品逻辑
+  // 获取作品
   const getWorks = async () => {
     return await works.value.pagePush(async (current: number, size: number) => {
-      return (await axiosProxy.get<
+      const data = (await axiosProxy.get<
         paths["/works"]["get"]["parameters"]["query"],
         paths["/works"]["get"]["responses"]["200"]["content"]["application/json"]
       >(`/works`,{
@@ -68,7 +84,32 @@
         type: worksType.value,
         targetUserId: targetUserId.value,
       })).workList
+      for (const work of data) {
+        enablePanelShowMap.value[work.work.id] = false
+      }
+
+      return data
     })
+  }
+
+  // 获取举报类型
+  const getReportTypes = async () => {
+    reportTypes.value = await axiosProxy.get<
+      undefined,  
+      paths["/report/types"]["get"]["responses"]["200"]["content"]["application/json"]
+    >("/report/types", undefined)
+  }
+
+  // 点击作品下方显示更多
+  const showFloating = (workId: string) => {
+    if (workId in enablePanelShowMap.value) {
+      enablePanelShowMap.value[workId] = !enablePanelShowMap.value[workId]
+    }
+  }
+
+  // 举报作品
+  const reportWork = (workId: string, reason: string, type: number) => {
+
   }
 
   /**
@@ -102,11 +143,17 @@
     }
   })
 
+  // 挂载钩子
+  onMounted(async () => {
+    await getReportTypes()
+  })
+
   // 以下为组件暴露方法
 
   /** 切换作品类型 */
   const changeWorksType = async (newType: string, userId: string) => {
     works.value.clear()
+    enablePanelShowMap.value = {}
     worksType.value = newType
     targetUserId.value = userId
     await getWorks()
@@ -165,6 +212,9 @@
               display: flex;
               align-items: center;
               gap: 5px;
+            }
+            .more {
+              position: relative;
             }
           }
         }

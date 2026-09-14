@@ -45,7 +45,7 @@
     <svg class="male" viewBox="0 0 16 16" v-if="props.type === 'male'">
       <path fill-rule="evenodd" d="M9.5 2a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V2.707L9.871 6.836a5 5 0 1 1-.707-.707L13.293 2zM6 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8"/>
     </svg>
-    <svg class="bi bi-x-lg" viewBox="0 0 16 16" v-if="props.type === 'close'">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'close'">
       <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
     </svg>
     <svg class="image" viewBox="0 0 16 16" v-if="props.type === 'image'">

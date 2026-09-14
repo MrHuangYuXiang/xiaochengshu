@@ -18,6 +18,7 @@ import {
   likeWorkCommentInput,
   createWorkCommentInput,
   reportWorkInput,
+  getReportTypesOutput,
 } from "../model/dto/work.js";
 import { v4 as uuidv4 } from "uuid";
 import { getImageExt, getPageParams } from "../../helper/http.js";
@@ -546,5 +547,18 @@ export class WorkService {
       report_type: res.locals.body!.reportType,
       reason: res.locals.body!.reason,
     })
+  }
+
+  // 查询举报类型
+  async getReportTypes(req: Request, res: EnhancedResponse<null, null>) {
+    const data = Object.entries(reportTypeEnum).map(([key, value]) => {
+      return {
+        text: key,
+        id: value,
+      }
+    })
+    res.json(getReportTypesOutput.parse({
+      types: data,
+    }))
   }
 }

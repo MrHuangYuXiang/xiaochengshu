@@ -14,6 +14,8 @@ import {
     likeWorkInput,
     collectWorkInput,
     likeWorkCommentInput,
+    reportWorkInput,
+    getReportTypesOutput,
 } from "./domain/model/dto/work.js"
 import {
     smsSendInput,
@@ -107,6 +109,8 @@ export class Server implements ServerPort {
         routerProxy.get('/work/comments', getWorkCommentsInput, getWorkCommentsOutput, workService.getWorkComments.bind(workService)) // 获取作品评论/回复
         routerProxy.post('/create/work', null, null, workService.createWork.bind(workService)) // 发表作品
         routerProxy.post('/create/work/comment', createWorkCommentInput, createWorkCommentOutput, workService.createWorkComment.bind(workService)) // 评论作品
+        routerProxy.post('/report/work', reportWorkInput, null, workService.reportWork.bind(workService)) // 举报作品
+        routerProxy.get('/report/types', null, getReportTypesOutput, workService.getReportTypes.bind(workService)) // 查询举报类型
         // routerProxy.post('/like/work/:workId', likeWorkInput, null, workService.likeWork.bind(workService)) // 点赞作品
         // routerProxy.post('/collect/work/:workId', collectWorkInput, null, workService.collectWork.bind(workService)) // 收藏作品
         // routerProxy.post('/like/work/:workId/comment/:commentId', likeWorkCommentInput, null, workService.likeWorkComment.bind(workService)) // 点赞评论
