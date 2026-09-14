@@ -76,6 +76,10 @@
     10,
   ))
 
+  // 消息时间显示集合
+  const msgTimeShowSet = ref<Set<string>>(new Set())
+  const latestTime = new Date()
+
   // 当前选中会话id
   const selectedSessionId = ref("");
   const msgScrollRef = useTemplateRef("msgScrollRef")
@@ -99,6 +103,8 @@
         paths["/chat/get/messages"]["get"]["parameters"]["query"],
         paths["/chat/get/messages"]["get"]["responses"]["200"]["content"]["application/json"]
       >("/chat/get/messages", { page: page, pageSize: size, sessionId: selectedSessionId.value })
+      for (const msg of data.messages) {
+      }
       return data.messages
     })
     return messages.value.isEnd
