@@ -43,8 +43,8 @@ export const ClientChatMessageTable = mysqlTable("client_chat_message", {
 // payload结构不同, 因此需要根据消息类型进行判
 // 断
 export const MessagePayload = objectType({
-    [ClientChatMessageTypeEnum.TEXT]: objectType({}),
+    [ClientChatMessageTypeEnum.TEXT]: objectType({}).optional(),
     [ClientChatMessageTypeEnum.REPORT_NOTIFICATION]: objectType({
-        report_id: stringType.optional().default(""),
-    }),
+        report_id: stringType,
+    }).optional(),
 })

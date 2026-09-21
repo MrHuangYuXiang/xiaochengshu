@@ -1,4 +1,4 @@
-import { db } from "../../db/db.js";
+import { db } from "../db.js";
 import { BaseService } from "./base.js";
 import { getCurrent } from "../../lib/local-stroage.js";
 import { ClientFollowTable, ClientUserTable } from "../model/db-schema/client-user.js";
@@ -24,11 +24,9 @@ import { v4 as uuidv4 } from "uuid";
 import { getImageExt, getPageParams } from "../../helper/http.js";
 import { handleRawSqlRes } from "../../helper/sql.js";
 import { FormParser, MemoryWritableStream, type FormFieldHeader } from "../../lib/framework-ext.js";
-import type { FileStoragePort } from "../../port/file-storage-port.js";
 import { AppError } from "../../lib/app-error.js";
 import { getWorkImageFilePath } from "../../helper/file.js";
 import { WorkImageTypeEnum } from "../model/enum/client-work.js";
-import type { ClientManagerPort } from "../../port/client-manager-port.js";
 
 export class ClientWorkService extends BaseService {
   /**

@@ -73,11 +73,10 @@ export class ClientUserService extends BaseService {
             // 系统会话发送欢迎消息
             await this.baseSendChatMessage({
                 type: ClientChatMessageTypeEnum.TEXT,
-                payload: {},
                 user_id: userId,
                 session_id: ids.sessionId,
                 content: "小橙书欢迎你的加入!",
-            })
+            }, { [ClientChatMessageTypeEnum.TEXT]: {} })
         } else {
             userId = user[0]!.id
         }

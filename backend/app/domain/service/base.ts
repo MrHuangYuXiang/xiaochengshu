@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ClientChatSessionTypeEnum, ClientChatMessageTypeEnum } from "../model/enum/client-chat.js"
 import { ClientEventType, pushChatMessageClientEvent } from "../model/dto/client-event.js"
 import { AppError } from "../../lib/app-error.js"
+import type z from "zod"
 
 /**
  * 服务基类,抽离各个服务公共的业务逻辑
@@ -129,12 +130,12 @@ export class BaseService {
 
         const sessionId = await this.baseCreateSession(ClientChatSessionTypeEnum.SYSTEM)
         await current.tx.insert(ClientChatSessionMemberTable).values({
-                session_id: sessionId,
-                user_id: userId,
-                last_read_seq: 0,
-                other_user_id: userId,
-                is_pin: 0,
-            })
+            session_id: sessionId,
+            user_id: userId,
+            last_read_seq: 0,
+            other_user_id: userId,
+            is_pin: 0,
+        })
 
         return { sessionId }
     }
@@ -174,7 +175,7 @@ export class BaseService {
      */
     async baseSendChatMessage(
         message: typeof ClientChatMessageTable.$inferInsert,
-        payload: typeof MessagePayload,
+        payload: z.infer<typeof MessagePayload>,
     ) {
         const current = getCurrent()
         const msgId = uuidv4()
@@ -184,7 +185,7 @@ export class BaseService {
             id: msgId,
             session_id: message.session_id,
             user_id: message.user_id,
-            payload: message.payload,
+            payload: payload,
             content: message.content,
             type: message.type,
         })

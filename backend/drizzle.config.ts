@@ -4,11 +4,11 @@ import { getEnv } from './app/helper/env.js';
 
 export default defineConfig({
     schema: [
-        './app/db/schema/client-chat.ts',
-        './app/db/schema/client-work.ts',
-        './app/db/schema/client-user.ts',
-        './app/db/schema/admin-user.ts',
-        './app/db/schema/admin-report.ts',
+        './app/domain/model/db-schema/client-chat.ts',
+        './app/domain/model/db-schema/client-work.ts',
+        './app/domain/model/db-schema/client-user.ts',
+        './app/domain/model/db-schema/admin-user.ts',
+        './app/domain/model/db-schema/admin-report.ts',
     ],
     dialect: 'mysql',
     dbCredentials: {
