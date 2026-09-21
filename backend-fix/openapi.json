@@ -1,0 +1,2380 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "小橙书",
+    "description": "小橙书官方openapi文档",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/user/connect": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/init-data": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_first_login"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_first_login": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sms/send": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "phoneNumber"
+                ],
+                "properties": {
+                  "phoneNumber": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "token"
+                  ],
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "phoneNumber",
+                  "code"
+                ],
+                "properties": {
+                  "phoneNumber": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "user",
+                    "followingCount",
+                    "followerCount",
+                    "workCount",
+                    "likeCount",
+                    "collectCount"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_first_login",
+                        "is_follow",
+                        "is_followed"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_first_login": {
+                          "type": "integer"
+                        },
+                        "is_follow": {
+                          "type": "integer"
+                        },
+                        "is_followed": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "followingCount": {
+                      "type": "integer"
+                    },
+                    "followerCount": {
+                      "type": "integer"
+                    },
+                    "workCount": {
+                      "type": "integer"
+                    },
+                    "likeCount": {
+                      "type": "integer"
+                    },
+                    "collectCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upload/user/avatar": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/update/user/info": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "desc",
+                  "birthday",
+                  "gender"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "desc": {
+                    "type": "string"
+                  },
+                  "birthday": {
+                    "type": "string"
+                  },
+                  "gender": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/follows": {
+      "get": {
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "users",
+                    "count"
+                  ],
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "created_at",
+                          "updated_at",
+                          "name",
+                          "desc",
+                          "birthday",
+                          "gender",
+                          "avatar_url",
+                          "is_first_login",
+                          "is_follow",
+                          "is_followed"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "desc": {
+                            "type": "string"
+                          },
+                          "birthday": {
+                            "type": "string"
+                          },
+                          "gender": {
+                            "type": "integer"
+                          },
+                          "avatar_url": {
+                            "type": "string"
+                          },
+                          "is_first_login": {
+                            "type": "integer"
+                          },
+                          "is_follow": {
+                            "type": "integer"
+                          },
+                          "is_followed": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/follow/user": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_first_login",
+                        "is_follow",
+                        "is_followed"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_first_login": {
+                          "type": "integer"
+                        },
+                        "is_follow": {
+                          "type": "integer"
+                        },
+                        "is_followed": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "isFollow"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "isFollow": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/remove/follower": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_first_login",
+                        "is_follow",
+                        "is_followed"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_first_login": {
+                          "type": "integer"
+                        },
+                        "is_follow": {
+                          "type": "integer"
+                        },
+                        "is_followed": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/work": {
+      "get": {
+        "parameters": [
+          {
+            "name": "workId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "user",
+                    "work",
+                    "images",
+                    "likeCount",
+                    "collectCount",
+                    "isLiked",
+                    "isCollected",
+                    "isOwner"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_first_login",
+                        "is_follow",
+                        "is_followed"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_first_login": {
+                          "type": "integer"
+                        },
+                        "is_follow": {
+                          "type": "integer"
+                        },
+                        "is_followed": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "work": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "title",
+                        "permission",
+                        "content"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "permission": {
+                          "type": "integer"
+                        },
+                        "content": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "images": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "created_at",
+                          "updated_at",
+                          "work_id",
+                          "path",
+                          "type"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          },
+                          "work_id": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "likeCount": {
+                      "type": "integer"
+                    },
+                    "collectCount": {
+                      "type": "integer"
+                    },
+                    "isLiked": {
+                      "type": "integer"
+                    },
+                    "isCollected": {
+                      "type": "integer"
+                    },
+                    "isOwner": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/works": {
+      "get": {
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetUserId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "workList"
+                  ],
+                  "properties": {
+                    "workList": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "user",
+                          "work",
+                          "cover_image",
+                          "likeCount",
+                          "isLiked",
+                          "isOwner"
+                        ],
+                        "properties": {
+                          "user": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "name",
+                              "desc",
+                              "birthday",
+                              "gender",
+                              "avatar_url",
+                              "is_first_login"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "desc": {
+                                "type": "string"
+                              },
+                              "birthday": {
+                                "type": "string"
+                              },
+                              "gender": {
+                                "type": "integer"
+                              },
+                              "avatar_url": {
+                                "type": "string"
+                              },
+                              "is_first_login": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "work": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "title",
+                              "permission"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "permission": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "cover_image": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "work_id",
+                              "path",
+                              "type"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "work_id": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "likeCount": {
+                            "type": "integer"
+                          },
+                          "isLiked": {
+                            "type": "integer"
+                          },
+                          "isOwner": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/create/work": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/delete/work": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workId"
+                ],
+                "properties": {
+                  "workId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/work/comments": {
+      "get": {
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rootCommentId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "comments"
+                  ],
+                  "properties": {
+                    "comments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "user",
+                          "comment",
+                          "isLiked",
+                          "likeCount",
+                          "replyCount"
+                        ],
+                        "properties": {
+                          "user": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "name",
+                              "desc",
+                              "birthday",
+                              "gender",
+                              "avatar_url",
+                              "is_first_login"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "desc": {
+                                "type": "string"
+                              },
+                              "birthday": {
+                                "type": "string"
+                              },
+                              "gender": {
+                                "type": "integer"
+                              },
+                              "avatar_url": {
+                                "type": "string"
+                              },
+                              "is_first_login": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "comment": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "content",
+                              "work_id",
+                              "user_id",
+                              "parent_id",
+                              "root_comment_id"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              },
+                              "work_id": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "type": "string"
+                              },
+                              "parent_id": {
+                                "type": "string"
+                              },
+                              "root_comment_id": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "isLiked": {
+                            "type": "integer"
+                          },
+                          "likeCount": {
+                            "type": "integer"
+                          },
+                          "replyCount": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/create/work/comment": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "user",
+                    "comment",
+                    "isLiked",
+                    "likeCount",
+                    "replyCount"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_first_login"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_first_login": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "comment": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "content",
+                        "work_id",
+                        "user_id",
+                        "parent_id",
+                        "root_comment_id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "work_id": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "type": "string"
+                        },
+                        "parent_id": {
+                          "type": "string"
+                        },
+                        "root_comment_id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "isLiked": {
+                      "type": "integer"
+                    },
+                    "likeCount": {
+                      "type": "integer"
+                    },
+                    "replyCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content",
+                  "workId",
+                  "rootCommentId",
+                  "parentId"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  },
+                  "workId": {
+                    "type": "string"
+                  },
+                  "rootCommentId": {
+                    "type": "string"
+                  },
+                  "parentId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/create/session": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "session",
+                    "sessionMember",
+                    "user",
+                    "latestMessage",
+                    "unreadCount"
+                  ],
+                  "properties": {
+                    "session": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "type"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "sessionMember": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "session_id",
+                        "user_id",
+                        "last_read_seq",
+                        "is_pin",
+                        "other_user_id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "session_id": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "type": "string"
+                        },
+                        "last_read_seq": {
+                          "type": "integer"
+                        },
+                        "is_pin": {
+                          "type": "integer"
+                        },
+                        "other_user_id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_first_login"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_first_login": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "latestMessage": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "session_id",
+                        "session_member_id",
+                        "user_id",
+                        "content",
+                        "inc_seq"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "session_id": {
+                          "type": "string"
+                        },
+                        "session_member_id": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "inc_seq": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "unreadCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/get/sessions": {
+      "get": {
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "sessions"
+                  ],
+                  "properties": {
+                    "sessions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "session",
+                          "sessionMember",
+                          "user",
+                          "latestMessage",
+                          "unreadCount"
+                        ],
+                        "properties": {
+                          "session": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "type"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "sessionMember": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "session_id",
+                              "user_id",
+                              "last_read_seq",
+                              "is_pin",
+                              "other_user_id"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "session_id": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "type": "string"
+                              },
+                              "last_read_seq": {
+                                "type": "integer"
+                              },
+                              "is_pin": {
+                                "type": "integer"
+                              },
+                              "other_user_id": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "user": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "name",
+                              "desc",
+                              "birthday",
+                              "gender",
+                              "avatar_url",
+                              "is_first_login"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "desc": {
+                                "type": "string"
+                              },
+                              "birthday": {
+                                "type": "string"
+                              },
+                              "gender": {
+                                "type": "integer"
+                              },
+                              "avatar_url": {
+                                "type": "string"
+                              },
+                              "is_first_login": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "latestMessage": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "session_id",
+                              "session_member_id",
+                              "user_id",
+                              "content",
+                              "inc_seq"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "session_id": {
+                                "type": "string"
+                              },
+                              "session_member_id": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              },
+                              "inc_seq": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "unreadCount": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/pin/session": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionMemberId",
+                  "isPin"
+                ],
+                "properties": {
+                  "sessionMemberId": {
+                    "type": "string"
+                  },
+                  "isPin": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/send/message": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "user"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "session_id",
+                        "session_member_id",
+                        "user_id",
+                        "content",
+                        "inc_seq"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "session_id": {
+                          "type": "string"
+                        },
+                        "session_member_id": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "inc_seq": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "name",
+                        "desc",
+                        "birthday",
+                        "gender",
+                        "avatar_url",
+                        "is_first_login"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "type": "string"
+                        },
+                        "gender": {
+                          "type": "integer"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        },
+                        "is_first_login": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId",
+                  "sessionMemberId",
+                  "content"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "sessionMemberId": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/get/messages": {
+      "get": {
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "messages"
+                  ],
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "message",
+                          "user"
+                        ],
+                        "properties": {
+                          "message": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "session_id",
+                              "session_member_id",
+                              "user_id",
+                              "content",
+                              "inc_seq"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "session_id": {
+                                "type": "string"
+                              },
+                              "session_member_id": {
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              },
+                              "inc_seq": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "user": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "name",
+                              "desc",
+                              "birthday",
+                              "gender",
+                              "avatar_url",
+                              "is_first_login"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "desc": {
+                                "type": "string"
+                              },
+                              "birthday": {
+                                "type": "string"
+                              },
+                              "gender": {
+                                "type": "integer"
+                              },
+                              "avatar_url": {
+                                "type": "string"
+                              },
+                              "is_first_login": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/report": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workId",
+                  "reportObject",
+                  "reportType",
+                  "reason"
+                ],
+                "properties": {
+                  "workId": {
+                    "type": "string"
+                  },
+                  "reportObject": {
+                    "type": "integer"
+                  },
+                  "reportType": {
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/report/types": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "types"
+                  ],
+                  "properties": {
+                    "types": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "text",
+                          "id"
+                        ],
+                        "properties": {
+                          "text": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/login": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "token"
+                  ],
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "employee_id",
+                  "password"
+                ],
+                "properties": {
+                  "employee_id": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/add/user": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "employee_id",
+                  "role",
+                  "name",
+                  "password"
+                ],
+                "properties": {
+                  "employee_id": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "heartbeatClientEvent": {
+        "type": "object",
+        "required": [
+          "jwt"
+        ],
+        "properties": {
+          "jwt": {
+            "type": "string"
+          }
+        }
+      },
+      "errorClientEvent": {
+        "type": "object",
+        "required": [
+          "msg"
+        ],
+        "properties": {
+          "msg": {
+            "type": "string"
+          }
+        }
+      },
+      "pushChatMessageEvent": {
+        "type": "object",
+        "required": [
+          "message",
+          "user"
+        ],
+        "properties": {
+          "message": {
+            "type": "object",
+            "required": [
+              "id",
+              "created_at",
+              "updated_at",
+              "session_id",
+              "session_member_id",
+              "user_id",
+              "content",
+              "inc_seq"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "session_id": {
+                "type": "string"
+              },
+              "session_member_id": {
+                "type": "string"
+              },
+              "user_id": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "inc_seq": {
+                "type": "integer"
+              }
+            }
+          },
+          "user": {
+            "type": "object",
+            "required": [
+              "id",
+              "created_at",
+              "updated_at",
+              "name",
+              "desc",
+              "birthday",
+              "gender",
+              "avatar_url",
+              "is_first_login"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "desc": {
+                "type": "string"
+              },
+              "birthday": {
+                "type": "string"
+              },
+              "gender": {
+                "type": "integer"
+              },
+              "avatar_url": {
+                "type": "string"
+              },
+              "is_first_login": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
