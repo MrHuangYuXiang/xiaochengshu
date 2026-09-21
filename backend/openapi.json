@@ -49,7 +49,7 @@
                         "birthday",
                         "gender",
                         "avatar_url",
-                        "is_first_login"
+                        "is_complete_profile"
                       ],
                       "properties": {
                         "id": {
@@ -76,7 +76,7 @@
                         "avatar_url": {
                           "type": "string"
                         },
-                        "is_first_login": {
+                        "is_complete_profile": {
                           "type": "integer"
                         }
                       }
@@ -213,7 +213,7 @@
                         "birthday",
                         "gender",
                         "avatar_url",
-                        "is_first_login",
+                        "is_complete_profile",
                         "is_follow",
                         "is_followed"
                       ],
@@ -242,7 +242,7 @@
                         "avatar_url": {
                           "type": "string"
                         },
-                        "is_first_login": {
+                        "is_complete_profile": {
                           "type": "integer"
                         },
                         "is_follow": {
@@ -404,7 +404,7 @@
                           "birthday",
                           "gender",
                           "avatar_url",
-                          "is_first_login",
+                          "is_complete_profile",
                           "is_follow",
                           "is_followed"
                         ],
@@ -433,7 +433,7 @@
                           "avatar_url": {
                             "type": "string"
                           },
-                          "is_first_login": {
+                          "is_complete_profile": {
                             "type": "integer"
                           },
                           "is_follow": {
@@ -481,7 +481,7 @@
                         "birthday",
                         "gender",
                         "avatar_url",
-                        "is_first_login",
+                        "is_complete_profile",
                         "is_follow",
                         "is_followed"
                       ],
@@ -510,7 +510,7 @@
                         "avatar_url": {
                           "type": "string"
                         },
-                        "is_first_login": {
+                        "is_complete_profile": {
                           "type": "integer"
                         },
                         "is_follow": {
@@ -577,7 +577,7 @@
                         "birthday",
                         "gender",
                         "avatar_url",
-                        "is_first_login",
+                        "is_complete_profile",
                         "is_follow",
                         "is_followed"
                       ],
@@ -606,7 +606,7 @@
                         "avatar_url": {
                           "type": "string"
                         },
-                        "is_first_login": {
+                        "is_complete_profile": {
                           "type": "integer"
                         },
                         "is_follow": {
@@ -685,7 +685,7 @@
                         "birthday",
                         "gender",
                         "avatar_url",
-                        "is_first_login",
+                        "is_complete_profile",
                         "is_follow",
                         "is_followed"
                       ],
@@ -714,7 +714,7 @@
                         "avatar_url": {
                           "type": "string"
                         },
-                        "is_first_login": {
+                        "is_complete_profile": {
                           "type": "integer"
                         },
                         "is_follow": {
@@ -884,7 +884,7 @@
                               "birthday",
                               "gender",
                               "avatar_url",
-                              "is_first_login"
+                              "is_complete_profile"
                             ],
                             "properties": {
                               "id": {
@@ -911,7 +911,7 @@
                               "avatar_url": {
                                 "type": "string"
                               },
-                              "is_first_login": {
+                              "is_complete_profile": {
                                 "type": "integer"
                               }
                             }
@@ -1127,7 +1127,7 @@
                               "birthday",
                               "gender",
                               "avatar_url",
-                              "is_first_login"
+                              "is_complete_profile"
                             ],
                             "properties": {
                               "id": {
@@ -1154,7 +1154,7 @@
                               "avatar_url": {
                                 "type": "string"
                               },
-                              "is_first_login": {
+                              "is_complete_profile": {
                                 "type": "integer"
                               }
                             }
@@ -1247,7 +1247,7 @@
                         "birthday",
                         "gender",
                         "avatar_url",
-                        "is_first_login"
+                        "is_complete_profile"
                       ],
                       "properties": {
                         "id": {
@@ -1274,7 +1274,7 @@
                         "avatar_url": {
                           "type": "string"
                         },
-                        "is_first_login": {
+                        "is_complete_profile": {
                           "type": "integer"
                         }
                       }
@@ -1457,7 +1457,7 @@
                         "birthday",
                         "gender",
                         "avatar_url",
-                        "is_first_login"
+                        "is_complete_profile"
                       ],
                       "properties": {
                         "id": {
@@ -1484,7 +1484,7 @@
                         "avatar_url": {
                           "type": "string"
                         },
-                        "is_first_login": {
+                        "is_complete_profile": {
                           "type": "integer"
                         }
                       }
@@ -1496,7 +1496,6 @@
                         "created_at",
                         "updated_at",
                         "session_id",
-                        "session_member_id",
                         "user_id",
                         "content",
                         "inc_seq"
@@ -1512,9 +1511,6 @@
                           "type": "string"
                         },
                         "session_id": {
-                          "type": "string"
-                        },
-                        "session_member_id": {
                           "type": "string"
                         },
                         "user_id": {
@@ -1674,7 +1670,7 @@
                               "birthday",
                               "gender",
                               "avatar_url",
-                              "is_first_login"
+                              "is_complete_profile"
                             ],
                             "properties": {
                               "id": {
@@ -1701,7 +1697,7 @@
                               "avatar_url": {
                                 "type": "string"
                               },
-                              "is_first_login": {
+                              "is_complete_profile": {
                                 "type": "integer"
                               }
                             }
@@ -1713,7 +1709,6 @@
                               "created_at",
                               "updated_at",
                               "session_id",
-                              "session_member_id",
                               "user_id",
                               "content",
                               "inc_seq"
@@ -1729,9 +1724,6 @@
                                 "type": "string"
                               },
                               "session_id": {
-                                "type": "string"
-                              },
-                              "session_member_id": {
                                 "type": "string"
                               },
                               "user_id": {
@@ -1822,7 +1814,6 @@
                         "created_at",
                         "updated_at",
                         "session_id",
-                        "session_member_id",
                         "user_id",
                         "content",
                         "inc_seq"
@@ -1838,9 +1829,6 @@
                           "type": "string"
                         },
                         "session_id": {
-                          "type": "string"
-                        },
-                        "session_member_id": {
                           "type": "string"
                         },
                         "user_id": {
@@ -1865,7 +1853,7 @@
                         "birthday",
                         "gender",
                         "avatar_url",
-                        "is_first_login"
+                        "is_complete_profile"
                       ],
                       "properties": {
                         "id": {
@@ -1892,7 +1880,7 @@
                         "avatar_url": {
                           "type": "string"
                         },
-                        "is_first_login": {
+                        "is_complete_profile": {
                           "type": "integer"
                         }
                       }
@@ -1987,7 +1975,6 @@
                               "created_at",
                               "updated_at",
                               "session_id",
-                              "session_member_id",
                               "user_id",
                               "content",
                               "inc_seq"
@@ -2003,9 +1990,6 @@
                                 "type": "string"
                               },
                               "session_id": {
-                                "type": "string"
-                              },
-                              "session_member_id": {
                                 "type": "string"
                               },
                               "user_id": {
@@ -2030,7 +2014,7 @@
                               "birthday",
                               "gender",
                               "avatar_url",
-                              "is_first_login"
+                              "is_complete_profile"
                             ],
                             "properties": {
                               "id": {
@@ -2057,7 +2041,7 @@
                               "avatar_url": {
                                 "type": "string"
                               },
-                              "is_first_login": {
+                              "is_complete_profile": {
                                 "type": "integer"
                               }
                             }
@@ -2298,7 +2282,6 @@
               "created_at",
               "updated_at",
               "session_id",
-              "session_member_id",
               "user_id",
               "content",
               "inc_seq"
@@ -2314,9 +2297,6 @@
                 "type": "string"
               },
               "session_id": {
-                "type": "string"
-              },
-              "session_member_id": {
                 "type": "string"
               },
               "user_id": {
@@ -2341,7 +2321,7 @@
               "birthday",
               "gender",
               "avatar_url",
-              "is_first_login"
+              "is_complete_profile"
             ],
             "properties": {
               "id": {
@@ -2368,7 +2348,7 @@
               "avatar_url": {
                 "type": "string"
               },
-              "is_first_login": {
+              "is_complete_profile": {
                 "type": "integer"
               }
             }

@@ -1,8 +1,8 @@
 import { db } from "../../db/db.js";
 import { BaseService } from "./base.js";
 import { getCurrent } from "../../lib/local-stroage.js";
-import { ClientFollowTable, ClientUserTable } from "../../db/schema/client-user.js";
-import { ClientWorkTable, ClientWorkCollectTable, ClientWorkCommentTable, ClientWorkLikeTable, ClientWorkCommentLikeTable, ClientWorkImageTable } from "../../db/schema/client-work.js";
+import { ClientFollowTable, ClientUserTable } from "../model/db-schema/client-user.js";
+import { ClientWorkTable, ClientWorkCollectTable, ClientWorkCommentTable, ClientWorkLikeTable, ClientWorkCommentLikeTable, ClientWorkImageTable } from "../model/db-schema/client-work.js";
 import { and, eq, getTableColumns, count, inArray, not, sql, desc, like, asc } from "drizzle-orm";
 import type { EnhancedResponse } from "../model/dto/index.js";
 import type { Request } from "express";

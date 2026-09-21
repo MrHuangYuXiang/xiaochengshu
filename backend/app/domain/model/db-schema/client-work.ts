@@ -35,6 +35,7 @@ export const ClientWorkCollectTable = mysqlTable('client_work_collect', {
 // 评论表
 export const ClientWorkCommentTable = mysqlTable('client_work_comment', {
     ...baseTable,
+    type: tinyint().notNull(),
     content: varchar({ length: 200 }).notNull(),
     work_id: varchar({ length: 255 }).notNull(),
     // 父评论id

@@ -1,7 +1,7 @@
 import type { Request } from "express";
 import type { EnhancedResponse } from "../model/dto/index.js";
-import { ClientChatSessionTable, ClientChatSessionMemberTable, ClientChatMessageTable } from "../../db/schema/client-chat.js";
-import { ClientUserTable } from "../../db/schema/client-user.js";
+import { ClientChatSessionTable, ClientChatSessionMemberTable, ClientChatMessageTable } from "../model/db-schema/client-chat.js";
+import { ClientUserTable } from "../model/db-schema/client-user.js";
 import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, pinSessionInput, sendMessageInput, sendMessageOutput, type createSessionInput } from "../model/dto/client-chat.js";
 import { getCurrent } from "../../lib/local-stroage.js";
 import { v4 as uuidv4 } from "uuid";
@@ -9,7 +9,7 @@ import { and, count, desc, eq, getTableColumns, gt, inArray, lt, max, not, SQL, 
 import { getPageParams } from "../../helper/http.js";
 import { ClientEventType, pushChatMessageClientEvent } from "../model/dto/client-event.js";
 import { BaseService } from "./base.js";
-import { ClientChatSessionTypeEnum } from "../model/enum/client-chat.js";
+import { ClientChatMessageTypeEnum, ClientChatSessionTypeEnum } from "../model/enum/client-chat.js";
 
 export class ClientChatService extends BaseService {
     // 查询会话信息
@@ -79,8 +79,7 @@ export class ClientChatService extends BaseService {
 
         if (!exist[0]) {
             // 创建会话
-            const sessionIds = await this.baseCreateChatSession(
-                ClientChatSessionTypeEnum.PRIVATE,
+            const sessionIds = await this.baseCreatePrivateSession(
                 current.payload.userId,
                 res.locals.body!.userId
             );
@@ -146,12 +145,13 @@ export class ClientChatService extends BaseService {
     async sendMessage(req: Request, res: EnhancedResponse<null, typeof sendMessageInput>) {
         const current = getCurrent();
 
-        const message = await this.baseSendChatMessage(
-            current.payload.userId,
-            res.locals.body!.sessionId,
-            res.locals.body!.sessionMemberId,
-            res.locals.body!.content,
-        )
+        const message = await this.baseSendChatMessage({
+            type: ClientChatMessageTypeEnum.TEXT,
+            payload: {},
+            user_id: current.payload.userId,
+            session_id: res.locals.body!.sessionId,
+            content: res.locals.body!.content,
+        })
 
         // 返回发送的消息
         res.json(sendMessageOutput.parse({

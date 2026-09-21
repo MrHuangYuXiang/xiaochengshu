@@ -1,7 +1,7 @@
 import { getCurrent } from "../../lib/local-stroage.js";
 import { BaseService } from "./base.js";
-import { ClientUserTable, ClientFollowTable } from "../../db/schema/client-user.js";
-import { ClientWorkCollectTable, ClientWorkTable, ClientWorkLikeTable } from "../../db/schema/client-work.js";
+import { ClientUserTable, ClientFollowTable } from "../model/db-schema/client-user.js";
+import { ClientWorkCollectTable, ClientWorkTable, ClientWorkLikeTable } from "../model/db-schema/client-work.js";
 import { eq, and, inArray, getTableColumns, gt, sql, count, desc, fillPlaceholders } from "drizzle-orm";
 import {
     updateUserInfoInput,
@@ -26,7 +26,7 @@ import { v4 as uuidv4 } from "uuid";
 import { heartbeatClientEvent, ClientEventType } from "../model/dto/client-event.js";
 import { AppError } from "../../lib/app-error.js";
 import { getImageExt, getPageParams } from "../../helper/http.js";
-import { ClientChatSessionTypeEnum } from "../model/enum/client-chat.js";
+import { ClientChatMessageTypeEnum, ClientChatSessionTypeEnum } from "../model/enum/client-chat.js";
 
 // FIXME: 该服务下的接口需要重写加锁逻辑,锁需要放在事务外面,避免mvcc快照导致锁失效
 export class ClientUserService extends BaseService {
@@ -54,7 +54,7 @@ export class ClientUserService extends BaseService {
 
         const user = await current.tx.select().from(ClientUserTable).where(eq(ClientUserTable.phone_number, res.locals.body!.phoneNumber))
 
-        // 用户不存在自动注册注册
+        // 用户不存在自动注册,以下为初始化逻辑
         if (user.length == 0) {
             // 创建用户
             userId = uuidv4()
@@ -69,18 +69,15 @@ export class ClientUserService extends BaseService {
                 is_complete_profile: 0,
             })
             // 创建系统会话
-            const sessionIds = await this.baseCreateChatSession(
-                ClientChatSessionTypeEnum.SYSTEM,
-                userId,
-                userId
-            )
+            const ids = await this.baseCreateSystemSession(userId)
             // 系统会话发送欢迎消息
-            await this.baseSendChatMessage(
-                userId,
-                sessionIds.sessionId,
-                sessionIds.sessionMemberId1,
-                "小橙书欢迎你的加入!"
-            )
+            await this.baseSendChatMessage({
+                type: ClientChatMessageTypeEnum.TEXT,
+                payload: {},
+                user_id: userId,
+                session_id: ids.sessionId,
+                content: "小橙书欢迎你的加入!",
+            })
         } else {
             userId = user[0]!.id
         }

@@ -1,13 +1,13 @@
 import { and, eq, getTableColumns, sql } from "drizzle-orm"
-import { ClientFollowTable, ClientUserTable } from "../../db/schema/client-user.js"
+import { ClientFollowTable, ClientUserTable } from "../model/db-schema/client-user.js"
 import { getCurrent } from "../../lib/local-stroage.js"
 import { alias } from "drizzle-orm/mysql-core"
-import { ClientWorkCollectTable, ClientWorkCommentLikeTable, ClientWorkCommentTable, ClientWorkImageTable, ClientWorkLikeTable, ClientWorkTable } from "../../db/schema/client-work.js"
+import { ClientWorkCollectTable, ClientWorkCommentLikeTable, ClientWorkCommentTable, ClientWorkImageTable, ClientWorkLikeTable, ClientWorkTable } from "../model/db-schema/client-work.js"
 import type { FileStoragePort } from "../../port/file-storage-port.js"
 import type { ClientManagerPort } from "../../port/client-manager-port.js"
-import { ClientChatMessageTable, ClientChatSessionMemberTable, ClientChatSessionTable } from "../../db/schema/client-chat.js"
+import { ClientChatMessageTable, ClientChatSessionMemberTable, ClientChatSessionTable, MessagePayload } from "../model/db-schema/client-chat.js"
 import { v4 as uuidv4 } from "uuid";
-import { ClientChatSessionTypeEnum } from "../model/enum/client-chat.js"
+import { ClientChatSessionTypeEnum, ClientChatMessageTypeEnum } from "../model/enum/client-chat.js"
 import { ClientEventType, pushChatMessageClientEvent } from "../model/dto/client-event.js"
 import { AppError } from "../../lib/app-error.js"
 
@@ -94,19 +94,11 @@ export class BaseService {
             where(eq(ClientWorkCommentLikeTable.work_id, workId))
     }
 
-    /** 
-     * 创建聊天会话
-     * userId1: 发起会话者id
-     * userId2: 参与会话者id
-     * 如果是系统会话,只创建一个会话成员,userId1和userId2都是自己的id
-     */
-    async baseCreateChatSession(
-        type: number,
-        userId1: string,
-        userId2: string,
+    private async baseCreateSession(
+        type: ClientChatSessionTypeEnum,
     ) {
-        const current = getCurrent()
         const sessionId = uuidv4()
+        const current = getCurrent()
 
         // 创建会话
         await current.tx.insert(ClientChatSessionTable).values({
@@ -114,42 +106,65 @@ export class BaseService {
             type: type,
         })
 
-        const members: typeof ClientChatSessionMemberTable.$inferInsert[] = []
+        return sessionId
+    }
 
-        switch (type) {
-            case ClientChatSessionTypeEnum.PRIVATE:
-                members.push(
-                    {
-                        session_id: sessionId,
-                        user_id: userId1,
-                        last_read_seq: 0,
-                        other_user_id: userId2,
-                        is_pin: 0,
-                    },
-                    {
-                        session_id: sessionId,
-                        user_id: userId2,
-                        last_read_seq: 0,
-                        other_user_id: userId1,
-                        is_pin: 0,
-                    }
-                )
-                break
-            case ClientChatSessionTypeEnum.SYSTEM:
-                members.push(
-                    {
-                        session_id: sessionId,
-                        user_id: userId1,
-                        last_read_seq: 0,
-                        other_user_id: "",
-                        is_pin: 0,
-                    },
-                )
-                break
-        }
+    private async baseCreateSessionMember(
+        members: typeof ClientChatSessionMemberTable.$inferInsert[],
+    ) {
+        const current = getCurrent()
 
         // 创建会话成员
         await current.tx.insert(ClientChatSessionMemberTable).values(members)
+    }
+
+
+    /**
+     * 创建系统会话
+     */
+    async baseCreateSystemSession(
+        userId: string,
+    ) {
+        const current = getCurrent()
+
+        const sessionId = await this.baseCreateSession(ClientChatSessionTypeEnum.SYSTEM)
+        await current.tx.insert(ClientChatSessionMemberTable).values({
+                session_id: sessionId,
+                user_id: userId,
+                last_read_seq: 0,
+                other_user_id: userId,
+                is_pin: 0,
+            })
+
+        return { sessionId }
+    }
+
+    /** 
+     * 创建私聊会话
+     * userId1: 发起会话者id
+     * userId2: 参与会话者id
+     */
+    async baseCreatePrivateSession(
+        userId1: string,
+        userId2: string,
+    ) {
+        const sessionId = await this.baseCreateSession(ClientChatSessionTypeEnum.PRIVATE)
+        await this.baseCreateSessionMember([
+            {
+                session_id: sessionId,
+                user_id: userId1,
+                last_read_seq: 0,
+                other_user_id: userId2,
+                is_pin: 0,
+            },
+            {
+                session_id: sessionId,
+                user_id: userId2,
+                last_read_seq: 0,
+                other_user_id: userId1,
+                is_pin: 0,
+            },
+        ])
 
         return { sessionId }
     }
@@ -158,9 +173,8 @@ export class BaseService {
      * 发送聊天消息
      */
     async baseSendChatMessage(
-        userId: string,
-        sessionId: string,
-        content: string,
+        message: typeof ClientChatMessageTable.$inferInsert,
+        payload: typeof MessagePayload,
     ) {
         const current = getCurrent()
         const msgId = uuidv4()
@@ -168,9 +182,11 @@ export class BaseService {
         // 创建消息
         await current.tx.insert(ClientChatMessageTable).values({
             id: msgId,
-            session_id: sessionId,
-            user_id: userId,
-            content: content,
+            session_id: message.session_id,
+            user_id: message.user_id,
+            payload: message.payload,
+            content: message.content,
+            type: message.type,
         })
 
         // 查询会话成员信息
@@ -191,7 +207,7 @@ export class BaseService {
             // 系统会话推送给自己,其他会话推送给其他用户
             if (
                 item.session.type === ClientChatSessionTypeEnum.SYSTEM ||
-                item.member.user_id !== userId
+                item.member.user_id !== message.user_id
             ) {
                 this.clientManager.push(
                     item.member.user_id,

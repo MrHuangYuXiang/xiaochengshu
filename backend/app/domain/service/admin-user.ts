@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { AdminUserTable } from "../../db/schema/admin-user.js";
+import { AdminUserTable } from "../model/db-schema/admin-user.js";
 import { getCurrent } from "../../lib/local-stroage.js";
 import type { adminAddUserInput, adminLoginInput, adminUpdateUserInput } from "../model/dto/admin-user.js";
 import type { EnhancedResponse } from "../model/dto/index.js";

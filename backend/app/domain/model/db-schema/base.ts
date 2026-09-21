@@ -6,3 +6,8 @@ export const baseTable = {
     created_at: datetime().default(new Date()).notNull(),
     updated_at: datetime().default(new Date()).notNull(),
 }
+
+// id字段
+export const idType = () => {
+    return varchar({ length: 255 }).notNull()
+}

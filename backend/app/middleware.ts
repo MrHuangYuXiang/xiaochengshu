@@ -95,15 +95,6 @@ const authMiddleware = (req: Request, res: Response): Payload => {
         throw new Error("请携带Authorization头")
     }
 
-    // 开发环境运行test请求头,默认userId为1
-    if (getEnv("ENV") === "development" && req.headers.authorization === "Bearer test") {
-        return {
-            userId: "1",
-            adminEmployeeId: "1",
-            adminRole: 1
-        }
-    }
-
     return verifyJWT(req.headers.authorization)
 }
 

@@ -1,10 +1,10 @@
 import type { Request } from "express";
 import type { EnhancedResponse } from "../model/dto/index.js";
-import { AdminReportTable } from "../../db/schema/admin-report.js";
+import { AdminReportTable } from "../model/db-schema/admin-report.js";
 import { getCurrent } from "../../lib/local-stroage.js";
-import { ClientWorkImageTable, ClientWorkTable } from "../../db/schema/client-work.js";
+import { ClientWorkImageTable, ClientWorkTable } from "../model/db-schema/client-work.js";
 import { and, eq, getTableColumns } from "drizzle-orm";
-import { ClientUserTable } from "../../db/schema/client-user.js";
+import { ClientUserTable } from "../model/db-schema/client-user.js";
 import { getReportDetailInput, getReportDetailOutput, getReportsOutput, handleReportInput, type getReportsInput } from "../model/dto/admin-report.js";
 import { AppError, throwServerBusy } from "../../lib/app-error.js";
 import { ReportStatusEnum } from "../model/enum/admin-report.js";
