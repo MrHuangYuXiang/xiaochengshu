@@ -10,9 +10,10 @@
         v-model:selected-id="selectedSessionId"
         :key="session.session.id"
         :sessionId="session.session.id"
+        :sessionType="session.session.type"
         :userId="session.user.id"
         :userAvatarUrl="session.user.avatar_url"
-        :sessionName="session.user.name"
+        :userName="session.user.name"
         :latestMsg="session.latestMessage ? session.latestMessage.content : ''"
         :msgTime="session.latestMessage ? session.latestMessage.created_at : ''"
         :unreadCount="session.unreadCount"
@@ -20,44 +21,32 @@
       />
     </ScrollContainer>
     <div class="chat-panel" v-show="selectedSessionId !== ''">
-      <ChatSender @send-msg="sendMsg" class="chat-sender"/>
+      <ChatSender @send-msg="sendMsg" class="chat-sender" v-show="sessions.get(selectedSessionId)?.session.type !== 3"/>
       <ScrollContainer
         trigger-type="reverse-top"
         :load-more-callback="getMessages"
         ref="msgScrollRef"
         class="chat-messages"
       >
-        <div
+        <ChatMessage
           v-for="msg in messages"
           :key="msg.message.id"
-          class="chat-message"
-          :style="{
-            'align-self': msg.user.id === storage.initData.value?.user.id ? 'end' : 'start',
-            'flex-direction': msg.user.id === storage.initData.value?.user.id ? 'row-reverse' : 'row',
-          }"
-        >
-          <UserAvatar :user-id="msg.user.id" width="3rem" :img-url="msg.user.avatar_url" />
-          <div
-            class="msg-content"
-            :style="{
-              'color': msg.user.id === storage.initData.value?.user.id ? 'white' : 'black',
-              'background-color': msg.user.id === storage.initData.value?.user.id ? '#0084ff' : 'var(--root-bg-gray)'
-            }"
-          >
-            {{ msg.message.content }}
-          </div>
-        </div>
+          :userId="msg.user.id"
+          :userAvatarUrl="msg.user.avatar_url"
+          :messageType="msg.message.type"
+          :messageContent="msg.message.content"
+          :sessionType="sessions.get(selectedSessionId)?.session.type"
+        />
       </ScrollContainer>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import SessionCard from '@/component/chat/SessionCard.vue';
+  import SessionCard from '@/component/chat/session-card.vue';
   import ChatSender from '@/component/chat/ChatSender.vue';
-  import UserAvatar from '@/component/user/UserAvatar.vue';
   import ScrollContainer from '@/component/common/ScrollContainer.vue';
-  import { storage } from '@/storage';
+  import ChatMessage from '@/component/chat/chat-message.vue';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { SessionSchema, MessageSchema } from '@/api/type.ext';
   import { EnhancedList } from '@/lib/list';
@@ -180,6 +169,8 @@
   .chat-panel {
     height: var(--root-mainview-height);
     position: relative;
+    background-color: var(--root-bg-gray);
+    border-radius: 15px;
     .chat-messages {
       height: calc(100% - 12rem);
       width: 100%;
@@ -190,17 +181,6 @@
       flex-direction: column-reverse;
       justify-content: end;
       align-items: center;
-      .chat-message {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        .msg-content {
-          font-size: 0.9rem;
-          font-weight: 500;
-          padding: 0.7rem 1.1rem;
-          border-radius: 15px;
-        }
-      }
     }
     .chat-sender {
       position: absolute;

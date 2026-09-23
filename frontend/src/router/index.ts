@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import UserPage from '@/page/UserPage.vue'
-import DiscoverPage from '@/page/DiscoverPage.vue'
-import LayoutPage from '@/page/LayoutPage.vue'
-import LoginPage from '@/page/LoginPage.vue'
-import PublishPage from '@/page/PublishPage.vue'
-import ChatPage from '@/page/ChatPage.vue'
-import LivePage from '@/page/LivePage.vue'
+import UserPage from '@/page/user-page.vue'
+import DiscoverPage from '@/page/discover-page.vue'
+import LayoutPage from '@/page/layout-page.vue'
+import LoginPage from '@/page/login-page.vue'
+import PublishPage from '@/page/publish-page.vue'
+import ChatPage from '@/page/chat-page.vue'
+import LivePage from '@/page/live-page.vue'
 import { checkLogin } from './middleware';
 
 const routes = [

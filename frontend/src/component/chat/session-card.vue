@@ -1,12 +1,12 @@
 <template>
   <div class="session-card" :class="{'active': selectedId === props.sessionId}">
-    <UserAvatar :user-id="props.userId" :img-url="props.userAvatarUrl" width="60px" />
+    <UserAvatar class="session-image" :user-id="props.userId" :img-url="getSessionImageUrl(props.sessionType)" width="60px" />
     <div class="session-content">
-      <div class="session-name">{{ props.sessionName }}</div>
-      <div class="session-meta">
-        <div class="msg-content">{{ props.latestMsg }}</div>
-        <div class="msg-time">{{ formatTime(props.msgTime) }}</div>
+      <div class="session-name">
+        <div class="name">{{ getSessionName() }}</div>
+        <div class="time">{{ formatTime(props.msgTime) }}</div>
       </div>
+      <div class="msg-content">{{ props.latestMsg }}</div>
     </div>
     <div v-if="props.unreadCount > 0" class="unread-count">{{ props.unreadCount }}</div>
   </div>
@@ -19,12 +19,38 @@
   const props = defineProps<{
     userId: string;
     userAvatarUrl: string;
+    userName: string;
     sessionId: string;
-    sessionName: string;
+    sessionType: number;
     latestMsg: string;
     msgTime: string;
     unreadCount: number;
   }>()
+
+  // 获取会话图片url
+  const getSessionImageUrl = (type: number) => {
+    switch (type) {
+      case 1:
+      case 2:
+        return props.userAvatarUrl;
+      case 3:
+      default:
+        return '/images/setting.png';
+    }
+  }
+
+  // 获取会话名称
+  const getSessionName = () => {
+    switch (props.sessionType) {
+      case 1:
+      case 2:
+        return props.userName;
+      case 3:
+        return "系统通知";
+      default:
+          return '未知会话';
+    }
+  }
 
   // 卡片选中标志位
   const selectedId = defineModel('selectedId', {
@@ -35,36 +61,41 @@
 
 <style lang="css" scoped>
   .session-card {
+    overflow: hidden;
+    white-space: nowrap;
+    width: calc(100% - 20px);
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1fr); /* 使用minmax避免显示问题 */
+    gap: 0.5rem;
     position: relative;
     cursor: pointer;
-    width: calc(100% - 20px);
-    display: flex;
     padding: 10px;
-    gap: 15px;
-    align-items: center;
     border-radius: 20px;
     transition: all 0.3s ease-in-out;
     .session-content {
-      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: space-evenly;
+      gap: 0.25rem;
       .session-name {
-        font-size: 0.9rem;
-        font-weight: 500;
-      }
-      .session-meta {
         display: flex;
         align-items: center;
-        gap: 8px;
-        .msg-content {
-          font-size: 0.75rem;
-          color: var(--root-gray-dark);
+        justify-content: space-between;
+        .name {
+          font-size: 1rem;
+          font-weight: 500;
         }
-        .msg-time {
-          font-size: 0.75rem;
-          color: var(--root-gray)
+        .time {
+          font-size: 0.7rem;
+          color: var(--root-gray);
+          font-weight: 500;
         }
+      }
+      .msg-content {
+        font-size: 0.75rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--root-gray-dark);
       }
     }
     .unread-count {
@@ -91,6 +122,6 @@
   }
 
   .session-card:hover {
-    transform: translateX(20px);
+    transform: translateX(10px);
   }
 </style>

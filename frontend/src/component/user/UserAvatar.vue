@@ -1,5 +1,4 @@
 <template>
-  <input type="file" accept="image/jpeg" @change="change" style="display: none;" ref="inputRef"/>
   <div class="avatar-box" :style="{ width: props.width }">
     <div
       class="avatar"
@@ -11,6 +10,7 @@
       <div v-if="props.topCount > 0" class="top-count">{{ props.topCount }}</div>
       <div v-if="props.isUploadable" class="upload-text">点击上传</div>
     </div>
+    <input type="file" accept="image/jpeg" @change="change" style="display: none;" ref="inputRef"/>
   </div>
 </template>
 
@@ -18,7 +18,6 @@
   import { useTemplateRef } from 'vue';
   import { useRouter } from 'vue-router';
 
-  const uploadUrl = import.meta.env.VITE_UPLOAD_URL
   const router = useRouter()
   const props = defineProps({
     userId: {
@@ -72,10 +71,8 @@
     switch (props.imgUrl) {
       case "":
         return "'/images/default-avatar.png'"
-      case "0":
-        return "'/images/setting.png'"
       default:
-        return `${uploadUrl}${props.imgUrl}`
+        return props.imgUrl
     }
   }
 
