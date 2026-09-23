@@ -1,16 +1,16 @@
 <template>
     <div 
         class="msg-tip"
-        :class="{ 'active': msgTipCom.showFlag.value }"
+        :class="{ 'active': globalMsgTip.isShow.value }"
         @click="redirect"
     >
-        <div class="user">{{ msgTipCom.data.value?.userName }}</div>
-        <div class="msg-content">{{ msgTipCom.data.value?.msgContent }}</div>
+        <div class="user">{{ globalMsgTip.data.value?.userName }}</div>
+        <div class="msg-content">{{ globalMsgTip.data.value?.msgContent }}</div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { msgTipCom } from './global';
+    import { globalMsgTip } from '../global';
     import { useRouter } from 'vue-router';
 
     const router = useRouter()
@@ -18,7 +18,7 @@
         router.push({ 
             name: "ChatPage",
             query: {
-                createOptionUserId: msgTipCom.data.value?.userId,
+                createOptionUserId: globalMsgTip.data.value?.userId,
             }
         })
     }

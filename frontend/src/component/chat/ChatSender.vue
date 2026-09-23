@@ -1,19 +1,19 @@
 <template>
   <div class="chat-sender">
-    <AppInput placeholder="想想要发送什么内容" type="textarea" v-model="msgContent" />
+    <FormInput placeholder="想想要发送什么内容" type="textarea" v-model="msgContent" />
     <div class="bottom-bar">
       <div class="ext-items">
         <AppIcon type="image" size="1.2rem" />
       </div>
-      <AppButton text="发送" @click="sendMsg" />
+      <FormButton text="发送" @click="sendMsg" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import AppInput from '../common/AppInput.vue';
-  import AppButton from '../common/AppButton.vue';
   import AppIcon from '../common/AppIcon.vue';
+  import FormButton from '../form/form-button.vue';
+  import FormInput from '../form/form-input.vue';
   import { ref } from 'vue';
 
   const emits = defineEmits<{

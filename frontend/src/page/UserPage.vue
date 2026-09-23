@@ -19,8 +19,8 @@
           <div class="name">
             <div class="text">{{ user?.user.name }}</div>
             <div class="btn-group" v-if="user?.user.id !== storage.initData.value?.user.id">
-              <AppButton :text="formatFollowStatus(user?.user.is_follow || 0, user?.user.is_followed || 0)" @click="follow"/>
-              <AppButton text="私信" @click="redirectToChatPage" />
+              <FormButton :text="formatFollowStatus(user?.user.is_follow || 0, user?.user.is_followed || 0)" @click="follow"/>
+              <FormButton text="私信" @click="redirectToChatPage" />
             </div>
           </div>
           <div class="tag">
@@ -52,7 +52,7 @@
   import UserAvatar from '@/component/user/UserAvatar.vue'
   import WorkGrid from '@/component/work/WorkGrid.vue'
   import AppSegment from '@/component/common/AppSegment.vue';
-  import AppButton from '@/component/common/AppButton.vue';
+  import FormButton from '@/component/form/form-button.vue';
   import FollowsModal from '@/component/user/FollowsModal.vue';
   import ScrollContainer from '@/component/common/ScrollContainer.vue';
   import { onMounted } from 'vue';
@@ -61,7 +61,7 @@
   import type { paths } from '@/api/gen'
   import { storage } from '@/storage';
   import { ElMessage } from 'element-plus';
-import router from '@/router';
+  import router from '@/router';
 
   const route = useRoute();
   const user = ref<paths["/user"]["get"]["responses"]["200"]["content"]["application/json"]>()

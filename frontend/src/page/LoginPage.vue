@@ -10,21 +10,21 @@
         <div class="border"></div>
         <div class="right">
           <div class="title">登录你的账号</div>
-          <AppInput
+          <FormInput
             placeholder="请输入手机号"
             :rule="phoneNumberValidator"
             v-model="loginForm.phoneNumber"
             ref="loginPhoneRef"
           />
-          <AppInput
+          <FormInput
             placeholder="请输入验证码"
             :rule="codeValidator"
             v-model="loginForm.code"
             ref="loginCodeRef"
           />
-          <AppButton text="登录" @click="clickLogin" type="glass" color="orange" />
+          <FormButton text="登录" @click="clickLogin" type="glass" color="orange" />
           <AppDivider text="用其他方式登录" color="black" />
-          <AppButton text="微信登录" type="glass" />
+          <FormButton text="微信登录" type="glass" />
           <div class="bottom">如果你是新用户,将会自动注册</div>
         </div>
       </div>
@@ -37,8 +37,8 @@
   import type { paths } from '@/api/gen';
   import { storage } from '@/storage';
   import { useRouter } from 'vue-router';
-  import AppInput from '@/component/common/AppInput.vue';
-  import AppButton from '@/component/common/AppButton.vue';
+  import FormInput from '@/component/form/form-input.vue';
+  import FormButton from '@/component/form/form-button.vue';
   import AppDivider from '@/component/common/AppDivider.vue';
   import { validateForm } from '@/helper/form';
 

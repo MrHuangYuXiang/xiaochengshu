@@ -2,8 +2,8 @@
     <BaseModal v-model:show="enableShow" width="auto" height="auto">
         <div class="report-modal">
             <div class="title">举报作品</div>
-            <AppRadio v-for="type in reportTypes?.types" :key="type.id" :value="type.id" :text="type.text" v-model="selectedType" />
-            <AppInput 
+            <FormRadio v-for="type in reportTypes?.types" :key="type.id" :value="type.id" :text="type.text" v-model="selectedType" />
+            <FormInput 
                 ref="reportContentRef"
                 placeholder="请输入举报内容" 
                 type="textarea"
@@ -11,16 +11,16 @@
                 class="textarea"
                 :rule="reportContentRule"
              />
-             <AppButton text="提交" @click="submitReport" />
+             <FormButton text="提交" @click="submitReport" />
         </div>
     </BaseModal>
 </template>
 
 <script setup lang="ts">
     import BaseModal from '../common/BaseModal.vue';
-    import AppRadio from '../common/AppRadio.vue';
-    import AppInput from '../common/AppInput.vue';
-    import AppButton from '../common/AppButton.vue';
+    import FormRadio from '../form/form-radio.vue';
+    import FormInput from '../form/form-input.vue';
+    import FormButton from '../form/form-button.vue';
     import { onMounted, ref, useTemplateRef } from 'vue';
     import type { paths } from '@/api/gen.ts';
     import { axiosProxy } from '@/api/axios.ts';

@@ -4,11 +4,11 @@
       <div v-if="currentCategory === 'image'" class="publish-form publish-image">
         <div class="form-item">
           <div class="item-label">文章标题</div>
-          <AppInput ref="titleInputRef" type="textarea" placeholder="请输入文章标题" v-model="form.title" :rule="titleValidator"></AppInput>
+          <FormInput ref="titleInputRef" type="textarea" placeholder="请输入文章标题" v-model="form.title" :rule="titleValidator"></FormInput>
         </div>
         <div class="form-item">
           <div class="item-label">文章正文</div>
-          <AppInput ref="contentInputRef" :rows="20" type="textarea" placeholder="请输入文章正文" v-model="form.content" :rule="contentValidator"></AppInput>
+          <FormInput ref="contentInputRef" :rows="20" type="textarea" placeholder="请输入文章正文" v-model="form.content" :rule="contentValidator"></FormInput>
         </div>
         <div class="form-item">
           <div class="item-label">设置封面</div>
@@ -23,18 +23,18 @@
           <div class="item-label">文章图片</div>
           <div class="image-uploader">
             <input type="file" accept="image/jpeg"  style="display: none;" ref="inputRef" @change="changeFile" multiple />
-            <ImageContainer
+            <ImageSlider
             class="item image"
             v-for="(file, index) in files"
             :key="file.url!"
             :src="file.url"
             :is-upload-image="false"
             >
-              <div class="image-options" @click.self="imagePreviewCom.show(file.url)">
+              <div class="image-options" @click.self="globalImagePreview.show(file.url)">
                   <div class="image-option" @click="setCover(file.file, file.url, index)">设为封面</div>
                   <div class="image-option" @click="deleteImage(file.file, file.url, index)">删除</div>
               </div>
-            </ImageContainer>
+            </ImageSlider>
             <div
               class="item upload-btn"
               @mouseenter="uploadBtnFill = 'var(--root-orange)'"
@@ -48,11 +48,11 @@
         <div class="form-item">
           <div class="item-label">谁可以看</div>
           <div class="form-btn-group">
-            <AppRadio v-model="permissionSelected" text="公开" :value="1"></AppRadio>
-            <AppRadio v-model="permissionSelected" text="仅自己可见" :value="2"></AppRadio>
+            <FormRadio v-model="permissionSelected" text="公开" :value="1"></FormRadio>
+            <FormRadio v-model="permissionSelected" text="仅自己可见" :value="2"></FormRadio>
           </div>
         </div>
-        <div class="publish-btn"><AppButton text="发布" @click="publish"></AppButton></div>
+        <div class="publish-btn"><FormButton text="发布" @click="publish"></FormButton></div>
       </div>
       <div v-else-if="currentCategory === 'article'" class="publish-form publish-article">
         <div style="margin-top: 300px; color: #999;">功能正在开发中...</div>
@@ -63,15 +63,15 @@
 
 <script setup lang="ts">
   import { ref, useTemplateRef } from 'vue'
-  import AppRadio from '@/component/common/AppRadio.vue';
-  import AppInput from '@/component/common/AppInput.vue';
+  import FormRadio from '@/component/form/form-radio.vue';
+  import FormInput from '@/component/form/form-input.vue';
   import AppSegment from '@/component/common/AppSegment.vue';
-  import AppButton from '@/component/common/AppButton.vue';
+  import FormButton from '@/component/form/form-button.vue';
   import AppIcon from '@/component/common/AppIcon.vue';
-  import ImageContainer from '@/component/common/ImageContainer.vue';
+  import ImageSlider from '@/component/image/image-slider.vue';
   import { ElMessage } from 'element-plus';
   import { axiosProxy } from '@/api/axios';
-  import { imagePreviewCom } from '@/component/global/global';
+  import { globalImagePreview } from '@/component/global';
   import { validateForm } from '@/helper/form';
 
   const titleInputRef = useTemplateRef("titleInputRef");

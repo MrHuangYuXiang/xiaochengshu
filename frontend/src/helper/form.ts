@@ -1,4 +1,4 @@
-import AppInput from "@/component/common/AppInput.vue";
+import AppInput from "@/component/form/form-input.vue";
 
 /**
  * 校验表单辅助函数

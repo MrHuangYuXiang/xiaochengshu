@@ -3,6 +3,7 @@
   <ImagePreview />
   <MsgTip />
   <ErrorDialog></ErrorDialog>
+  <WorkModal v-if="globalWorkModal.isShow.value"></WorkModal>
 
   <!-- 初始化用户弹窗 -->
   <InitUserModal v-model:show="enableInitUserModalShow" v-if="enableInitUserModalShow"></InitUserModal>
@@ -54,15 +55,17 @@
   import UserAvatar from '@/component/user/UserAvatar.vue';
   import InitUserModal from '@/component/user/InitUserModal.vue';
   import UpdateUserModal from '@/component/user/UpdateUserModal.vue';
-  import ErrorDialog from '@/component/global/ErrorDialog.vue';
-  import MsgTip from '@/component/global/MsgTip.vue';
-  import ImagePreview from '@/component/global/ImagePreview.vue';
+  import ErrorDialog from '@/component/common/ErrorDialog.vue';
+  import MsgTip from '@/component/chat/msg-tip.vue';
+  import ImagePreview from '@/component/image/image-preview.vue';
+  import WorkModal from '@/component/work/WorkModal.vue';
   import { onBeforeMount, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { storage } from '@/storage';
   import { clientEvent } from '@/api/event';
   import type { paths } from '@/api/gen';
   import { axiosProxy } from '@/api/axios';
+import { globalWorkModal } from '@/component/global';
 
   const router = useRouter();
   const dropMenuItems = [
@@ -100,7 +103,7 @@
     >("/user/init-data", undefined))
 
     // 如果新用户个人信息未完善,显示弹窗
-    if (storage.initData.value?.user.is_profile_completed === 0) {
+    if (storage.initData.value?.user.is_complete_profile === 0) {
       setTimeout(() => {
         enableInitUserModalShow.value = true
       },500)

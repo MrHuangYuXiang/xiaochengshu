@@ -71,7 +71,7 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                             };
                         };
                     };
@@ -207,7 +207,7 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                                 is_follow: number;
                                 is_followed: number;
                             };
@@ -346,7 +346,7 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                                 is_follow: number;
                                 is_followed: number;
                             }[];
@@ -406,7 +406,7 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                                 is_follow: number;
                                 is_followed: number;
                             };
@@ -462,7 +462,7 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                                 is_follow: number;
                                 is_followed: number;
                             };
@@ -511,7 +511,7 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                                 is_follow: number;
                                 is_followed: number;
                             };
@@ -521,7 +521,6 @@ export interface paths {
                                 updated_at: string;
                                 title: string;
                                 permission: number;
-                                cover_image_id: string;
                                 content: string;
                             };
                             images: {
@@ -530,7 +529,7 @@ export interface paths {
                                 updated_at: string;
                                 work_id: string;
                                 path: string;
-                                is_cover: number;
+                                type: number;
                             }[];
                             likeCount: number;
                             collectCount: number;
@@ -588,7 +587,7 @@ export interface paths {
                                     birthday: string;
                                     gender: number;
                                     avatar_url: string;
-                                    is_profile_completed: number;
+                                    is_complete_profile: number;
                                 };
                                 work: {
                                     id: string;
@@ -596,7 +595,6 @@ export interface paths {
                                     updated_at: string;
                                     title: string;
                                     permission: number;
-                                    cover_image_id: string;
                                 };
                                 cover_image: {
                                     id: string;
@@ -604,7 +602,7 @@ export interface paths {
                                     updated_at: string;
                                     work_id: string;
                                     path: string;
-                                    is_cover: number;
+                                    type: number;
                                 };
                                 likeCount: number;
                                 isLiked: number;
@@ -617,6 +615,83 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/create/work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/delete/work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        workId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -662,7 +737,7 @@ export interface paths {
                                     birthday: string;
                                     gender: number;
                                     avatar_url: string;
-                                    is_profile_completed: number;
+                                    is_complete_profile: number;
                                 };
                                 comment: {
                                     id: string;
@@ -685,41 +760,6 @@ export interface paths {
         };
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/create/work": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description 响应模型 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": unknown;
-                    };
-                };
-            };
-        };
         delete?: never;
         options?: never;
         head?: never;
@@ -770,7 +810,7 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                             };
                             comment: {
                                 id: string;
@@ -832,6 +872,7 @@ export interface paths {
                                 id: string;
                                 created_at: string;
                                 updated_at: string;
+                                type: number;
                             };
                             sessionMember: {
                                 id: string;
@@ -840,6 +881,8 @@ export interface paths {
                                 session_id: string;
                                 user_id: string;
                                 last_read_seq: number;
+                                is_pin: number;
+                                other_user_id: string;
                             };
                             user: {
                                 id: string;
@@ -850,14 +893,25 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                             };
                             latestMessage: {
                                 id: string;
                                 created_at: string;
                                 updated_at: string;
+                                type: number;
+                                payload: {
+                                    1?: Record<string, never>;
+                                    2?: {
+                                        report_id: string;
+                                    };
+                                    3?: {
+                                        work_id: string;
+                                        title: string;
+                                        cover_url: string;
+                                    };
+                                };
                                 session_id: string;
-                                session_member_id: string;
                                 user_id: string;
                                 content: string;
                                 inc_seq: number;
@@ -905,6 +959,7 @@ export interface paths {
                                     id: string;
                                     created_at: string;
                                     updated_at: string;
+                                    type: number;
                                 };
                                 sessionMember: {
                                     id: string;
@@ -913,6 +968,8 @@ export interface paths {
                                     session_id: string;
                                     user_id: string;
                                     last_read_seq: number;
+                                    is_pin: number;
+                                    other_user_id: string;
                                 };
                                 user: {
                                     id: string;
@@ -923,14 +980,25 @@ export interface paths {
                                     birthday: string;
                                     gender: number;
                                     avatar_url: string;
-                                    is_profile_completed: number;
+                                    is_complete_profile: number;
                                 };
                                 latestMessage: {
                                     id: string;
                                     created_at: string;
                                     updated_at: string;
+                                    type: number;
+                                    payload: {
+                                        1?: Record<string, never>;
+                                        2?: {
+                                            report_id: string;
+                                        };
+                                        3?: {
+                                            work_id: string;
+                                            title: string;
+                                            cover_url: string;
+                                        };
+                                    };
                                     session_id: string;
-                                    session_member_id: string;
                                     user_id: string;
                                     content: string;
                                     inc_seq: number;
@@ -944,6 +1012,49 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/chat/pin/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        sessionMemberId: string;
+                        isPin: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -971,8 +1082,19 @@ export interface paths {
                 content: {
                     "application/json": {
                         sessionId: string;
-                        sessionMemberId: string;
                         content: string;
+                        type: number;
+                        payload: {
+                            1?: Record<string, never>;
+                            2?: {
+                                report_id: string;
+                            };
+                            3?: {
+                                work_id: string;
+                                title: string;
+                                cover_url: string;
+                            };
+                        };
                     };
                 };
             };
@@ -988,8 +1110,19 @@ export interface paths {
                                 id: string;
                                 created_at: string;
                                 updated_at: string;
+                                type: number;
+                                payload: {
+                                    1?: Record<string, never>;
+                                    2?: {
+                                        report_id: string;
+                                    };
+                                    3?: {
+                                        work_id: string;
+                                        title: string;
+                                        cover_url: string;
+                                    };
+                                };
                                 session_id: string;
-                                session_member_id: string;
                                 user_id: string;
                                 content: string;
                                 inc_seq: number;
@@ -1003,7 +1136,7 @@ export interface paths {
                                 birthday: string;
                                 gender: number;
                                 avatar_url: string;
-                                is_profile_completed: number;
+                                is_complete_profile: number;
                             };
                         };
                     };
@@ -1048,8 +1181,19 @@ export interface paths {
                                     id: string;
                                     created_at: string;
                                     updated_at: string;
+                                    type: number;
+                                    payload: {
+                                        1?: Record<string, never>;
+                                        2?: {
+                                            report_id: string;
+                                        };
+                                        3?: {
+                                            work_id: string;
+                                            title: string;
+                                            cover_url: string;
+                                        };
+                                    };
                                     session_id: string;
-                                    session_member_id: string;
                                     user_id: string;
                                     content: string;
                                     inc_seq: number;
@@ -1063,7 +1207,7 @@ export interface paths {
                                     birthday: string;
                                     gender: number;
                                     avatar_url: string;
-                                    is_profile_completed: number;
+                                    is_complete_profile: number;
                                 };
                             }[];
                         };
@@ -1086,7 +1230,54 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: {
+            parameters: {
+                query: {
+                    page: number;
+                    pageSize: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            reports: {
+                                report: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    work_id: string;
+                                    reporter_id: string;
+                                    report_object: number;
+                                    report_type: number;
+                                    reason: string;
+                                    status: number;
+                                };
+                                reporter: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    name: string;
+                                    desc: string;
+                                    birthday: string;
+                                    gender: number;
+                                    avatar_url: string;
+                                    is_complete_profile: number;
+                                };
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
         put?: never;
         post: {
             parameters: {
@@ -1269,8 +1460,19 @@ export interface components {
                 id: string;
                 created_at: string;
                 updated_at: string;
+                type: number;
+                payload: {
+                    1?: Record<string, never>;
+                    2?: {
+                        report_id: string;
+                    };
+                    3?: {
+                        work_id: string;
+                        title: string;
+                        cover_url: string;
+                    };
+                };
                 session_id: string;
-                session_member_id: string;
                 user_id: string;
                 content: string;
                 inc_seq: number;
@@ -1284,7 +1486,7 @@ export interface components {
                 birthday: string;
                 gender: number;
                 avatar_url: string;
-                is_profile_completed: number;
+                is_complete_profile: number;
             };
         };
     };

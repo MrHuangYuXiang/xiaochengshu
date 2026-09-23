@@ -3,10 +3,10 @@
     :can-close="false"
     width="30vw"
     height="30vh"
-    v-model:show="errorDialogCom.enableShow.value"
+    v-model:show="globalErrorDialog.isShow.value"
   >
     <div class="dialog">
-      <div>{{ errorDialogCom.content }}</div>
+      <div>{{ globalErrorDialog.content }}</div>
       <div class="btn-group">
         <AppButton text="确定" @click="confirmErrorDialog" />
       </div>
@@ -16,14 +16,14 @@
 
 <script setup lang="ts">
   import BaseModal from '../common/BaseModal.vue';
-  import AppButton from '../common/AppButton.vue';
-  import { errorDialogCom } from './global.ts';
+  import AppButton from '../form/form-button.vue';
+  import { globalErrorDialog } from '../global.ts';
   import { useRouter } from 'vue-router';
 
   const router = useRouter()
 
   const confirmErrorDialog = async () => {
-    errorDialogCom.close()
+    globalErrorDialog.close()
     await router.push({ name: "LoginPage" });
   }
 </script>

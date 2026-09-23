@@ -1,4 +1,4 @@
-import { errorDialogCom, msgTipCom } from "@/component/global/global";
+import { globalErrorDialog, globalMsgTip } from "@/component/global";
 import { storage } from "../storage";
 import type { components } from "./gen";
 import SharedWorker from "./share.ts?sharedworker"
@@ -10,7 +10,7 @@ import SharedWorker from "./share.ts?sharedworker"
 /** 服务器错误 */
 const errorCallback = async (data: unknown) => {
   // 接收到错误,清理相关资源,由于后端主动断开tcp连接,客户端不需要主动断
-  errorDialogCom.show((data as components["schemas"]["errorClientEvent"]).msg)
+  globalErrorDialog.show((data as components["schemas"]["errorClientEvent"]).msg)
   storage.clear()
 }
 
@@ -23,7 +23,7 @@ const heartbeatCallback = async (data: unknown) => {
 /** 聊天消息推送 */
 const chatMessagePushCallback = async (data: unknown) => {
   const message = data as components["schemas"]["pushChatMessageEvent"]
-  msgTipCom.show(
+  globalMsgTip.show(
     message.user.id,
     message.user.name,
     message.message.session_id,

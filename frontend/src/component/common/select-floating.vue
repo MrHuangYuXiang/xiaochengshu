@@ -1,7 +1,7 @@
 <!-- 基于浮动面板的选择器面板 -->
 
 <template>
-    <FloatingPanel :direction="props.direction" :enable-show="props.enableShow">
+    <FloatingWindow :direction="props.direction" :enable-show="props.enableShow">
         <div class="inner">
             <div 
                 v-for="option in props.options"
@@ -12,11 +12,11 @@
                 {{ option.text }}
             </div>
         </div>
-    </FloatingPanel>
+    </FloatingWindow>
 </template>
 
 <script setup lang="ts">
-    import FloatingPanel from './FloatingPanel.vue';
+    import FloatingWindow from './floating-window.vue';
     
     const props = defineProps<{
         enableShow: boolean,

@@ -1,7 +1,7 @@
 <template>
-  <div class="image-preview" v-show="imagePreviewCom.url.value !== ''">
-    <img :src="imagePreviewCom.url.value" alt="预览图片" />
-    <div class="close-btn" @click="imagePreviewCom.url.value = ''">
+  <div class="image-preview" v-show="globalImagePreview.url.value !== ''">
+    <img :src="globalImagePreview.url.value" alt="预览图片" />
+    <div class="close-btn" @click="globalImagePreview.url.value = ''">
       <AppIcon
         type="close" 
         size="30px" 
@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
   import AppIcon from '@/component/common/AppIcon.vue';
-  import { imagePreviewCom } from '@/component/global/global';
+  import { globalImagePreview } from '@/component/global';
   import { ref } from 'vue';
 
   const closeFillColor = ref('black');

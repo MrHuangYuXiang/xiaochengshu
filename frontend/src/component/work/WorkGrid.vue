@@ -7,11 +7,11 @@
       :style="{'grid-row-end': `span ${cssVarMap[work.work.id]}`}"
     >
       <div class="real-card" ref="cardContainerRefs" :id="work.work.id">
-        <ImageContainer
+        <ImageSlider
           :src="`${work.cover_image.path}`"
           class="image"
           :enableHover="true"
-          @click="showWorkModal(work.work.id)"
+          @click="globalWorkModal.show(work.work.id)"
         />
         <div class="text" ref="textRefs">
           <div class="title">{{ work.work.title }}</div>
@@ -31,36 +31,32 @@
           </div>
         </div>
       </div>
-      <SelectPanel 
+      <SelectFloating 
         :options="[{ id: 1, text: '举报该作品' }]" 
         direction="right" 
-        :enableShow="enablePanelShowMap[work.work.id] || false" 
+        :enableShow="isShowFloatingMap[work.work.id] || false" 
         @clickOption="handleClickFloating"
       />
     </div>
   </div>
 
-  <!-- 作品弹窗 -->
-  <WorkModal v-model:show="enableDetailShow" :workId="currentWorkId" v-if="enableDetailShow" />
   <!-- 举报作品弹窗 -->
   <WorkReportModal v-model:show="enableReportShow" v-if="enableReportShow" />
 </template>
 
 <script setup lang="ts">
   import UserAvatar from '../user/UserAvatar.vue';
-  import WorkModal from '../work/WorkModal.vue';
-  import ImageContainer from '../common/ImageContainer.vue';
+  import ImageSlider from '../image/image-slider.vue';
   import AppIcon from '../common/AppIcon.vue';
-  import SelectPanel from '../common/SelectPanel.vue';
+  import SelectFloating from '../common/select-floating.vue';
   import WorkReportModal from './WorkReportModal.vue';
   import { EnhancedList } from '@/lib/list';
   import type { WorksSchema } from '@/api/type.ext';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen.ts';
   import { axiosProxy } from '@/api/axios.ts';
+  import { globalWorkModal } from '../global.ts';
 
-  // 是否展示作品详情弹窗
-  const enableDetailShow = ref(false)
   // 是否展示举报作品弹窗
   const enableReportShow = ref(false)
 
@@ -68,8 +64,7 @@
   const targetUserId = ref("")
   const worksType = ref("self")
   // 是否显示作品更多浮动框(值为对应的作品id)
-  const enablePanelShowMap = ref<Record<string, boolean>>({})
-  const currentWorkId = ref("")
+  const isShowFloatingMap = ref<Record<string, boolean>>({})
 
   // 获取作品
   const getWorks = async () => {
@@ -84,7 +79,7 @@
         targetUserId: targetUserId.value,
       })).workList
       for (const work of data) {
-        enablePanelShowMap.value[work.work.id] = false
+        isShowFloatingMap.value[work.work.id] = false
       }
 
       return data
@@ -93,8 +88,8 @@
 
   // 点击作品下方显示更多浮动框
   const showFloating = (workId: string) => {
-    if (workId in enablePanelShowMap.value) {
-      enablePanelShowMap.value[workId] = !enablePanelShowMap.value[workId]
+    if (workId in isShowFloatingMap.value) {
+      isShowFloatingMap.value[workId] = !isShowFloatingMap.value[workId]
     }
   }
 
@@ -103,17 +98,6 @@
     if (id === 1) {
       enableReportShow.value = true
     }
-  }
-
-  // 举报作品
-  // const reportWork = (workId: string, reason: string, type: number) => {
-
-  // }
-
-  // 显示作品详情弹窗
-  const showWorkModal = (workId: string) => {
-    currentWorkId.value = workId
-    enableDetailShow.value = true
   }
 
   /**
@@ -162,7 +146,7 @@
   /** 切换作品类型 */
   const changeWorksType = async (newType: string, userId: string) => {
     works.value.clear()
-    enablePanelShowMap.value = {}
+    isShowFloatingMap.value = {}
     worksType.value = newType
     targetUserId.value = userId
     await getWorks()

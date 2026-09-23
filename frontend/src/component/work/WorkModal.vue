@@ -5,10 +5,10 @@
 -->
 
 <template>
-  <BaseModal v-model:show="enableShow">
+  <BaseModal v-model:show="globalWorkModal.isShow.value">
     <div class="work-modal">
       <div class="left">
-        <ImageContainer
+        <ImageSlider
           class="image"
           :src="work?.images[currentImageIndex]?.path || ''"
           :enable-preview="true"
@@ -100,7 +100,7 @@
         <div class="publish-form">
           <div :class="{'reply-content': true, 'focus': isInputFocus && replyTarget !== undefined}">回复{{ replyTarget?.replyUserName }} {{ replyTarget?.replyContent }} : </div>
           <div :class="{'publish-input': true, 'focus': isInputFocus}">
-            <AppInput type="textarea"
+            <FormInput type="textarea"
             :rows="1"
             placeholder="请输入评论内容"
             ref="textareaRef"
@@ -121,8 +121,8 @@
             </div>
           </div>
           <div :class="{'bottom-btns': true, 'focus': isInputFocus}">
-            <div><AppButton text="取消" @click="isInputFocus = false" /></div>
-            <div><AppButton text="发布" @click="publish" /></div>
+            <div><FormButton text="取消" @click="isInputFocus = false" /></div>
+            <div><FormButton text="发布" @click="publish" /></div>
           </div>
         </div>
       </div>
@@ -134,11 +134,11 @@
   import BaseModal from '../common/BaseModal.vue';
   import UserCard from '../user/UserCard.vue';
   import AppIcon from '../common/AppIcon.vue';
-  import AppButton from '../common/AppButton.vue';
+  import FormButton from '../form/form-button.vue';
   import CommentCard from './CommentCard.vue';
-  import AppInput from '../common/AppInput.vue';
+  import FormInput from '../form/form-input.vue';
   import ScrollContainer from '../common/ScrollContainer.vue';
-  import ImageContainer from '../common/ImageContainer.vue';
+  import ImageSlider from '../image/image-slider.vue';
   import { formatTime } from '@/helper/format';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen';
@@ -147,17 +147,9 @@
   import { axiosProxy } from '@/api/axios.ts';
   import { EnhancedList } from '@/lib/list.ts';
   import { ElMessage } from 'element-plus';
-
-  const props = defineProps({
-    workId: {
-      type: String,
-      default: '',
-    },
-  })
-  const enableShow = defineModel<boolean>("show")
+  import { globalWorkModal } from '../global.ts';
 
   const textareaRef = useTemplateRef('textareaRef')
-  const scrollContainerRef = useTemplateRef('scrollContainerRef')
   const work = ref<WorkSchema>()
   const comments = ref(
     new EnhancedList<workCommentSchema>((item: workCommentSchema) => {
@@ -199,7 +191,7 @@
       >(`/work/comments`, {
         page: currentPage,
         pageSize: pageSize,
-        workId: props.workId,
+        workId: globalWorkModal.workId.value,
         type: "top",
         rootCommentId: '',
       })
@@ -293,14 +285,14 @@
 
   // 挂载后加载作品和评论信息
   onMounted(async () => {
-    if (!enableShow.value) return
+    if (!globalWorkModal.isShow.value) return
 
     // 获取作品详情
     work.value = await axiosProxy.get<
       paths["/work"]["get"]["parameters"]["query"],
       paths["/work"]["get"]["responses"]["200"]["content"]["application/json"]
     >(`/work`, {
-      workId: props.workId
+      workId: globalWorkModal.workId.value
     })
 
     // 获取评论

@@ -2284,6 +2284,53 @@
       }
     },
     "/report": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workId",
+                  "reportObject",
+                  "reportType",
+                  "reason"
+                ],
+                "properties": {
+                  "workId": {
+                    "type": "string"
+                  },
+                  "reportObject": {
+                    "type": "integer"
+                  },
+                  "reportType": {
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "parameters": [
           {

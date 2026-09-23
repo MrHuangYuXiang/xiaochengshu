@@ -383,15 +383,15 @@ class DocGen {
     }
 
     registerPath(method: "GET" | "POST", path: string, inputSchema: z.ZodObject | null, outputSchema: z.ZodObject | null) {
-        this.doc.paths[path] = {
-            [method.toLowerCase()]: {
-                parameters: [],
-                responses: {
-                    "200": {
-                        description: "响应模型",
-                        content: {
-                            "application/json": {}
-                        },
+        // FIX: 重复路径的不同方法时防止覆盖
+        this.doc.paths[path] ||= {}
+        this.doc.paths[path][method.toLowerCase()] = {
+            parameters: [],
+            responses: {
+                "200": {
+                    description: "响应模型",
+                    content: {
+                        "application/json": {}
                     },
                 },
             },

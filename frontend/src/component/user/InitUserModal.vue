@@ -41,8 +41,8 @@
   import { ref, useTemplateRef } from 'vue';
   import BaseModal from '../common/BaseModal.vue';
   import UserAvatar from './UserAvatar.vue';
-  import AppInput from '../common/AppInput.vue';
-  import AppButton from '../common/AppButton.vue';
+  import AppInput from '../form/form-input.vue';
+  import AppButton from '../form/form-button.vue';
   import GenderRadio from './GenderRadio.vue';
   import { validateForm } from '@/helper/form.ts';
   import { storage } from '@/storage.ts';

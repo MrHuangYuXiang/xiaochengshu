@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
   import UserAvatar from './UserAvatar.vue';
-  import AppButton from '../common/AppButton.vue';
+  import AppButton from '../form/form-button.vue';
   import { axiosProxy } from '@/api/axios.ts';
   import type { paths } from '@/api/gen.ts';
   import { formatFollowStatus } from '@/helper/format.ts';
