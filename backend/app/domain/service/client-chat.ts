@@ -146,11 +146,11 @@ export class ClientChatService extends BaseService {
         const current = getCurrent();
 
         const message = await this.baseSendChatMessage({
-            type: ClientChatMessageTypeEnum.TEXT,
+            type: res.locals.body!.type,
             user_id: current.payload.userId,
             session_id: res.locals.body!.sessionId,
             content: res.locals.body!.content,
-        }, { [ClientChatMessageTypeEnum.TEXT]: {} })
+        }, res.locals.body!.payload)
 
         // 返回发送的消息
         res.json(sendMessageOutput.parse({

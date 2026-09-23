@@ -16,19 +16,6 @@ export const getReportsOutput = objectType({
     })),
 })
 
-// 获取举报详情输入
-export const getReportDetailInput = objectType({
-    reportId: stringType,
-})
-
-// 获取举报详情输出
-export const getReportDetailOutput = objectType({
-    report: reportSchema,
-    work: workDetailSchema,
-    user: userSchema,
-    images: arrayType(stringType),
-})
-
 // 处理举报输入
 export const handleReportInput = objectType({
     reportId: stringType,

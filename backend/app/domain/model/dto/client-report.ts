@@ -1,7 +1,8 @@
 import { objectType, stringType, numberType, arrayType } from "./index.js"
 import { ReportTypeEnum, ReportObjectEnum } from "../enum/admin-report.js"
+import { reportSchema } from "./common.js"
 
-// 举报作品输入
+// 举报输入
 export const reportWorkInput = objectType({
     workId: stringType,
     reportObject: numberType,
@@ -17,4 +18,14 @@ export const getReportTypesOutput = objectType({
         text: stringType,
         id: numberType,
     }))
+})
+
+// 查询举报详情输入
+export const getReportDetailInput = objectType({
+    reportId: stringType,
+})
+
+// 查询举报详情输出
+export const getReportDetailOutput = objectType({
+    report: reportSchema,
 })

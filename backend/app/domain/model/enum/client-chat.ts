@@ -9,4 +9,5 @@ export enum ClientChatSessionTypeEnum {
 export enum ClientChatMessageTypeEnum {
     TEXT = 1, // 文本消息
     REPORT_NOTIFICATION = 2, // 举报通知
+    WORK_SHARE = 3, // 作品分享
 }

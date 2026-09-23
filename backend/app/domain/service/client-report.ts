@@ -1,5 +1,5 @@
 import type { EnhancedResponse } from "../model/dto/index.js"
-import { getReportTypesOutput, reportWorkInput } from "../model/dto/client-report.js"
+import { getReportDetailInput, getReportDetailOutput, getReportTypesOutput, reportWorkInput } from "../model/dto/client-report.js"
 import { getCurrent } from "../../lib/local-stroage.js"
 import { ReportObjectEnum, ReportStatusEnum, ReportTypeEnum } from "../model/enum/admin-report.js"
 import { AppError } from "../../lib/app-error.js"
@@ -48,6 +48,14 @@ export class ClientReportService extends BaseService {
                 }
             })
         }
+    }
+
+    // 查询举报详情
+    async getReportDetail(req: Request, res: EnhancedResponse<null, typeof getReportDetailInput>) {
+        const data = await this.baseGetReportDetail(res.locals.body!.reportId)
+        res.json(getReportDetailOutput.parse({
+            report: data,
+        }))
     }
 
     // 查询举报类型

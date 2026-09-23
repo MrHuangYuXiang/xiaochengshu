@@ -11,6 +11,7 @@ import { ClientChatSessionTypeEnum, ClientChatMessageTypeEnum } from "../model/e
 import { ClientEventType, pushChatMessageClientEvent } from "../model/dto/client-event.js"
 import { AppError } from "../../lib/app-error.js"
 import type z from "zod"
+import { AdminReportTable } from "../model/db-schema/admin-report.js"
 
 /**
  * 服务基类,抽离各个服务公共的业务逻辑
@@ -203,11 +204,9 @@ export class BaseService {
             innerJoin(ClientChatSessionTable, eq(ClientChatSessionTable.id, ClientChatMessageTable.session_id)).
             where(eq(ClientChatMessageTable.id, msgId))
 
-        // 推送消息给对应用户客户端
+        // 推送消息给对应用户客户端,系统消息将不会推送
         for (const item of members) {
-            // 系统会话推送给自己,其他会话推送给其他用户
             if (
-                item.session.type === ClientChatSessionTypeEnum.SYSTEM ||
                 item.member.user_id !== message.user_id
             ) {
                 this.clientManager.push(
@@ -229,5 +228,23 @@ export class BaseService {
             message: members[0].message,
             user: members[0].user,
         }
+    }
+
+    // 查询举报详情
+    async baseGetReportDetail(
+        reportId: string,
+    ) {
+        const current = getCurrent()
+
+        const data = await current.tx.
+            select().
+            from(AdminReportTable).
+            where(eq(AdminReportTable.id, reportId))
+
+        if (!data[0]) {
+            throw new AppError("举报不存在")
+        }
+
+        return data[0]
     }
 }

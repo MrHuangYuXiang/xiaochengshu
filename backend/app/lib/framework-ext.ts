@@ -314,55 +314,71 @@ class DocGen {
     }
 
     // 创建openapi对象主逻辑
-    private createOpenApiObjectMain(key: string, obj: any, current: any) {
+    private createOpenApiObjectMain(key: string, obj: any, current: any): {
+        isRequired: boolean,
+    } {
         // 获取zod原始类型
-        obj = this.getOriginalType(obj)
+        const { obj: originObj, isRequired } = this.getOriginalType(obj)
 
         // 对象类型处理逻辑
-        if (obj instanceof z.ZodObject) {
+        if (originObj instanceof z.ZodObject) {
             current[key] = {
-                type: obj.meta()?.openapiType,
+                type: originObj.meta()?.openapiType,
                 required: [],
                 properties: {},
             }
-            for (const propKey in obj.shape) {
+            for (const propKey in originObj.shape) {
+                const { isRequired: sonIsRequired } = this.createOpenApiObjectMain(propKey, originObj.shape[propKey], current[key].properties)
                 // 设置对象的required属性
-                current[key].required.push(propKey)
-                this.createOpenApiObjectMain(propKey, obj.shape[propKey], current[key].properties)
+                if (sonIsRequired) {
+                    current[key].required.push(propKey)
+                }
             }
         }
         // 数组类型处理逻辑
-        else if (obj instanceof z.ZodArray) {
+        else if (originObj instanceof z.ZodArray) {
             current[key] = {
-                type: obj.meta()?.openapiType,
+                type: originObj.meta()?.openapiType,
             }
             // 对于Array类型需要通过unwrap拿到内部类型
-            this.createOpenApiObjectMain("items", obj.unwrap(), current[key])
+            this.createOpenApiObjectMain("items", originObj.unwrap(), current[key])
         }
         // 基础类型处理逻辑
         else {
             current[key] = {
-                type: obj.meta()?.openapiType,
+                type: originObj.meta()?.openapiType,
             }
         }
+
+        return { isRequired }
     }
 
-    // 获取schema原始类型
-    private getOriginalType(obj: any): any {
+    /** 
+     * 获取schema原始类型
+     * isRequired 是否必填项
+     */
+    private getOriginalType(obj: any, isRequired: boolean = true): {
+        obj: any,
+        isRequired: boolean,
+    } {
         // 对于Pipe类型,需要通过in拿到内部类型
         if (obj instanceof z.ZodPipe) {
             return this.getOriginalType(obj.in)
         }
-        // 对于Default类型,需要通过unwrap拿到内部类型
+        // 对于Default和Nullable类型,需要通过unwrap拿到内部类型
         else if (
             obj instanceof z.ZodDefault ||
-            obj instanceof z.ZodNullable ||
-            obj instanceof z.ZodOptional
+            obj instanceof z.ZodNullable
         ) {
             return this.getOriginalType(obj.unwrap())
         }
+        // 对于Optional类型,需要通过unwrap拿到内部类型,并设置isRequired为true
+        else if (obj instanceof z.ZodOptional) {
+            return this.getOriginalType(obj.unwrap(), false)
+        }
+        // 递归到Object类型时,携带出原始类型和isRequired
         else {
-            return obj
+            return { obj, isRequired }
         }
     }
 
@@ -393,7 +409,7 @@ class DocGen {
                     in: "query",
                     required: true,
                     schema: {
-                        type: this.getOriginalType(obj.shape[key]).meta()?.openapiType,
+                        type: this.getOriginalType(obj.shape[key]).obj.meta()?.openapiType,
                     },
                 })
             }
@@ -431,12 +447,14 @@ class DocGen {
 
     // 导出openapi文档字符串
     exportDoc() {
+        console.log("生成openapi文档中...")
         for (const item of clientEvents) {
             const begin = this.doc.components.schemas
             this.createOpenApiObject(item.meta()!.openapiName as string, begin, item)
         }
 
         fs.writeFileSync("/opt/xiaochengshu/openapi.json", JSON.stringify(this.doc, null, 2))
+        console.log("openapi文档生成完成")
     }
 }
 

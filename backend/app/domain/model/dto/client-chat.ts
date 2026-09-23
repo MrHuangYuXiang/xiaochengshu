@@ -13,6 +13,8 @@ import {
     objectType,
 } from "./index.js";
 import { page } from "./common.js";
+import { MessagePayload } from "../db-schema/client-chat.js";
+import { ClientChatMessageTypeEnum } from "../enum/client-chat.js";
 
 // 会话聚合模型
 export const chatSessionAggregate = {
@@ -58,9 +60,21 @@ export const pinSessionInput = objectType({
 // 发送消息输入
 export const sendMessageInput = objectType({
     sessionId: stringType,
-    sessionMemberId: stringType,
     content: stringType,
-});
+    type: numberType,
+    payload: MessagePayload,
+}).refine((data) => {
+    if (!Object.values(ClientChatMessageTypeEnum).includes(data.type)) {
+        return false
+    }
+    if (!(data.payload as Record<string, unknown>)[data.type]) {
+        return false
+    }
+    return true
+}, { message: "类型非法或类型与载荷不匹配" });
+
+
+
 
 // 发送消息输出
 export const sendMessageOutput = objectType(chatMessageAggregate);

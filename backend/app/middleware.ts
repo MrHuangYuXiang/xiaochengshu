@@ -1,13 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
 import { routeMap } from "./lib/framework-ext.js";
 import { verifyJWT, type Payload } from "./helper/jwt.js";
-import { getEnv } from "./helper/env.js";
 import { localStorage } from "./lib/local-stroage.js";
-import { getTx } from "./db/db.js";
+import { getTx } from "./domain/db.js";
 import { errorClientEvent, ClientEventType } from "./domain/model/dto/client-event.js";
 import { AppError } from "./lib/app-error.js";
 import type { ClientManagerPort } from "./port/client-manager-port.js";
 import { AdminUserRole } from "./domain/model/enum/admin-user.js";
+import { ZodError } from "zod";
 
 /**
  * 中间件包装器
@@ -51,9 +51,16 @@ export const middlewareWrapper = (
             let msg = ""
 
             console.log("捕捉到错误: ", error)
+            // 应用错误
             if (error instanceof AppError) {
                 msg = error.message
-            } else if (error instanceof Error) {
+            }
+            // zod错误(参数校验)
+            else if (error instanceof ZodError) {
+                msg = error.message
+            }
+            // 未知错误
+            else if (error instanceof Error) {
                 msg = "服务器错误,请稍后重试"
             }
 

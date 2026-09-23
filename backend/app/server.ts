@@ -46,6 +46,7 @@ import { adminAddUserInput, adminLoginInput, adminLoginOutput } from "./domain/m
 import { AdminUserService } from "./domain/service/admin-user.js"
 import { AdminReportService } from "./domain/service/admin-report.js"
 import type { FileStoragePort } from "./port/file-storage-port.js"
+import { getReportsInput, getReportsOutput } from "./domain/model/dto/admin-report.js"
 
 export interface ServerPort {
     Run(): void
@@ -120,6 +121,7 @@ export class Server implements ServerPort {
         // 举报模块
         this.registerHandler("POST", '/report', reportWorkInput, null, clientReportService.report.bind(clientReportService)) // 举报
         this.registerHandler("GET", '/report/types', null, getReportTypesOutput, clientReportService.getReportTypes.bind(clientReportService)) // 查询举报类型
+        this.registerHandler("GET", '/report', getReportsInput, getReportsOutput, adminReportService.getReports.bind(adminReportService)) // 查询举报列表
 
         // 直播模块
 

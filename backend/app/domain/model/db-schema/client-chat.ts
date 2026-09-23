@@ -47,4 +47,9 @@ export const MessagePayload = objectType({
     [ClientChatMessageTypeEnum.REPORT_NOTIFICATION]: objectType({
         report_id: stringType,
     }).optional(),
+    [ClientChatMessageTypeEnum.WORK_SHARE]: objectType({
+        work_id: stringType,
+        title: stringType,
+        cover_url: stringType,
+    }).optional(),
 })

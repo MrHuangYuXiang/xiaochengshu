@@ -1495,6 +1495,8 @@
                         "id",
                         "created_at",
                         "updated_at",
+                        "type",
+                        "payload",
                         "session_id",
                         "user_id",
                         "content",
@@ -1509,6 +1511,50 @@
                         },
                         "updated_at": {
                           "type": "string"
+                        },
+                        "type": {
+                          "type": "integer"
+                        },
+                        "payload": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "1": {
+                              "type": "object",
+                              "required": [],
+                              "properties": {}
+                            },
+                            "2": {
+                              "type": "object",
+                              "required": [
+                                "report_id"
+                              ],
+                              "properties": {
+                                "report_id": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "3": {
+                              "type": "object",
+                              "required": [
+                                "work_id",
+                                "title",
+                                "cover_url"
+                              ],
+                              "properties": {
+                                "work_id": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                },
+                                "cover_url": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
                         },
                         "session_id": {
                           "type": "string"
@@ -1708,6 +1754,8 @@
                               "id",
                               "created_at",
                               "updated_at",
+                              "type",
+                              "payload",
                               "session_id",
                               "user_id",
                               "content",
@@ -1722,6 +1770,50 @@
                               },
                               "updated_at": {
                                 "type": "string"
+                              },
+                              "type": {
+                                "type": "integer"
+                              },
+                              "payload": {
+                                "type": "object",
+                                "required": [],
+                                "properties": {
+                                  "1": {
+                                    "type": "object",
+                                    "required": [],
+                                    "properties": {}
+                                  },
+                                  "2": {
+                                    "type": "object",
+                                    "required": [
+                                      "report_id"
+                                    ],
+                                    "properties": {
+                                      "report_id": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "3": {
+                                    "type": "object",
+                                    "required": [
+                                      "work_id",
+                                      "title",
+                                      "cover_url"
+                                    ],
+                                    "properties": {
+                                      "work_id": {
+                                        "type": "string"
+                                      },
+                                      "title": {
+                                        "type": "string"
+                                      },
+                                      "cover_url": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
                               },
                               "session_id": {
                                 "type": "string"
@@ -1813,6 +1905,8 @@
                         "id",
                         "created_at",
                         "updated_at",
+                        "type",
+                        "payload",
                         "session_id",
                         "user_id",
                         "content",
@@ -1827,6 +1921,50 @@
                         },
                         "updated_at": {
                           "type": "string"
+                        },
+                        "type": {
+                          "type": "integer"
+                        },
+                        "payload": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "1": {
+                              "type": "object",
+                              "required": [],
+                              "properties": {}
+                            },
+                            "2": {
+                              "type": "object",
+                              "required": [
+                                "report_id"
+                              ],
+                              "properties": {
+                                "report_id": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "3": {
+                              "type": "object",
+                              "required": [
+                                "work_id",
+                                "title",
+                                "cover_url"
+                              ],
+                              "properties": {
+                                "work_id": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                },
+                                "cover_url": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
                         },
                         "session_id": {
                           "type": "string"
@@ -1900,18 +2038,60 @@
                 "type": "object",
                 "required": [
                   "sessionId",
-                  "sessionMemberId",
-                  "content"
+                  "content",
+                  "type",
+                  "payload"
                 ],
                 "properties": {
                   "sessionId": {
                     "type": "string"
                   },
-                  "sessionMemberId": {
-                    "type": "string"
-                  },
                   "content": {
                     "type": "string"
+                  },
+                  "type": {
+                    "type": "integer"
+                  },
+                  "payload": {
+                    "type": "object",
+                    "required": [],
+                    "properties": {
+                      "1": {
+                        "type": "object",
+                        "required": [],
+                        "properties": {}
+                      },
+                      "2": {
+                        "type": "object",
+                        "required": [
+                          "report_id"
+                        ],
+                        "properties": {
+                          "report_id": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "3": {
+                        "type": "object",
+                        "required": [
+                          "work_id",
+                          "title",
+                          "cover_url"
+                        ],
+                        "properties": {
+                          "work_id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "cover_url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -1974,6 +2154,8 @@
                               "id",
                               "created_at",
                               "updated_at",
+                              "type",
+                              "payload",
                               "session_id",
                               "user_id",
                               "content",
@@ -1988,6 +2170,50 @@
                               },
                               "updated_at": {
                                 "type": "string"
+                              },
+                              "type": {
+                                "type": "integer"
+                              },
+                              "payload": {
+                                "type": "object",
+                                "required": [],
+                                "properties": {
+                                  "1": {
+                                    "type": "object",
+                                    "required": [],
+                                    "properties": {}
+                                  },
+                                  "2": {
+                                    "type": "object",
+                                    "required": [
+                                      "report_id"
+                                    ],
+                                    "properties": {
+                                      "report_id": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "3": {
+                                    "type": "object",
+                                    "required": [
+                                      "work_id",
+                                      "title",
+                                      "cover_url"
+                                    ],
+                                    "properties": {
+                                      "work_id": {
+                                        "type": "string"
+                                      },
+                                      "title": {
+                                        "type": "string"
+                                      },
+                                      "cover_url": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
                               },
                               "session_id": {
                                 "type": "string"
@@ -2058,46 +2284,134 @@
       }
     },
     "/report": {
-      "post": {
-        "parameters": [],
+      "get": {
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "响应模型",
             "content": {
               "application/json": {
                 "schema": {
-                  "required": [],
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "description": "请求体参数",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "workId",
-                  "reportObject",
-                  "reportType",
-                  "reason"
-                ],
-                "properties": {
-                  "workId": {
-                    "type": "string"
-                  },
-                  "reportObject": {
-                    "type": "integer"
-                  },
-                  "reportType": {
-                    "type": "integer"
-                  },
-                  "reason": {
-                    "type": "string"
+                  "type": "object",
+                  "required": [
+                    "reports"
+                  ],
+                  "properties": {
+                    "reports": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "report",
+                          "reporter"
+                        ],
+                        "properties": {
+                          "report": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "work_id",
+                              "reporter_id",
+                              "report_object",
+                              "report_type",
+                              "reason",
+                              "status"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "work_id": {
+                                "type": "string"
+                              },
+                              "reporter_id": {
+                                "type": "string"
+                              },
+                              "report_object": {
+                                "type": "integer"
+                              },
+                              "report_type": {
+                                "type": "integer"
+                              },
+                              "reason": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "reporter": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "name",
+                              "desc",
+                              "birthday",
+                              "gender",
+                              "avatar_url",
+                              "is_complete_profile"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "desc": {
+                                "type": "string"
+                              },
+                              "birthday": {
+                                "type": "string"
+                              },
+                              "gender": {
+                                "type": "integer"
+                              },
+                              "avatar_url": {
+                                "type": "string"
+                              },
+                              "is_complete_profile": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -2281,6 +2595,8 @@
               "id",
               "created_at",
               "updated_at",
+              "type",
+              "payload",
               "session_id",
               "user_id",
               "content",
@@ -2295,6 +2611,50 @@
               },
               "updated_at": {
                 "type": "string"
+              },
+              "type": {
+                "type": "integer"
+              },
+              "payload": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "1": {
+                    "type": "object",
+                    "required": [],
+                    "properties": {}
+                  },
+                  "2": {
+                    "type": "object",
+                    "required": [
+                      "report_id"
+                    ],
+                    "properties": {
+                      "report_id": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "3": {
+                    "type": "object",
+                    "required": [
+                      "work_id",
+                      "title",
+                      "cover_url"
+                    ],
+                    "properties": {
+                      "work_id": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "cover_url": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
               },
               "session_id": {
                 "type": "string"

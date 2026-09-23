@@ -2,6 +2,7 @@
  * 该文件定义基础模型,与数据库实体字段保持一致并做脱敏处理
  */
 
+import { MessagePayload } from "../db-schema/client-chat.js";
 import {
     booleanType,
     stringType,
@@ -100,6 +101,8 @@ export const chatSessionMemberSchema = objectType({
 // 聊天消息模型
 export const chatMessageSchema = objectType({
     ...baseSchema,
+    type: numberType,
+    payload: MessagePayload,
     session_id: stringType,
     user_id: stringType,
     content: stringType,
