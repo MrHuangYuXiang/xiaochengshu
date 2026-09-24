@@ -1,5 +1,10 @@
 <template>
-    <div class="floating-panel" v-show="isShow" ref="divRef">
+    <div 
+        class="floating-panel"
+        v-show="isShow"
+        ref="divRef"
+        @click.stop=""
+    >
         <slot></slot>
     </div>
 </template>

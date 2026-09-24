@@ -35,7 +35,6 @@
         :options="[{ id: 1, text: '举报该作品' }]"
         direction="right"
         @clickOption="handleClickFloating"
-        @click="showFloating(work.work.id)"
         v-model:show="isShowFloatingMap[work.work.id]"
       />
     </div>

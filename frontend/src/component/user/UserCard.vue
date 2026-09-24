@@ -48,7 +48,6 @@
 <style scoped lang="scss">
   .user-card {
     display: flex;
-    width: 100%;
     justify-content: space-between;
     align-items: center;
     gap: 20px;

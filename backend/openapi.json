@@ -2357,7 +2357,6 @@
                         "updated_at",
                         "work_id",
                         "reporter_id",
-                        "report_object",
                         "report_type",
                         "reason",
                         "status"
@@ -2377,9 +2376,6 @@
                         },
                         "reporter_id": {
                           "type": "string"
-                        },
-                        "report_object": {
-                          "type": "integer"
                         },
                         "report_type": {
                           "type": "integer"

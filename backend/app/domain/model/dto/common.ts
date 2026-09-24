@@ -114,7 +114,6 @@ export const reportSchema = objectType({
     ...baseSchema,
     work_id: stringType,
     reporter_id: stringType,
-    report_object: numberType,
     report_type: numberType,
     reason: stringType,
     status: numberType,
