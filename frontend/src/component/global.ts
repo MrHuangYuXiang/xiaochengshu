@@ -98,8 +98,22 @@ class GlobalWorkModal extends GlobalBase {
     this.workId = ref("")
   }
 
-  async show(workId: string) {
+  show(workId: string) {
     this.workId.value = workId
+    this.isShow.value = true
+  }
+}
+
+class GlobalReportModal extends GlobalBase {
+  public reportId: Ref<string>
+
+  constructor() {
+    super()
+    this.reportId = ref("")
+  }
+
+  show(reportId: string) {
+    this.reportId.value = reportId
     this.isShow.value = true
   }
 }
@@ -108,3 +122,4 @@ export const globalImagePreview = new GlobalImagePreview()
 export const globalMsgTip = new GlobalMsgTip()
 export const globalErrorDialog = new GlobalErrorDialog()
 export const globalWorkModal = new GlobalWorkModal()
+export const globalReportModal = new GlobalReportModal()

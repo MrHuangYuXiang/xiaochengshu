@@ -1,7 +1,7 @@
 import type { EnhancedResponse } from "../model/dto/index.js"
 import { getReportDetailInput, getReportDetailOutput, getReportTypesOutput, reportWorkInput } from "../model/dto/client-report.js"
 import { getCurrent } from "../../lib/local-stroage.js"
-import { ReportObjectEnum, ReportStatusEnum, ReportTypeEnum } from "../model/enum/admin-report.js"
+import { ReportStatusEnum, ReportTypeEnum } from "../model/enum/admin-report.js"
 import { AppError } from "../../lib/app-error.js"
 import { AdminReportTable } from "../model/db-schema/admin-report.js"
 import type { Request } from "express"
@@ -21,7 +21,6 @@ export class ClientReportService extends BaseService {
             id: reportId,
             work_id: res.locals.body!.workId,
             reporter_id: current.payload.userId,
-            report_object: res.locals.body!.reportObject,
             report_type: res.locals.body!.reportType,
             reason: res.locals.body!.reason,
             status: ReportStatusEnum.PENDING,
@@ -51,8 +50,8 @@ export class ClientReportService extends BaseService {
     }
 
     // 查询举报详情
-    async getReportDetail(req: Request, res: EnhancedResponse<null, typeof getReportDetailInput>) {
-        const data = await this.baseGetReportDetail(res.locals.body!.reportId)
+    async getReportDetail(req: Request, res: EnhancedResponse<typeof getReportDetailInput, null>) {
+        const data = await this.baseGetReportDetail(res.locals.query!.reportId)
         res.json(getReportDetailOutput.parse({
             report: data,
         }))

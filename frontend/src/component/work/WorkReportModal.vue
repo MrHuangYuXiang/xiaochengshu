@@ -66,7 +66,6 @@
         >("/report", {
             workId: props.workId,
             reportType: selectedType.value,
-            reportObject: 1,
             reason: reportContent.value
         })
         ElMessage("举报成功")

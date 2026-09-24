@@ -77,7 +77,6 @@
       height: 90vh;
       width: 70vw;
       max-height: 100vh;
-      overflow: auto;
       .step {
         position: absolute;
         bottom: 5%;

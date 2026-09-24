@@ -4,6 +4,7 @@
   <MsgTip />
   <ErrorDialog></ErrorDialog>
   <WorkModal v-if="globalWorkModal.isShow.value"></WorkModal>
+  <ReportModal v-if="globalReportModal.isShow.value"></ReportModal>
 
   <!-- 初始化用户弹窗 -->
   <InitUserModal v-model:show="enableInitUserModalShow" v-if="enableInitUserModalShow"></InitUserModal>
@@ -59,13 +60,15 @@
   import MsgTip from '@/component/chat/msg-tip.vue';
   import ImagePreview from '@/component/image/image-preview.vue';
   import WorkModal from '@/component/work/WorkModal.vue';
+  import ReportModal from '@/component/report/report-modal.vue';
   import { onBeforeMount, ref } from 'vue';
+
   import { useRouter } from 'vue-router';
   import { storage } from '@/storage';
   import { clientEvent } from '@/api/event';
   import type { paths } from '@/api/gen';
   import { axiosProxy } from '@/api/axios';
-import { globalWorkModal } from '@/component/global';
+  import { globalWorkModal, globalReportModal } from '@/component/global';
 
   const router = useRouter();
   const dropMenuItems = [

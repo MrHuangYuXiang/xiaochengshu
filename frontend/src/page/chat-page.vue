@@ -36,6 +36,7 @@
           :messageType="msg.message.type"
           :messageContent="msg.message.content"
           :sessionType="sessions.get(selectedSessionId)?.session.type"
+          @clickMessage="clickMessage(msg)"
         />
       </ScrollContainer>
     </div>
@@ -53,6 +54,7 @@
   import { axiosProxy } from '@/api/axios';
   import type { paths } from '@/api/gen';
   import { useRoute } from 'vue-router';
+  import { globalReportModal } from '@/component/global';
 
   const route = useRoute()
 
@@ -123,6 +125,23 @@
     messages.value.unshift(message)
   }
 
+  // 点击消息
+  const clickMessage = (msg: MessageSchema) => {
+    switch (msg.message.type) {
+      // 普通文本消息
+      case 1:
+        break;
+      // 举报通知
+      case 2:
+        console.log(msg.message)
+        if (!msg.message.payload[2]) return
+        globalReportModal.show(msg.message.payload[2].report_id)
+        break;
+      default:
+        break;
+    }
+  }
+
   onMounted(async () => {
     // 加载当前用户会话数据
     await getSessions()
@@ -169,7 +188,6 @@
   .chat-panel {
     height: var(--root-mainview-height);
     position: relative;
-    background-color: var(--root-bg-gray);
     border-radius: 15px;
     .chat-messages {
       height: calc(100% - 12rem);

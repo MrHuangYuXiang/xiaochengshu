@@ -32,7 +32,7 @@ import {
     followUserOutput,
     removeFollowerOutput,
 } from "./domain/model/dto/client-user.js"
-import { reportWorkInput, getReportTypesOutput } from "./domain/model/dto/client-report.js"
+import { reportWorkInput, getReportTypesOutput, getReportDetailInput, getReportDetailOutput } from "./domain/model/dto/client-report.js"
 import express from "express"
 import { routeMap } from "./lib/framework-ext.js"
 import { doc } from "./lib/framework-ext.js"
@@ -121,7 +121,7 @@ export class Server implements ServerPort {
         // 举报模块
         this.registerHandler("POST", '/report', reportWorkInput, null, clientReportService.report.bind(clientReportService)) // 举报
         this.registerHandler("GET", '/report/types', null, getReportTypesOutput, clientReportService.getReportTypes.bind(clientReportService)) // 查询举报类型
-        this.registerHandler("GET", '/report', getReportsInput, getReportsOutput, adminReportService.getReports.bind(adminReportService)) // 查询举报列表
+        this.registerHandler("GET", '/report', getReportDetailInput, getReportDetailOutput, clientReportService.getReportDetail.bind(clientReportService)) // 查询举报详情
 
         // 直播模块
 

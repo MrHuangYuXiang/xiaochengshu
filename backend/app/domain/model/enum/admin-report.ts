@@ -1,8 +1,3 @@
-// 举报对象枚举
-export const ReportObjectEnum = {
-    Work: 1,
-}
-
 // 举报类型枚举
 export const ReportTypeEnum = {
     "侵犯权益": 1,

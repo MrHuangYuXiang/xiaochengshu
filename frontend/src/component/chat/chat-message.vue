@@ -1,11 +1,12 @@
 <template>
     <div
     v-if="props.sessionType === 1 || props.sessionType === 2"
-    class="private-message"
+    class="private-message message"
     :class="{
         'private-message-self': props.userId === storage.initData.value?.user.id,
         'private-message-other': props.userId !== storage.initData.value?.user.id,
     }"
+    @click="clickMessage"
     >
         <UserAvatar :user-id="props.userId" width="3rem" :img-url="props.userAvatarUrl" />
         <div
@@ -18,7 +19,12 @@
             {{ props.messageContent }}
         </div>
     </div>
-    <div v-if="props.sessionType === 3" class="system-message">
+
+    <div 
+    v-if="props.sessionType === 3" 
+    class="system-message message"
+    @click="clickMessage"
+    >
         <div class="system-title">{{ getSystemTitle(props.messageType) }}</div>
         <div class="system-content">{{ props.messageContent }}</div>
         <div style="height: 1px;background-color: rgba(0, 0, 0, 0.1);"></div>
@@ -31,6 +37,7 @@
 
 <script lang="ts" setup>
     import { storage } from '@/storage';
+    import UserAvatar from '../user/UserAvatar.vue';
     import AppIcon from '../common/AppIcon.vue';
 
     const props = defineProps<{
@@ -40,6 +47,9 @@
         messageType: number;
         sessionType?: number;
     }>()
+    const emits = defineEmits<{
+        (e: 'clickMessage'): void;
+    } >()
 
     // 获取系统消息标题
     const getSystemTitle = (type: number) => {
@@ -52,9 +62,21 @@
                 return '系统通知';
         }
     }
+    // 点击消息
+    const clickMessage = () => {
+        emits('clickMessage')
+    }
 </script>
 
 <style scoped>
+    .message {
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+    }
+    .message:hover {
+        transform: scale(1.03);
+    }
+
     .private-message {
         display: flex;
         align-items: center;
@@ -82,7 +104,7 @@
     }
     .private-content-other {
         color: black;
-        background-color: white;
+        background-color: var(--root-bg-gray);
     }
 
     /* 系统会话类型css属性 */
@@ -90,7 +112,7 @@
         display: flex;
         flex-direction: column;
         padding: 1.2rem;
-        background-color: white;
+        background-color: var(--root-bg-gray);
         width: 75%;
         border-radius: 15px;
         gap: 0.8rem;
@@ -102,7 +124,6 @@
             font-size: 1rem;
         }
         .system-detail {
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;

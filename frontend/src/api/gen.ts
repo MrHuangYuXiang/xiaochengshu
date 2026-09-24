@@ -1233,8 +1233,7 @@ export interface paths {
         get: {
             parameters: {
                 query: {
-                    page: number;
-                    pageSize: number;
+                    reportId: string;
                 };
                 header?: never;
                 path?: never;
@@ -1249,30 +1248,17 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            reports: {
-                                report: {
-                                    id: string;
-                                    created_at: string;
-                                    updated_at: string;
-                                    work_id: string;
-                                    reporter_id: string;
-                                    report_object: number;
-                                    report_type: number;
-                                    reason: string;
-                                    status: number;
-                                };
-                                reporter: {
-                                    id: string;
-                                    created_at: string;
-                                    updated_at: string;
-                                    name: string;
-                                    desc: string;
-                                    birthday: string;
-                                    gender: number;
-                                    avatar_url: string;
-                                    is_complete_profile: number;
-                                };
-                            }[];
+                            report: {
+                                id: string;
+                                created_at: string;
+                                updated_at: string;
+                                work_id: string;
+                                reporter_id: string;
+                                report_object: number;
+                                report_type: number;
+                                reason: string;
+                                status: number;
+                            };
                         };
                     };
                 };
@@ -1291,7 +1277,6 @@ export interface paths {
                 content: {
                     "application/json": {
                         workId: string;
-                        reportObject: number;
                         reportType: number;
                         reason: string;
                     };

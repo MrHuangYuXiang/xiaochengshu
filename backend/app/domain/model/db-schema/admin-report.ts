@@ -7,8 +7,6 @@ export const AdminReportTable = mysqlTable('admin_report', {
     work_id: varchar({ length: 255 }).notNull(),
     // 举报人(发起举报的用户)id
     reporter_id: varchar({ length: 255 }).notNull(),
-    // 举报对象
-    report_object: tinyint().notNull(),
     // 举报类型
     report_type: tinyint().notNull(),
     // 举报原因

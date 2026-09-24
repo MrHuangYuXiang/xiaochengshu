@@ -6,8 +6,6 @@ import {
     stringType,
     objectType,
 } from "./index.js";
-import { number } from "zod";
-import { ReportObjectEnum, ReportTypeEnum } from "../enum/admin-report.js";
 
 // 评论聚合模型
 export const workCommentAggregate = {

@@ -2308,16 +2308,12 @@
                 "type": "object",
                 "required": [
                   "workId",
-                  "reportObject",
                   "reportType",
                   "reason"
                 ],
                 "properties": {
                   "workId": {
                     "type": "string"
-                  },
-                  "reportObject": {
-                    "type": "integer"
                   },
                   "reportType": {
                     "type": "integer"
@@ -2334,19 +2330,11 @@
       "get": {
         "parameters": [
           {
-            "name": "page",
+            "name": "reportId",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
+              "type": "string"
             }
           }
         ],
@@ -2358,104 +2346,49 @@
                 "schema": {
                   "type": "object",
                   "required": [
-                    "reports"
+                    "report"
                   ],
                   "properties": {
-                    "reports": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "report",
-                          "reporter"
-                        ],
-                        "properties": {
-                          "report": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "created_at",
-                              "updated_at",
-                              "work_id",
-                              "reporter_id",
-                              "report_object",
-                              "report_type",
-                              "reason",
-                              "status"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "created_at": {
-                                "type": "string"
-                              },
-                              "updated_at": {
-                                "type": "string"
-                              },
-                              "work_id": {
-                                "type": "string"
-                              },
-                              "reporter_id": {
-                                "type": "string"
-                              },
-                              "report_object": {
-                                "type": "integer"
-                              },
-                              "report_type": {
-                                "type": "integer"
-                              },
-                              "reason": {
-                                "type": "string"
-                              },
-                              "status": {
-                                "type": "integer"
-                              }
-                            }
-                          },
-                          "reporter": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "created_at",
-                              "updated_at",
-                              "name",
-                              "desc",
-                              "birthday",
-                              "gender",
-                              "avatar_url",
-                              "is_complete_profile"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "created_at": {
-                                "type": "string"
-                              },
-                              "updated_at": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "desc": {
-                                "type": "string"
-                              },
-                              "birthday": {
-                                "type": "string"
-                              },
-                              "gender": {
-                                "type": "integer"
-                              },
-                              "avatar_url": {
-                                "type": "string"
-                              },
-                              "is_complete_profile": {
-                                "type": "integer"
-                              }
-                            }
-                          }
+                    "report": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "created_at",
+                        "updated_at",
+                        "work_id",
+                        "reporter_id",
+                        "report_object",
+                        "report_type",
+                        "reason",
+                        "status"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "work_id": {
+                          "type": "string"
+                        },
+                        "reporter_id": {
+                          "type": "string"
+                        },
+                        "report_object": {
+                          "type": "integer"
+                        },
+                        "report_type": {
+                          "type": "integer"
+                        },
+                        "reason": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "integer"
                         }
                       }
                     }
