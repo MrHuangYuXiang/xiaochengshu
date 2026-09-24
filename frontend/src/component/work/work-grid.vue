@@ -21,10 +21,10 @@
               <div>{{ work.user.name }}</div>
             </div>
             <div class="more">
-              <AppIcon 
+              <AppIcon
                 :style="{cursor: 'pointer'}"
-                type="more" 
-                size="1rem" 
+                type="more"
+                size="1rem"
                 @click="showFloating(work.work.id)"
               />
             </div>
@@ -32,10 +32,11 @@
         </div>
       </div>
       <SelectFloating 
-        :options="[{ id: 1, text: '举报该作品' }]" 
-        direction="right" 
-        :enableShow="isShowFloatingMap[work.work.id] || false" 
+        :options="[{ id: 1, text: '举报该作品' }]"
+        direction="right"
         @clickOption="handleClickFloating"
+        @click="showFloating(work.work.id)"
+        v-model:show="isShowFloatingMap[work.work.id]"
       />
     </div>
   </div>
@@ -63,7 +64,7 @@
   const works = ref(new EnhancedList<WorksSchema>((work) => work.work.id, 10))
   const targetUserId = ref("")
   const worksType = ref("self")
-  // 是否显示作品更多浮动框(值为对应的作品id)
+  // 浮动框相关数据(键为对应的作品id)
   const isShowFloatingMap = ref<Record<string, boolean>>({})
 
   // 获取作品
@@ -81,16 +82,13 @@
       for (const work of data) {
         isShowFloatingMap.value[work.work.id] = false
       }
-
       return data
     })
   }
 
   // 点击作品下方显示更多浮动框
   const showFloating = (workId: string) => {
-    if (workId in isShowFloatingMap.value) {
-      isShowFloatingMap.value[workId] = !isShowFloatingMap.value[workId]
-    }
+    isShowFloatingMap.value[workId] = true
   }
 
   // 点击浮动框处理函数

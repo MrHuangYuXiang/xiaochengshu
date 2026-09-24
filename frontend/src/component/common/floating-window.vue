@@ -1,14 +1,34 @@
 <template>
-    <div class="floating-panel" v-show="props.enableShow">
+    <div class="floating-panel" v-show="isShow" ref="divRef">
         <slot></slot>
     </div>
 </template>
 
 <script setup lang="ts">
+    import { useTemplateRef, watch } from 'vue';
+
+    const isShow = defineModel<boolean>("show")
     const props = defineProps<{
-        enableShow: boolean,
-        direction: "right"
+        direction: "right",
     }>()
+    const divRef = useTemplateRef("divRef")
+
+    watch(isShow, (newVal) => {
+        console.log(newVal)
+        if (newVal) {
+            setTimeout(() => {
+                document.addEventListener("click", clickHandler)
+            }, 100)
+        } else {
+            document.removeEventListener("click", clickHandler)
+        }
+    })
+
+    const clickHandler = (e: Event) => {
+        if (!divRef.value?.contains(e.target as Node) && isShow.value) {
+            isShow.value = false
+        }
+    }
 </script>
 
 <style scoped lang="css">

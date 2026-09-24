@@ -1,5 +1,5 @@
 <template>
-  <BaseModal width="50vw" v-model:show="enableShow">
+  <BaseModal width="50vw" v-model:show="globalUpdateUserModal.isShow.value">
     <div class="form-body">
       <UserAvatar :is-uploadable="true" width="30%" :img-url="storage.initData.value?.user?.avatar_url" @change="changeAvatar"></UserAvatar>
       <div class="form-item">
@@ -35,8 +35,7 @@
   import { axiosProxy } from '@/api/axios.ts';
   import { ElMessage } from 'element-plus';
   import type { paths } from '@/api/gen.ts';
-
-  const enableShow = defineModel<boolean>()
+  import { globalUpdateUserModal } from '../global.ts';
 
   const nameInput = useTemplateRef("nameInput")
   const birthdayInput = useTemplateRef("birthdayInput")
@@ -87,7 +86,7 @@
     storage.setInitData(initData)
 
     ElMessage("保存成功")
-    enableShow.value = false
+    globalUpdateUserModal.isShow.value = false
   }
 
   // 更新头像

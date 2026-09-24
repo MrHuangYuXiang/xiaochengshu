@@ -5,6 +5,7 @@
       :load-more-callback="getSessions"
       class="sessions"
     >
+      <div class="title">我的消息</div>
       <SessionCard
         v-for="session in sessions"
         v-model:selected-id="selectedSessionId"
@@ -173,8 +174,6 @@
 
 <style scoped lang="css">
 .chat-page {
-  height: 100%;
-  width: 100%;
   display: grid;
   grid-template-columns: 1fr 3fr;
 
@@ -183,6 +182,12 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    .title {
+      font-size: large;
+      padding: 2rem;
+      text-align: center;
+      font-weight: bold;
+    }
   }
   
   .chat-panel {

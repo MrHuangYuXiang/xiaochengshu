@@ -118,6 +118,16 @@ class GlobalReportModal extends GlobalBase {
   }
 }
 
+class GlobalUpdateUserModal extends GlobalBase {
+  public isShow: Ref<boolean>
+
+  constructor() {
+    super()
+    this.isShow = ref(false)
+  }
+}
+
+export const globalUpdateUserModal = new GlobalUpdateUserModal()
 export const globalImagePreview = new GlobalImagePreview()
 export const globalMsgTip = new GlobalMsgTip()
 export const globalErrorDialog = new GlobalErrorDialog()

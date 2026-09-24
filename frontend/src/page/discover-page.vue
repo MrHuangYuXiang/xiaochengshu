@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-  import WorkGrid from '@/component/work/WorkGrid.vue';
+  import WorkGrid from '@/component/work/work-grid.vue';
   import AppSegment from '@/component/common/AppSegment.vue';
   import ScrollContainer from '@/component/common/ScrollContainer.vue';
   import { onMounted, useTemplateRef } from 'vue';

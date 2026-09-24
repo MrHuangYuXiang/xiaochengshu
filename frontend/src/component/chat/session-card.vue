@@ -61,11 +61,9 @@
 
 <style lang="css" scoped>
   .session-card {
-    overflow: hidden;
-    white-space: nowrap;
     width: calc(100% - 20px);
     display: grid;
-    grid-template-columns: 60px minmax(0, 1fr); /* 使用minmax避免显示问题 */
+    grid-template-columns: auto 1fr;
     gap: 0.5rem;
     position: relative;
     cursor: pointer;
@@ -73,27 +71,30 @@
     border-radius: 20px;
     transition: all 0.3s ease-in-out;
     .session-content {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
+      display: grid;
+      grid-template-columns: auto;
       gap: 0.25rem;
       .session-name {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
-        justify-content: space-between;
         .name {
+          grid-column: 1;
           font-size: 1rem;
           font-weight: 500;
         }
         .time {
+          grid-column: 3;
           font-size: 0.7rem;
           color: var(--root-gray);
           font-weight: 500;
         }
       }
       .msg-content {
+        grid-column: 1;
         font-size: 0.75rem;
         overflow: hidden;
+        white-space: nowrap;
         text-overflow: ellipsis;
         color: var(--root-gray-dark);
       }

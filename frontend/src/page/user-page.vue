@@ -50,7 +50,7 @@
   import { ref, useTemplateRef } from 'vue'
   import { useRoute } from 'vue-router';
   import UserAvatar from '@/component/user/UserAvatar.vue'
-  import WorkGrid from '@/component/work/WorkGrid.vue'
+  import WorkGrid from '@/component/work/work-grid.vue'
   import AppSegment from '@/component/common/AppSegment.vue';
   import FormButton from '@/component/form/form-button.vue';
   import FollowsModal from '@/component/user/FollowsModal.vue';
