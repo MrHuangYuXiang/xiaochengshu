@@ -12,7 +12,7 @@ const rawDb = drizzle({
         user: getEnv('DB_USER'),
         password: getEnv('DB_PASSWORD'),
         database: getEnv('DB_DATABASE'),
-    }
+    },
 });
 
 // 获取事务实例,封装钩子逻辑

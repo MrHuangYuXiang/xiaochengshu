@@ -12,19 +12,6 @@ export function getPageParams(res: Response) {
     }
 }
 
-// 判断http表单请求体并获取图片扩展名
-export function getImageExt(formFieldType: FormFieldHeader) {
-    if (!formFieldType.filename || !formFieldType.contentType) {
-        throw new AppError(`字段${formFieldType.name}类型错误`)
-    }
-    if (formFieldType.contentType !== "image/jpeg"
-        && formFieldType.contentType !== "image/png"
-    ) {
-        throw new AppError(`字段${formFieldType.name}必须为jpeg或png格式`)
-    }
-    return `.${formFieldType.contentType.split("/")[1]}`
-}
-
 // 拼接sse字符串格式
 export const getSsePattern = (event: string, data: any) => {
     return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`

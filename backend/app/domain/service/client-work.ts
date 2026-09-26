@@ -21,12 +21,13 @@ import {
   deleteWorkInput,
 } from "../model/dto/client-work.js";
 import { v4 as uuidv4 } from "uuid";
-import { getImageExt, getPageParams } from "../../helper/http.js";
+import { getPageParams } from "../../helper/http.js";
 import { handleRawSqlRes } from "../../helper/sql.js";
 import { FormParser, MemoryWritableStream, type FormFieldHeader } from "../../lib/framework-ext.js";
 import { AppError } from "../../lib/app-error.js";
-import { getWorkImageFilePath } from "../../helper/file.js";
 import { WorkImageTypeEnum } from "../model/enum/client-work.js";
+import { FileExtEnum } from "../model/enum/file.js";
+import { getTableConfig } from "drizzle-orm/mysql-core";
 
 export class ClientWorkService extends BaseService {
   /**
@@ -214,10 +215,10 @@ export class ClientWorkService extends BaseService {
     const workImageCountStream = new MemoryWritableStream()
     const images: Array<typeof ClientWorkImageTable.$inferInsert> = []
 
-    await formParser.exec(async () => titleStream)
-    await formParser.exec(async () => contentStream)
-    await formParser.exec(async () => permissionStream)
-    await formParser.exec(async () => workImageCountStream)
+    await formParser.exec(async () => titleStream, [FileExtEnum.Unknown])
+    await formParser.exec(async () => contentStream, [FileExtEnum.Unknown])
+    await formParser.exec(async () => permissionStream, [FileExtEnum.Unknown])
+    await formParser.exec(async () => workImageCountStream, [FileExtEnum.Unknown])
     const workImageCount = workImageCountStream.getNumber()
 
     if (workImageCount === 0) {
@@ -227,21 +228,23 @@ export class ClientWorkService extends BaseService {
     // 解析图片流并写入文件
     for (let i = 0; i < workImageCount; i++) {
       await formParser.exec(async (fieldHeader: FormFieldHeader) => {
-        const path = getWorkImageFilePath(workId, getImageExt(fieldHeader))
+        const imageId = uuidv4()
+        const filePath = this.fileStorage.getFilePath(`/work-images/${imageId}`, fieldHeader.contentType)
         images.push({
+          id: imageId,
           work_id: workId,
-          path: path,
+          path: filePath,
           // 第一张图片默认为封面图片
           type: i === 0 ? WorkImageTypeEnum.Cover : WorkImageTypeEnum.Normal,
         })
-        return await this.fileStorage.getWritableStream(path)
-      })
+        return await this.fileStorage.getWritableStream(filePath)
+      }, [FileExtEnum.Jpg, FileExtEnum.Png])
     }
 
     // 数据库插入图片信息
     await current.tx.insert(ClientWorkImageTable).values(images)
 
-    // 数据库插入作品
+    // 数据库插入作品信息
     await current.tx.insert(ClientWorkTable).values({
       id: workId,
       user_id: current.payload.userId,
@@ -357,22 +360,22 @@ export class ClientWorkService extends BaseService {
 
     const userCol = Object.
       keys(getTableColumns(ClientUserTable)).
-      map((key) => `user.${key} AS user$${key}`).
+      map((key) => `${getTableConfig(ClientUserTable).name}.${key} AS user$${key}`).
       join(', ')
 
     // 用户是否点赞评论子查询
     const isLikedSubQuery = sql`
       (SELECT COUNT(*)
-      FROM work_comment_like
-      WHERE comment_id = ct.id
-      AND user_id = ${current.payload.userId})
+      FROM ${ClientWorkCommentLikeTable}
+      WHERE ${ClientWorkCommentLikeTable.comment_id} = ct.id
+      AND ${ClientWorkCommentLikeTable.user_id} = ${current.payload.userId})
     `
 
     // 评论点赞数子查询
     const likeCountSubQuery = sql`
       (SELECT COUNT(*)
-      FROM work_comment_like
-      WHERE comment_id = ct.id)
+      FROM ${ClientWorkCommentLikeTable}
+      WHERE ${ClientWorkCommentLikeTable.comment_id} = ct.id)
     `
 
     /* CTE默认广度遍历, 需要用path字段模拟深度遍历结果
@@ -381,21 +384,21 @@ export class ClientWorkService extends BaseService {
     const execRes = await current.tx.execute(sql
       `
         WITH RECURSIVE comment_tree AS (
-          SELECT *, 1 AS level, work_comment.id AS path
-          FROM work_comment
-          WHERE id = ${rootCommentId}
+          SELECT *, 1 AS level, ${ClientWorkCommentTable.id} AS path
+          FROM ${ClientWorkCommentTable}
+          WHERE ${ClientWorkCommentTable.id} = ${rootCommentId}
           UNION ALL
 
           SELECT wc.*, comment_tree.level + 1 AS level, CONCAT(comment_tree.path, '.', wc.id) AS path
-          FROM work_comment AS wc
+          FROM ${ClientWorkCommentTable} AS wc
           INNER JOIN comment_tree
           ON wc.parent_id = comment_tree.id
         )
 
         SELECT ${sql.raw(commentTreeCol)}, ${sql.raw(userCol)}, ${isLikedSubQuery} AS isLiked, ${likeCountSubQuery} AS likeCount, 0 AS replyCount
         FROM comment_tree AS ct
-        INNER JOIN \`user\`
-        ON ct.user_id = \`user\`.id
+        INNER JOIN ${ClientUserTable}
+        ON ct.user_id = ${ClientUserTable.id}
         WHERE ct.parent_id != ''
         ORDER BY ct.path
         LIMIT ${page.limit}
@@ -408,7 +411,7 @@ export class ClientWorkService extends BaseService {
 
   /**
    * 创建评论/回复
-   * 将评论和回复合并为一个接口,前端需要传入完整的rootCommentId和parentId字段
+   * 将评论和回复合并为一个接口,根评论的parent_id和root_comment_id为空
    */
   async createWorkComment(req: Request, res: EnhancedResponse<null, typeof createWorkCommentInput>) {
     const current = getCurrent()
@@ -443,5 +446,54 @@ export class ClientWorkService extends BaseService {
       likeCount: 0,
       replyCount: 0,
     }))
+  }
+
+  // 点赞作品
+  async likeWork(req: Request, res: EnhancedResponse<null, typeof likeWorkInput>) {
+    const current = getCurrent()
+    if (res.locals.body!.isLike) {
+      await current.tx.insert(ClientWorkLikeTable).values({
+        work_id: res.locals.body!.workId,
+        user_id: current.payload.userId,
+      })
+    } else {
+      await current.tx.delete(ClientWorkLikeTable).where(and(
+        eq(ClientWorkLikeTable.work_id, res.locals.body!.workId),
+        eq(ClientWorkLikeTable.user_id, current.payload.userId),
+      ))
+    }
+  }
+
+  // 收藏作品
+  async collectWork(req: Request, res: EnhancedResponse<null, typeof collectWorkInput>) {
+    const current = getCurrent()
+    if (res.locals.body!.isCollect) {
+      await current.tx.insert(ClientWorkCollectTable).values({
+        work_id: res.locals.body!.workId,
+        user_id: current.payload.userId,
+      })
+    } else {
+      await current.tx.delete(ClientWorkCollectTable).where(and(
+        eq(ClientWorkCollectTable.work_id, res.locals.body!.workId),
+        eq(ClientWorkCollectTable.user_id, current.payload.userId),
+      ))
+    }
+  }
+
+  // 点赞评论
+  async likeWorkComment(req: Request, res: EnhancedResponse<null, typeof likeWorkCommentInput>) {
+    const current = getCurrent()
+    if (res.locals.body!.isLike) {
+      await current.tx.insert(ClientWorkCommentLikeTable).values({
+        comment_id: res.locals.body!.commentId,
+        user_id: current.payload.userId,
+        work_id: res.locals.body!.workId,
+      })
+    } else {
+      await current.tx.delete(ClientWorkCommentLikeTable).where(and(
+        eq(ClientWorkCommentLikeTable.comment_id, res.locals.body!.commentId),
+        eq(ClientWorkCommentLikeTable.user_id, current.payload.userId),
+      ))
+    }
   }
 }

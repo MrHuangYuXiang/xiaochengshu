@@ -108,8 +108,11 @@ export class Server implements ServerPort {
         this.registerHandler("GET", '/works', getWorksInput, getWorksOutput, clientWorkService.getWorks.bind(clientWorkService)) // 获取用户作品列表
         this.registerHandler("POST", '/create/work', null, null, clientWorkService.createWork.bind(clientWorkService)) // 发表作品
         this.registerHandler("POST", '/delete/work', deleteWorkInput, null, clientWorkService.deleteWork.bind(clientWorkService)) // 删除作品
+        this.registerHandler("POST", '/like/work', likeWorkInput, null, clientWorkService.likeWork.bind(clientWorkService)) // 点赞作品
+        this.registerHandler("POST", '/collect/work', collectWorkInput, null, clientWorkService.collectWork.bind(clientWorkService)) // 收藏作品
         this.registerHandler("GET", '/work/comments', getWorkCommentsInput, getWorkCommentsOutput, clientWorkService.getWorkComments.bind(clientWorkService)) // 获取作品评论/回复
         this.registerHandler("POST", '/create/work/comment', createWorkCommentInput, createWorkCommentOutput, clientWorkService.createWorkComment.bind(clientWorkService)) // 评论作品
+        this.registerHandler("POST", '/like/work/comment', likeWorkCommentInput, null, clientWorkService.likeWorkComment.bind(clientWorkService)) // 点赞评论
 
         // 聊天模块
         this.registerHandler("POST", '/chat/create/session', createSessionInput, createSessionOutput, clientChatService.createSession.bind(clientChatService)) // 创建会话

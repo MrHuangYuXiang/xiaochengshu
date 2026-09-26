@@ -4,6 +4,7 @@ import { sscanf } from "scanf"
 import { AppError } from "./app-error.js"
 import fs from "fs"
 import { clientEvents } from "../domain/model/dto/client-event.js"
+import { FileExtEnum } from '../domain/model/enum/file.js';
 
 // 路由映射表
 export class RouteMap {
@@ -41,7 +42,7 @@ export type FormFieldHeader = {
 
     // 仅对文件字段有值,当字段为普通字段时以下为空字符串
     filename: string,
-    contentType: string,
+    contentType: FileExtEnum,
 }
 
 /**
@@ -64,6 +65,9 @@ export class FormParser {
     // 当前writer实例以及provider函数
     private currentWriter: WritableStreamDefaultWriter<Buffer> | undefined
     private writerProvider: undefined | ((fieldType: FormFieldHeader) => Promise<WritableStream<Buffer>>)
+
+    // 当前可接受的文件类型
+    private accept: FileExtEnum[] = []
 
     // reject和resolve对象
     private currentReject: (err: Error) => void
@@ -104,12 +108,29 @@ export class FormParser {
         this.status = 0
         this.isEnd = false
         this.isExecuting = false
+        this.accept = [FileExtEnum.Unknown]
+    }
+
+    // 获取文件类型
+    private getFileType(contentType: string) {
+        switch (contentType) {
+            case "image/jpeg":
+            case "image/jpg":
+                return FileExtEnum.Jpg
+            case "image/png":
+                return FileExtEnum.Png
+            default:
+                throw new AppError(`非法的文件类型: ${contentType}`)
+        }
     }
 
     /**
      * @param provider: 写入流对象提供者回调,在解析字段元数据时调用获取Writer实例
      */
-    exec(provider: (fieldType: FormFieldHeader) => Promise<WritableStream<Buffer>>) {
+    exec(
+        provider: (fieldType: FormFieldHeader) => Promise<WritableStream<Buffer>>,
+        accept: FileExtEnum[],
+    ) {
         return new Promise(async (resolve, reject) => {
             if (this.isEnd) {
                 reject(new Error("表单已解析结束"))
@@ -122,6 +143,7 @@ export class FormParser {
 
             this.status = 0
             this.writerProvider = provider
+            this.accept = accept
             this.currentResolve = resolve
             this.currentReject = reject
             this.isExecuting = true
@@ -157,7 +179,7 @@ export class FormParser {
                     const fieldType: FormFieldHeader = {
                         name: "",
                         filename: "",
-                        contentType: "",
+                        contentType: FileExtEnum.Unknown,
                     }
                     const header = buffer.subarray(0, endIndex)
                     const headerLines = header.toString().split("\r\n")
@@ -169,11 +191,16 @@ export class FormParser {
                         fieldType.filename = sscanf(ContentDispositionLines[2], " filename=\"%s\"")
                     }
                     if (headerLines[2]) {
-                        fieldType.contentType = sscanf(headerLines[2], "Content-Type: %s")
+                        fieldType.contentType = this.getFileType(sscanf(headerLines[2], "Content-Type: %s"))
                     }
-                    this.currentWriter = (await this.writerProvider?.(fieldType))?.getWriter()
 
-                    // 去除字段头部内容,进入解析字段内容状态
+                    // 验证文件类型是否合法
+                    if (!this.accept.includes(fieldType.contentType)) {
+                        throw new AppError(`不支持的文件类型: ${fieldType.contentType}`)
+                    }
+
+                    // 执行provider回调,获取当前writer实例
+                    this.currentWriter = (await this.writerProvider?.(fieldType))?.getWriter()
                     buffer = buffer.subarray(endIndex + 4)
                     this.status = 1
                 }

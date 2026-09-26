@@ -25,8 +25,9 @@ import { FormParser } from "../../lib/framework-ext.js";
 import { v4 as uuidv4 } from "uuid";
 import { heartbeatClientEvent, ClientEventType } from "../model/dto/client-event.js";
 import { AppError } from "../../lib/app-error.js";
-import { getImageExt, getPageParams } from "../../helper/http.js";
+import { getPageParams } from "../../helper/http.js";
 import { ClientChatMessageTypeEnum, ClientChatSessionTypeEnum } from "../model/enum/client-chat.js";
+import { FileExtEnum } from "../model/enum/file.js";
 
 // FIXME: 该服务下的接口需要重写加锁逻辑,锁需要放在事务外面,避免mvcc快照导致锁失效
 export class ClientUserService extends BaseService {
@@ -162,16 +163,16 @@ export class ClientUserService extends BaseService {
     async uploadUserAvatar(req: Request, res: EnhancedResponse<null, null>) {
         const current = getCurrent()
         const formParser = new FormParser(req)
-        let fileName = ""
+        let filePath = ""
 
-        await formParser.exec(async (fieldType) => {
-            const ext = getImageExt(fieldType)
-            fileName = `/avatars/${current.payload.userId}${ext}`
-            return await this.fileStorage.getWritableStream(fileName)
-        })
+        await formParser.exec(async (header) => {
+            filePath = this.fileStorage.getFilePath(`/user-avatars/${current.payload.userId}`, header.contentType)
+            return await this.fileStorage.getWritableStream(filePath)
+        }, [FileExtEnum.Jpg, FileExtEnum.Png])
 
+        // 数据库更新用户信息
         await current.tx.update(ClientUserTable).set({
-            avatar_url: fileName,
+            avatar_url: filePath,
         }).where(eq(ClientUserTable.id, current.payload.userId))
     }
 

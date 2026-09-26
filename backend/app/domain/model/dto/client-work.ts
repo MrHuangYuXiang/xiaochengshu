@@ -104,15 +104,19 @@ export const createWorkCommentOutput = objectType(workCommentAggregate)
 
 // 点赞作品输入
 export const likeWorkInput = objectType({
-    isLiked: numberType,
+    workId: stringType,
+    isLike: booleanType,
 })
 
 // 收藏作品输入
 export const collectWorkInput = objectType({
-    isCollected: numberType,
+    workId: stringType,
+    isCollect: booleanType,
 })
 
 // 点赞/取消点赞作品评论输入
 export const likeWorkCommentInput = objectType({
-    isLiked: numberType,
+    commentId: stringType,
+    workId: stringType,
+    isLike: booleanType,
 })

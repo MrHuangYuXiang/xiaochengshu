@@ -1049,6 +1049,88 @@
         }
       }
     },
+    "/like/work": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workId",
+                  "isLike"
+                ],
+                "properties": {
+                  "workId": {
+                    "type": "string"
+                  },
+                  "isLike": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collect/work": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workId",
+                  "isCollect"
+                ],
+                "properties": {
+                  "workId": {
+                    "type": "string"
+                  },
+                  "isCollect": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/work/comments": {
       "get": {
         "parameters": [
@@ -1358,6 +1440,51 @@
                   },
                   "parentId": {
                     "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/like/work/comment": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "commentId",
+                  "workId",
+                  "isLike"
+                ],
+                "properties": {
+                  "commentId": {
+                    "type": "string"
+                  },
+                  "workId": {
+                    "type": "string"
+                  },
+                  "isLike": {
+                    "type": "boolean"
                   }
                 }
               }
