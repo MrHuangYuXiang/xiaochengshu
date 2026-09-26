@@ -54,7 +54,7 @@
   import AppSegment from '@/component/common/AppSegment.vue';
   import FormButton from '@/component/form/form-button.vue';
   import FollowsModal from '@/component/user/FollowsModal.vue';
-  import ScrollContainer from '@/component/common/ScrollContainer.vue';
+  import ScrollContainer from '@/component/common/scroll-container.vue';
   import { onMounted } from 'vue';
   import { axiosProxy } from '@/api/axios';
   import { formatBirthday, formatFollowStatus } from '@/helper/format'

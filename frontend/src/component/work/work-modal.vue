@@ -19,104 +19,111 @@
         />
       </div>
       <div class="right">
-        <div class="user">
-          <UserCard
-            :user-id="work?.user?.id || ''"
-            :user-name="work?.user?.name || ''"
-            :user-avatar-url="work?.user?.avatar_url || ''"
-            :is-follow="work?.user?.is_follow || 0"
-            :is-followed="work?.user?.is_followed || 0"
-            :updateFollowCallback="updateFollowCallback"
-          />
-        </div>
-        <div class="work">
-          <ScrollContainer
-            ref="scrollContainerRef"
-            :loadMoreCallback="getTopComments"
-            trigger-type="bottom"
-          >
-            <div class="work-body">
-              <div class="title">{{ work?.work.title }}</div>
-              <div class="content">{{ work?.work.content }}</div>
-              <div class="info">{{ formatTime(work?.work.created_at || '') }}</div>
-              <div style="border-top: 1px solid #d4d3d3;margin: 8px 0;" ></div>
-              <div class="comment-list">
-                <CommentCard
-                  v-for="comment in comments" :key="comment.comment.id"
-                  :userName="comment.user.name"
-                  :avatarUrl="comment.user.avatar_url"
-                  :content="comment.comment.content"
-                  :createdAt="comment.comment.created_at"
-                  :parentUserName="''"
-                  :isLiked="comment.isLiked"
-                  :likeCount="comment.likeCount"
-                  class="item"
-                  v-show="comments.list.length() > 0"
-                  @clickReply="triggerFocus({
-                    parentId: comment.comment.id,
-                    rootCommentId: comment.comment.id,
-                    replyContent: comment.comment.content,
-                    replyUserName: comment.user.name
-                  })">
-                  <template #bottom>
-                    <div class="reply" v-show="repliesMap.get(comment.comment.id)!.count() > 0">
-                      <CommentCard
-                      v-for="reply in repliesMap.get(comment.comment.id)!"
-                      :key="reply.data.comment.id"
-                      class="reply-item"
-                      :parentUserName="reply.data.comment.parent_id === comment.comment.id ? '' : reply.parent!.data.user.name"
-                      :userName="reply.data.user.name"
-                      :avatarUrl="reply.data.user.avatar_url"
-                      :content="reply.data.comment.content"
-                      :createdAt="reply.data.comment.created_at"
-                      :isLiked="reply.data.isLiked"
-                      :likeCount="reply.data.likeCount"
-                      @clickReply="triggerFocus({
-                        parentId: reply.data.comment.id,
-                        rootCommentId: comment.comment.id,
-                        replyContent: reply.data.comment.content,
-                        replyUserName: reply.data.user.name
-                      })"
-                      />
+        <UserCard
+          class="user"
+          :user-id="work?.user?.id || ''"
+          :user-name="work?.user?.name || ''"
+          :user-avatar-url="work?.user?.avatar_url || ''"
+          :is-follow="work?.user?.is_follow || 0"
+          :is-followed="work?.user?.is_followed || 0"
+          :updateFollowCallback="updateFollowCallback"
+        />
+        <ScrollContainer
+          ref="scrollContainerRef"
+          :loadMoreCallback="getTopComments"
+          trigger-type="bottom"
+          class="work"
+        >
+          <div class="work-body">
+            <div class="title">{{ work?.work.title }}</div>
+            <div class="content">{{ work?.work.content }}</div>
+            <div class="info">{{ formatTime(work?.work.created_at || '') }}</div>
+            <div style="border-top: 1px solid #d4d3d3;margin: 8px 0;" ></div>
+            <div class="comment-list">
+              <CommentCard
+                v-for="comment in comments" :key="comment.comment.id"
+                :userName="comment.user.name"
+                :avatarUrl="comment.user.avatar_url"
+                :content="comment.comment.content"
+                :createdAt="comment.comment.created_at"
+                :parentUserName="''"
+                :isLiked="comment.isLiked"
+                :likeCount="comment.likeCount"
+                class="item"
+                v-show="comments.list.length() > 0"
+                @clickReply="triggerFocus({
+                  parentId: comment.comment.id,
+                  rootCommentId: comment.comment.id,
+                  replyContent: comment.comment.content,
+                  replyUserName: comment.user.name
+                })">
+                <template #bottom>
+                  <div class="reply" v-show="repliesMap.get(comment.comment.id)!.count() > 0">
+                    <CommentCard
+                    v-for="reply in repliesMap.get(comment.comment.id)!"
+                    :key="reply.data.comment.id"
+                    class="reply-item"
+                    :parentUserName="reply.data.comment.parent_id === comment.comment.id ? '' : reply.parent!.data.user.name"
+                    :userName="reply.data.user.name"
+                    :avatarUrl="reply.data.user.avatar_url"
+                    :content="reply.data.comment.content"
+                    :createdAt="reply.data.comment.created_at"
+                    :isLiked="reply.data.isLiked"
+                    :likeCount="reply.data.likeCount"
+                    @clickReply="triggerFocus({
+                      parentId: reply.data.comment.id,
+                      rootCommentId: comment.comment.id,
+                      replyContent: reply.data.comment.content,
+                      replyUserName: reply.data.user.name
+                    })"
+                    />
+                  </div>
+                  <div class="more" v-show="comment.replyCount > 0">
+                    <div style="border-bottom: 1.5px solid #d4d3d3;width: 25px;margin-right: 6px;"></div>
+                    <div class="more-item" @click="getReplies(comment.comment.id)" v-show="!repliesMap.get(comment.comment.id)!.isEnd">
+                      <div v-show="repliesMap.get(comment.comment.id)!.count() === 0">展开 {{ comment.replyCount }} 条回复</div>
+                      <div v-show="repliesMap.get(comment.comment.id)!.count() > 0">展开更多</div>
+                      <div style="width: 0.8rem; height: 0.8rem;"><AppIcon type="arrow-down-outline" /></div>
                     </div>
-                    <div class="more" v-show="comment.replyCount > 0">
-                      <div style="border-bottom: 1.5px solid #d4d3d3;width: 25px;margin-right: 6px;"></div>
-                      <div class="more-item" @click="getReplies(comment.comment.id)" v-show="!repliesMap.get(comment.comment.id)!.isEnd">
-                        <div v-show="repliesMap.get(comment.comment.id)!.count() === 0">展开 {{ comment.replyCount }} 条回复</div>
-                        <div v-show="repliesMap.get(comment.comment.id)!.count() > 0">展开更多</div>
-                        <div style="width: 0.8rem; height: 0.8rem;"><AppIcon type="arrow-down-outline" /></div>
-                      </div>
-                      <div class="more-item" @click="clearReplies(comment.comment.id)" v-show="repliesMap.get(comment.comment.id)!.count() > 0">
-                        <div>收起</div>
-                        <div style="width: 0.8rem; height: 0.8rem;"><AppIcon type="arrow-up-outline" /></div>
-                      </div>
+                    <div class="more-item" @click="clearReplies(comment.comment.id)" v-show="repliesMap.get(comment.comment.id)!.count() > 0">
+                      <div>收起</div>
+                      <div style="width: 0.8rem; height: 0.8rem;"><AppIcon type="arrow-up-outline" /></div>
                     </div>
-                  </template>
-                </CommentCard>
-              </div>
+                  </div>
+                </template>
+              </CommentCard>
             </div>
-          </ScrollContainer>
-        </div>
+          </div>
+        </ScrollContainer>
         <div class="publish-form">
-          <div :class="{'reply-content': true, 'focus': isInputFocus && replyTarget !== undefined}">回复{{ replyTarget?.replyUserName }} {{ replyTarget?.replyContent }} : </div>
-          <div :class="{'publish-input': true, 'focus': isInputFocus}">
-            <FormInput type="textarea"
-            :rows="1"
-            placeholder="请输入评论内容"
-            ref="textareaRef"
-            @click="triggerFocus()"
-            v-model="inputContent"
+          <WorkShareFloating v-model:show="isShowShareFloating" />
+          <div :class="{'reply-content': true, 'focus': isInputFocus && replyTarget !== undefined}">
+            回复{{ replyTarget?.replyUserName }} {{ replyTarget?.replyContent }} : 
+          </div>
+          <div class="publish-input">
+            <FormInput 
+              class="textarea"
+              :class="{'focus': isInputFocus}"
+              type="textarea"
+              :rows="1"
+              placeholder="请输入评论内容"
+              ref="textareaRef"
+              @click="triggerFocus()"
+              v-model="inputContent"
             />
-            <div :class="{'focus': isInputFocus, 'icons': true}">
-              <div class="icon">
-                <AppIcon v-if="work?.isLiked === 0" type="heart" />
-                <AppIcon v-else type="heart-fill" fill="red" />
+            <div :class="{'focus': isInputFocus, 'interaction': true}">
+              <div class="item">
+                <AppIcon v-if="work?.isLiked === 0" type="heart" class="icon" />
+                <AppIcon v-else type="heart-fill" fill="red" class="icon" />
                 <div>{{ work?.likeCount }}</div>
               </div>
-              <div class="icon">
-                <AppIcon v-if="work?.isCollected === 0" type="star" />
-                <AppIcon v-else type="star-fill" fill="yellow" />
+              <div class="item">
+                <AppIcon v-if="work?.isCollected === 0" type="star" class="icon" />
+                <AppIcon v-else type="star-fill" fill="yellow" class="icon" />
                 <div>{{ work?.collectCount }}</div>
+              </div>
+              <div class="item">
+                <AppIcon type="share" class="icon" @click="isShowShareFloating = true" />
               </div>
             </div>
           </div>
@@ -137,8 +144,9 @@
   import FormButton from '../form/form-button.vue';
   import CommentCard from './CommentCard.vue';
   import FormInput from '../form/form-input.vue';
-  import ScrollContainer from '../common/ScrollContainer.vue';
+  import ScrollContainer from '../common/scroll-container.vue';
   import ImageSlider from '../image/image-slider.vue';
+  import WorkShareFloating from './work-share-floating.vue';
   import { formatTime } from '@/helper/format';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen';
@@ -172,6 +180,9 @@
     replyContent: string,
     replyUserName: string,
   } | undefined>(undefined)
+
+  // 显示分享浮动框
+  const isShowShareFloating = ref(false)
 
   // 初始化评论回复映射表
   const initRepliesMap = (commentId: string) => {
@@ -304,10 +315,10 @@
   .work-modal {
     width: 100%;
     height: 100%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 60% 40%;
+    grid-template-rows: 100%;
     .left {
-      flex: 7;
-      height: 100%;
       border-right: 1px solid #e5e5e5;
       .image {
         width: 100%;
@@ -316,19 +327,17 @@
       }
     }
     .right {
-      position: relative;
-      flex: 4;
-      height: 100%;
-      padding: 20px;
-
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      grid-template-columns: 100%;
       .user {
-        height: 10%;
         border-bottom: 1px solid #e5e5e5;
       }
 
       .work {
-        height: 90%;
-        padding: 30px 0px;
+        padding: 1rem;
+        height: 100%;
+        overflow-y: auto;
         .work-body {
           width: 100%;
           display: flex;
@@ -382,18 +391,14 @@
       }
 
       .publish-form {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        padding: 0 20px;
-        padding-top: 10px;
-        width: 100%;
+        position: relative;
         border-top: 1px solid #e5e5e5;
         background-color: white;
         display: flex;
         flex-direction: column;
         justify-content: center;
         gap: 5px;
+        padding: 1rem;
         .reply-content {
           margin: 0;
           font-size: 12px;
@@ -411,33 +416,37 @@
         }
         .publish-input {
           transition: all 0.2s ease-in-out;
-          position: relative;
-          width: 80%;
-          .icons {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%) translateX(125%);
+          width: 100%;
+          display: flex;
+          gap: 1rem;
+          .interaction {
+            flex: 0 0 auto;
+            min-width: 0;
             display: flex;
             align-items: center;
             gap: 15px;
             transition: all 0.2s ease-in-out;
             opacity: 1;
-            .icon {
+            .item {
               cursor: pointer;
-              font-size: 12px;
               display: flex;
               align-items: center;
               gap: 4px;
+              .icon {
+                width: 1.2rem;
+                height: 1.2rem;
+              }
             }
           }
-          .icons.focus {
+          .interaction.focus {
+            flex-basis: 0;
             opacity: 0;
-            transform: translateX(200%) translateY(-50%);
+            transform: translateX(200%);
           }
-        }
-        .publish-input.focus {
-          width: 100%;
+          .textarea {
+            transition: all 0.2s ease-in-out;
+            flex: 1 1 auto;
+          }
         }
         .bottom-btns {
           transition: all 0.2s ease-in-out;

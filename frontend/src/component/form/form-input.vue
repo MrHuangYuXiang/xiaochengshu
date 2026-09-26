@@ -138,8 +138,6 @@
       padding: 1rem;
       border: none;
       transition: all 0.2s ease-in-out;
-    }
-    textarea {
       resize: none;
     }
     input:hover,

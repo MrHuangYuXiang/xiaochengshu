@@ -18,16 +18,18 @@
         :latestMsg="session.latestMessage ? session.latestMessage.content : ''"
         :msgTime="session.latestMessage ? session.latestMessage.created_at : ''"
         :unreadCount="session.unreadCount"
-        @click="switchSelectedSession(session.session.id)"
+        @click="switchSession(session.session.id)"
       />
     </ScrollContainer>
     <div class="chat-panel" v-show="selectedSessionId !== ''">
-      <ChatSender @send-msg="sendMsg" class="chat-sender" v-show="sessions.get(selectedSessionId)?.session.type !== 3"/>
       <ScrollContainer
         trigger-type="reverse-top"
         :load-more-callback="getMessages"
         ref="msgScrollRef"
         class="chat-messages"
+        :class="{
+          'system': sessions.get(selectedSessionId)?.session.type === 3,
+        }"
       >
         <ChatMessage
           v-for="msg in messages"
@@ -40,14 +42,19 @@
           @clickMessage="clickMessage(msg)"
         />
       </ScrollContainer>
+      <ChatSender 
+        @send-msg="sendMsg" 
+        class="chat-sender" 
+        v-if="sessions.get(selectedSessionId)?.session.type !== 3"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
   import SessionCard from '@/component/chat/session-card.vue';
-  import ChatSender from '@/component/chat/ChatSender.vue';
-  import ScrollContainer from '@/component/common/ScrollContainer.vue';
+  import ChatSender from '@/component/chat/chat-sender.vue';
+  import ScrollContainer from '@/component/common/scroll-container.vue';
   import ChatMessage from '@/component/chat/chat-message.vue';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { SessionSchema, MessageSchema } from '@/api/type.ext';
@@ -97,7 +104,7 @@
   }
 
   // 切换当前选中会话
-  const switchSelectedSession = async (sessionId: string) => {
+  const switchSession = async (sessionId: string) => {
     if (selectedSessionId.value === sessionId) {
       return
     }
@@ -110,10 +117,6 @@
 
   // 发送消息
   const sendMsg = async (content: string) => {
-    // 从会话数据中获取成员id
-    const memberId = sessions.value.get(selectedSessionId.value)?.sessionMember.id
-    if (!memberId) return
-
     const message = await axiosProxy.post<
       paths["/chat/send/message"]["post"]["requestBody"]["content"]["application/json"],
       paths["/chat/send/message"]["post"]["responses"]["200"]["content"]["application/json"]
@@ -121,7 +124,9 @@
       sessionId: selectedSessionId.value,
       content: content,
       type: 1,
-      payload: {},
+      payload: {
+        1: {}
+      },
     })
     messages.value.unshift(message)
   }
@@ -191,27 +196,26 @@
   }
   
   .chat-panel {
-    height: var(--root-mainview-height);
-    position: relative;
-    border-radius: 15px;
+    height: 100%;
+    padding-bottom: 1rem;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    grid-template-columns: 100%;
+    justify-items: center;
     .chat-messages {
-      height: calc(100% - 12rem);
       width: 100%;
-      overflow-y: auto;
       gap: 0.5rem;
-      padding: 0 5%;
+      padding: 1rem 3rem;
       display: flex;
       flex-direction: column-reverse;
       justify-content: end;
       align-items: center;
     }
+    .system {
+      grid-row: 2;
+    }
     .chat-sender {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70%;
-      height: 11rem;
+      width: 75%;
     }
   }
 }

@@ -29,7 +29,6 @@
 
 <style scoped lang="css">
   .chat-sender {
-    padding-top: 1rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;

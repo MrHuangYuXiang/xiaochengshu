@@ -18,7 +18,7 @@
 <script setup lang="ts">
   import WorkGrid from '@/component/work/work-grid.vue';
   import AppSegment from '@/component/common/AppSegment.vue';
-  import ScrollContainer from '@/component/common/ScrollContainer.vue';
+  import ScrollContainer from '@/component/common/scroll-container.vue';
   import { onMounted, useTemplateRef } from 'vue';
 
   const scrollContainerRef = useTemplateRef("scrollContainerRef")

@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
   import UserCard from './UserCard.vue';
-  import ScrollContainer from '../common/ScrollContainer.vue';
+  import ScrollContainer from '../common/scroll-container.vue';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import BaseModal from '../common/BaseModal.vue';
   import { axiosProxy } from '@/api/axios.ts';

@@ -26,7 +26,7 @@
   import ErrorDialog from '@/component/common/ErrorDialog.vue';
   import MsgTip from '@/component/chat/msg-tip.vue';
   import ImagePreview from '@/component/image/image-preview.vue';
-  import WorkModal from '@/component/work/WorkModal.vue';
+  import WorkModal from '@/component/work/work-modal.vue';
   import ReportModal from '@/component/report/report-modal.vue';
   import { onBeforeMount, ref } from 'vue';
 

@@ -1,7 +1,6 @@
 <!-- 选择器浮动框 -->
 <template>
     <FloatingWindow 
-        :direction="props.direction" 
         v-model:show="isShow"
     >
         <div class="inner">
@@ -23,7 +22,6 @@
     const isShow = defineModel<boolean>("show")
     const props = defineProps<{
         options: Array<{ id: number, text: string }>,
-        direction: "right"
     }>()
 
     const emits = defineEmits<{

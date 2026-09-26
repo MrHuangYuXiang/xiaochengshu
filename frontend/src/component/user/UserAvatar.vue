@@ -27,6 +27,11 @@
       type: String,
       default: ''
     },
+    // 是否为后端上传图片
+    isUpload: {
+      type: Boolean,
+      default: true
+    },
     width: {
       type: String,
       default: '100%'
@@ -68,12 +73,9 @@
   }
 
   const getAvatarUrl = () => {
-    switch (props.imgUrl) {
-      case "":
-        return "'/images/default-avatar.png'"
-      default:
-        return props.imgUrl
-    }
+    if (!props.imgUrl) return "'/images/default-avatar.png'"
+    if (props.isUpload) return import.meta.env.VITE_UPLOAD_URL + props.imgUrl
+    else return props.imgUrl
   }
 
 </script>

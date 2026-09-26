@@ -698,6 +698,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/like/work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        workId: string;
+                        isLike: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/collect/work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        workId: string;
+                        isCollect: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/work/comments": {
         parameters: {
             query?: never;
@@ -826,6 +912,50 @@ export interface paths {
                             likeCount: number;
                             replyCount: number;
                         };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/like/work/comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        commentId: string;
+                        workId: string;
+                        isLike: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
                     };
                 };
             };
@@ -1254,7 +1384,6 @@ export interface paths {
                                 updated_at: string;
                                 work_id: string;
                                 reporter_id: string;
-                                report_object: number;
                                 report_type: number;
                                 reason: string;
                                 status: number;

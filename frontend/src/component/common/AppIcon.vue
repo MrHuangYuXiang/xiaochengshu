@@ -1,7 +1,7 @@
 <template>
   <div
     class="icon"
-    :style="{ fill: props.fill, width: props.size, height: props.size }"
+    :style="{ fill: props.fill }"
   >
     <svg class="heart" viewBox="0 0 16 16" v-if="props.type === 'heart'" transform="translate(0, 1.2)">
       <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
@@ -52,6 +52,10 @@
       <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
       <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z"/>
     </svg>
+    <svg class="share" viewBox="0 0 16 16" v-if="props.type === 'share'">
+      <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+      <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+    </svg>
   </div>
 </template>
 
@@ -68,12 +72,6 @@
       type: String,
       default: 'var(--root-gray)'
     },
-
-    // 图标大小(单位px)
-    size: {
-      type: String,
-      default: '12px'
-    }
   })
 </script>
 
@@ -82,5 +80,7 @@
     display: flex;
     align-items: center;
     gap: 2px;
+    width: 1rem;
+    height: 1rem;
   }
 </style>

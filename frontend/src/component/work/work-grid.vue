@@ -33,7 +33,6 @@
       </div>
       <SelectFloating 
         :options="[{ id: 1, text: '举报该作品' }]"
-        direction="right"
         @clickOption="handleClickFloating"
         v-model:show="isShowFloatingMap[work.work.id]"
       />
@@ -171,6 +170,7 @@
     grid-auto-flow: dense;
     grid-auto-rows: 10px;
     gap: 10px;
+    padding: 1rem 0;
     .card {
       position: relative;
       border-radius: 15px;

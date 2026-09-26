@@ -13,9 +13,6 @@
     import { useTemplateRef, watch } from 'vue';
 
     const isShow = defineModel<boolean>("show")
-    const props = defineProps<{
-        direction: "right",
-    }>()
     const divRef = useTemplateRef("divRef")
 
     watch(isShow, (newVal) => {
@@ -38,13 +35,11 @@
 
 <style scoped lang="css">
     .floating-panel {
+        width: auto;
+        height: auto;
         white-space: nowrap;
         position: absolute;
-        bottom: 0;
-        right: 0;
-        transform: translateX(100%);
         border-radius: 10px;
-        box-shadow: 2px 7px 7px rgba(0, 0, 0, 0.10);
         background-color: white;
         z-index: 1;
     }

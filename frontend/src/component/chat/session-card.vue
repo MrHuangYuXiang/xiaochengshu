@@ -1,12 +1,18 @@
 <template>
   <div class="session-card" :class="{'active': selectedId === props.sessionId}">
-    <UserAvatar class="session-image" :user-id="props.userId" :img-url="getSessionImageUrl(props.sessionType)" width="60px" />
+    <UserAvatar 
+      class="session-image"
+      :user-id="props.userId"
+      :img-url="getSessionImageUrl(props.sessionType)"
+      :is-upload="props.sessionType === 3 ? false : true"
+      width="60px"
+    />
     <div class="session-content">
       <div class="session-name">
         <div class="name">{{ getSessionName() }}</div>
         <div class="time">{{ formatTime(props.msgTime) }}</div>
       </div>
-      <div class="msg-content">{{ props.latestMsg }}</div>
+      <div class="msg-content">{{ props.latestMsg || "快去给Ta打个招呼吧^.^" }}</div>
     </div>
     <div v-if="props.unreadCount > 0" class="unread-count">{{ props.unreadCount }}</div>
   </div>
@@ -73,7 +79,6 @@
     .session-content {
       display: grid;
       grid-template-columns: auto;
-      gap: 0.25rem;
       .session-name {
         display: grid;
         grid-template-columns: auto 1fr auto;

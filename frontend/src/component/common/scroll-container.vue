@@ -25,19 +25,22 @@
   // 滚动底部加载更多
   const scrollToBottom = async (e: Event) => {
     const target = e.target as HTMLElement
+    let diff = 0
 
     // 加载中或无更多数据时, 不触发
     if (isEnd.value || isLoading.value) return
     switch (props.triggerType) {
       case 'bottom':
-        if (target.scrollTop >= (target.scrollHeight - target.clientHeight) + 0.5) {
+        diff = (target.scrollHeight - target.clientHeight) - target.scrollTop
+        if (diff <= 1 || diff >= -1) {
           scrollMain()
         }
         break
 
       // 该情况匹配flex-direction: column-reverse时滚动顶部触发,该情况scrollTop为负数
       case 'reverse-top':
-        if (target.scrollTop <= -(target.scrollHeight - target.clientHeight) + 0.5) {
+        diff = -target.scrollTop
+        if (diff <= 1 || diff >= -1) {
           scrollMain()
         }
         break
@@ -73,8 +76,6 @@
 
 <style scoped lang="scss">
   .scroll-container {
-    width: 100%;
-    height: 100%;
     overflow: auto;
     .tip {
       font-size: 0.9rem;

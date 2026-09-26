@@ -67,7 +67,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
+    z-index: 3;
     .modal {
       white-space: nowrap;
       position: relative;
@@ -77,6 +77,7 @@
       height: 90vh;
       width: 70vw;
       max-height: 100vh;
+      overflow: hidden;
       .step {
         position: absolute;
         bottom: 5%;
