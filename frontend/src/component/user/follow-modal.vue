@@ -8,13 +8,13 @@
       <div class="follows-modal">
         <div class="top">{{ type === "following" ? "关注" : "粉丝" }} {{ `(${allCount})` }}</div>
         <div v-for="user in users" :key="user.id">
-          <UserCard
+          <UserFollowCard
             :userId="user.id"
             :userName="user.name"
             :userAvatarUrl="user.avatar_url"
+            avatarSize="2rem"
             :isFollow="user.is_follow"
             :isFollowed="user.is_followed"
-            :updateFollowCallback="updateData"
           />
         </div>
       </div>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-  import UserCard from './UserCard.vue';
+  import UserFollowCard from './user-follow-card.vue';
   import ScrollContainer from '../common/scroll-container.vue';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import BaseModal from '../common/BaseModal.vue';
@@ -77,11 +77,6 @@
       return res.users
     })
     return users.value.isEnd
-  }
-
-  // UserCard组件更新用户信息
-  const updateData = (res: paths["/follow/user"]["post"]["responses"]["200"]["content"]["application/json"]) => {
-    users.value.update(res.user.id, res.user)
   }
 
   // 挂载后获取关注/粉丝信息

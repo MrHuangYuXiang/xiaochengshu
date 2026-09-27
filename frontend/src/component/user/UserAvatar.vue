@@ -34,7 +34,7 @@
     },
     width: {
       type: String,
-      default: '100%'
+      default: '2rem'
     },
     // 右上角消息数量
     topCount: {

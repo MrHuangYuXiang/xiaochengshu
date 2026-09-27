@@ -1,7 +1,7 @@
 <template>
   <div class="comment-card">
     <div class="avatar">
-      <UserAvatar :img-url="props.avatarUrl" />
+      <UserAvatar :img-url="props.avatarUrl" width="2.5rem"/>
     </div>
     <div class="text">
       <div class="top">

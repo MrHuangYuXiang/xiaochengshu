@@ -1,7 +1,6 @@
 <template>
     <div 
         class="floating-panel"
-        v-show="isShow"
         ref="divRef"
         @click.stop=""
     >
@@ -16,7 +15,6 @@
     const divRef = useTemplateRef("divRef")
 
     watch(isShow, (newVal) => {
-        console.log(newVal)
         if (newVal) {
             setTimeout(() => {
                 document.addEventListener("click", clickHandler)

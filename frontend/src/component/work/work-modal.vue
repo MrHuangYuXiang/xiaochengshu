@@ -19,14 +19,14 @@
         />
       </div>
       <div class="right">
-        <UserCard
+        <UserFollowCard
           class="user"
           :user-id="work?.user?.id || ''"
           :user-name="work?.user?.name || ''"
           :user-avatar-url="work?.user?.avatar_url || ''"
+          avatarSize="3rem"
           :is-follow="work?.user?.is_follow || 0"
           :is-followed="work?.user?.is_followed || 0"
-          :updateFollowCallback="updateFollowCallback"
         />
         <ScrollContainer
           ref="scrollContainerRef"
@@ -128,8 +128,8 @@
             </div>
           </div>
           <div :class="{'bottom-btns': true, 'focus': isInputFocus}">
-            <div><FormButton text="取消" @click="isInputFocus = false" /></div>
-            <div><FormButton text="发布" @click="publish" /></div>
+            <div><FormButton text="取消" @click="isInputFocus = false" color="default" /></div>
+            <div><FormButton text="发布" @click="publish" color="orange" /></div>
           </div>
         </div>
       </div>
@@ -139,7 +139,7 @@
 
 <script setup lang="ts">
   import BaseModal from '../common/BaseModal.vue';
-  import UserCard from '../user/UserCard.vue';
+  import UserFollowCard from '../user/user-follow-card.vue';
   import AppIcon from '../common/AppIcon.vue';
   import FormButton from '../form/form-button.vue';
   import CommentCard from './CommentCard.vue';
@@ -285,13 +285,6 @@
   const clearReplies = (commentId: string) => {
     const reply = repliesMap.value.get(commentId)
     reply?.clear()
-  }
-
-  // 更新用户关注状态回调
-  const updateFollowCallback = (res: paths["/follow/user"]["post"]["responses"]["200"]["content"]["application/json"]) => {
-    if (work.value) {
-      work.value.user = res.user
-    }
   }
 
   // 挂载后加载作品和评论信息

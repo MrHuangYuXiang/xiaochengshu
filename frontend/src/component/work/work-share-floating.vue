@@ -2,53 +2,95 @@
     <FloatingWindow 
         class="share-floating"
         :class="{'show': isShow}"
-        v-model:show="constantShow"
+        v-model:show="isShow"
     >
         <div class="title">分享给</div>
-        <div class="users">
-            <div v-for="value in 100" :key="value">
-                用户{{ value }}
-            </div>
+        <ScrollContainer 
+            trigger-type="bottom"
+            :load-more-callback="getSessions"
+        >
+        <div class="sessions">
+            <UserCard
+                v-for="session in sessions" 
+                :key="session.session.id"
+                :userId="session.user.id"
+                :userName="session.user.name"
+                :userAvatarUrl="session.user.avatar_url"
+                avatarSize="2rem"
+                btnText="分享"
+                @click-btn="shareWork()"
+            >
+            </UserCard>
         </div>
+        </ScrollContainer>
     </FloatingWindow>
 </template>
 
 <script lang="ts" setup>
-    import { ref } from 'vue';
     import FloatingWindow from '../common/floating-window.vue';
+    import ScrollContainer from '../common/scroll-container.vue';
+    import UserCard from '../user/user-card.vue';
+    import { EnhancedList } from '@/lib/list.ts';
+    import { ref } from 'vue';
+    import type { SessionSchema } from '@/api/type.ext.ts';
+    import { axiosProxy } from '@/api/axios.ts';
+    import type { paths } from '@/api/gen.ts';
 
+    const sessions = ref<EnhancedList<SessionSchema>>(new EnhancedList(
+        (item) => item.session.id,
+        5,
+    ))
     const isShow = defineModel<boolean>('show');
-    const constantShow = ref(true)
+    
+    // 获取当前用户会话
+    const getSessions = async() => {
+        await sessions.value.pagePush(async (currentPage, pageSize) => {
+            return (await axiosProxy.get<
+            paths["/chat/get/sessions"]["get"]["parameters"]["query"],
+            paths["/chat/get/sessions"]["get"]["responses"]["200"]["content"]["application/json"]
+            >("/chat/get/sessions", {
+                page: currentPage,
+                pageSize: pageSize,
+            })).sessions
+        })
+        return sessions.value.isEnd
+    }
+
+    // 分享作品
+    const shareWork = async () => {
+        console.log("分享作品")
+    }
 </script>
 
 <style scoped lang="scss">
     .share-floating {
-        animation: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+        overflow: hidden;
         height: 0;
+        opacity: 0;
         width: 100%;
-        padding: 0.5rem;
+        padding: 0.8rem;
+        padding-bottom: 0;
         top: 0;
         left: 0;
         transform: translateY(-100%);
-        background-color: yellow;
         display: grid;
-        grid-template-rows: auto auto;
-        grid-template-columns: auto;
-        row-gap: 1rem;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: 1fr;
         .title {
             font-weight: bold;
             padding-bottom: 0.5rem;
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
-        .users {
-            overflow-x: auto;
+        .sessions {
+            padding-top: 1rem;
             display: grid;
-            grid-auto-flow: column;
-            grid-template-rows: auto;
-            grid-template-columns: auto;
+            grid-template-columns: 1fr;
+            padding-bottom: 0.5rem;
         }
     }
     .show {
-        height: 10rem;
+        height: 20rem;
+        opacity: 1;
     }
 </style>

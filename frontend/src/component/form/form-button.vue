@@ -1,39 +1,22 @@
 <template>
   <button
     :class="{'default': props.color === 'default', 'orange': props.color === 'orange'}"
-    :style="{ width: props.width }"
-    @click="handleClick">
+  >
     {{ props.text }}
   </button>
 </template>
 
 <script setup lang="ts">
-    const props = defineProps({
-      text: {
-          type: String,
-          default: '发送'
-      },
-      color: {
-        type: String,
-        default: 'default'
-      },
-      width: {
-        type: String,
-        default: '100%'
-      }
-    })
-
-    const emits = defineEmits(['click'])
-    const handleClick = () => {
-        emits('click')
-    }
+    const props = defineProps<{
+        text: string,
+        color: 'default' | 'orange',
+    }>()
 </script>
 
 <style scoped lang="scss">
   button {
-    width: 3rem;
     border: none;
-    padding: 0.7rem 1rem;
+    padding: 0.5rem 1rem;
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;

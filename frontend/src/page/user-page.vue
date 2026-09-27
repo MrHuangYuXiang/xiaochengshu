@@ -1,6 +1,6 @@
 <template>
   <!-- 关注/粉丝列表弹窗 -->
-  <FollowsModal
+  <FollowModal
     v-if="enableFollowsModalShow"
     width="30vw"
     :type="followsModalType"
@@ -53,7 +53,7 @@
   import WorkGrid from '@/component/work/work-grid.vue'
   import AppSegment from '@/component/common/AppSegment.vue';
   import FormButton from '@/component/form/form-button.vue';
-  import FollowsModal from '@/component/user/FollowsModal.vue';
+  import FollowModal from '@/component/user/follow-modal.vue';
   import ScrollContainer from '@/component/common/scroll-container.vue';
   import { onMounted } from 'vue';
   import { axiosProxy } from '@/api/axios';

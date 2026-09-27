@@ -2,6 +2,7 @@
 <template>
     <FloatingWindow 
         v-model:show="isShow"
+        v-show="isShow"
     >
         <div class="inner">
             <div 

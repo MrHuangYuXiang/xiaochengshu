@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
 
   const props = defineProps<{
     // 触发类型 bottom: 底部触发 reverse-top: 逆顶部触发
@@ -47,11 +47,17 @@
     }
   }
 
+  // 加载主逻辑
   const scrollMain = async () => {
     isLoading.value = true
     isEnd.value = await props.loadMoreCallback()
     isLoading.value = false
   }
+
+  // 挂载时自动执行一次回调
+  onMounted(async () => {
+    await scrollMain()
+  })
 
   /**
    * 以下为组件暴露方法
@@ -77,12 +83,14 @@
 <style scoped lang="scss">
   .scroll-container {
     overflow: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
     .tip {
       font-size: 0.9rem;
       color: var(--root-gray);
-      padding: 30px 0;
-      width: 100%;
-      text-align: center;
+      padding: 1rem 0;
+      justify-self: center;
     }
   }
 </style>
