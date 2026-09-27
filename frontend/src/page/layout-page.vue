@@ -6,6 +6,7 @@
   <WorkModal v-if="globalWorkModal.isShow.value"></WorkModal>
   <ReportModal v-if="globalReportModal.isShow.value"></ReportModal>
   <UpdateUserModal v-if="globalUpdateUserModal.isShow.value"></UpdateUserModal>
+  <WorkReportModal v-if="globalWorkReportModal.isShow.value"></WorkReportModal>
 
   <!-- 初始化用户弹窗 -->
   <InitUserModal v-model:show="enableInitUserModalShow" v-if="enableInitUserModalShow"></InitUserModal>
@@ -28,6 +29,7 @@
   import ImagePreview from '@/component/image/image-preview.vue';
   import WorkModal from '@/component/work/work-modal.vue';
   import ReportModal from '@/component/report/report-modal.vue';
+  import WorkReportModal from '@/component/work/work-report-modal.vue';
   import { onBeforeMount, ref } from 'vue';
 
   import { useRouter } from 'vue-router';
@@ -35,7 +37,7 @@
   import { clientEvent } from '@/api/event';
   import type { paths } from '@/api/gen';
   import { axiosProxy } from '@/api/axios';
-  import { globalWorkModal, globalReportModal, globalUpdateUserModal } from '@/component/global';
+  import { globalWorkModal, globalReportModal, globalUpdateUserModal, globalWorkReportModal } from '@/component/global';
 
   const router = useRouter();
   const enableInitUserModalShow = ref(false)

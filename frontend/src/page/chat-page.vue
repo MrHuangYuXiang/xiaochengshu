@@ -38,6 +38,7 @@
           :userAvatarUrl="msg.user.avatar_url"
           :messageType="msg.message.type"
           :messageContent="msg.message.content"
+          :messagePayload="msg.message.payload"
           :sessionType="sessions.get(selectedSessionId)?.session.type"
           @clickMessage="clickMessage(msg)"
         />

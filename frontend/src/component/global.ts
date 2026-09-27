@@ -104,6 +104,7 @@ class GlobalWorkModal extends GlobalBase {
   }
 }
 
+// 举报详情弹窗
 class GlobalReportModal extends GlobalBase {
   public reportId: Ref<string>
 
@@ -118,13 +119,27 @@ class GlobalReportModal extends GlobalBase {
   }
 }
 
-class GlobalUpdateUserModal extends GlobalBase {
-  public isShow: Ref<boolean>
+// 举报作品弹窗
+class GlobalWorkReportModal extends GlobalBase {
+  public workId: Ref<string>
 
   constructor() {
     super()
-    this.isShow = ref(false)
+    this.workId = ref("")
   }
+
+  show(workId: string) {
+    this.workId.value = workId
+    this.isShow.value = true
+  }
+
+  close() {
+    this.isShow.value = false
+    this.workId.value = ""
+  }
+}
+
+class GlobalUpdateUserModal extends GlobalBase {
 }
 
 export const globalUpdateUserModal = new GlobalUpdateUserModal()
@@ -133,3 +148,4 @@ export const globalMsgTip = new GlobalMsgTip()
 export const globalErrorDialog = new GlobalErrorDialog()
 export const globalWorkModal = new GlobalWorkModal()
 export const globalReportModal = new GlobalReportModal()
+export const globalWorkReportModal = new GlobalWorkReportModal()

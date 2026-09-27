@@ -18,7 +18,7 @@
                 :userAvatarUrl="session.user.avatar_url"
                 avatarSize="2rem"
                 btnText="分享"
-                @click-btn="shareWork()"
+                @click-btn="shareWork(session.session.id)"
             >
             </UserCard>
         </div>
@@ -35,6 +35,13 @@
     import type { SessionSchema } from '@/api/type.ext.ts';
     import { axiosProxy } from '@/api/axios.ts';
     import type { paths } from '@/api/gen.ts';
+    import { ElMessage } from 'element-plus';
+
+    const props = defineProps<{
+        workId: string;
+        title: string;
+        coverUrl: string;
+    }>()
 
     const sessions = ref<EnhancedList<SessionSchema>>(new EnhancedList(
         (item) => item.session.id,
@@ -57,8 +64,23 @@
     }
 
     // 分享作品
-    const shareWork = async () => {
-        console.log("分享作品")
+    const shareWork = async (sessionId: string) => {
+        await axiosProxy.post<
+            paths["/chat/send/message"]["post"]["requestBody"]["content"]["application/json"],
+            paths["/chat/send/message"]["post"]["responses"]["200"]["content"]["application/json"]
+        >("/chat/send/message", {
+            sessionId: sessionId,
+            content: "",
+            type: 3,
+            payload: {
+                3: {
+                    work_id: props.workId,
+                    title: props.title,
+                    cover_url: props.coverUrl,
+                }
+            },
+        })
+        ElMessage('分享成功');
     }
 </script>
 

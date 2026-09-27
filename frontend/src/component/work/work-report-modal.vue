@@ -1,5 +1,5 @@
 <template>
-    <BaseModal v-model:show="enableShow" width="auto" height="auto">
+    <BaseModal v-model:show="globalWorkReportModal.isShow.value">
         <div class="report-modal">
             <div class="title">举报作品</div>
             <FormRadio v-for="type in reportTypes?.types" :key="type.id" :value="type.id" :text="type.text" v-model="selectedType" />
@@ -11,7 +11,7 @@
                 class="textarea"
                 :rule="reportContentRule"
              />
-             <FormButton text="提交" @click="submitReport" />
+             <FormButton text="提交" @click="submitReport" color="default" />
         </div>
     </BaseModal>
 </template>
@@ -26,15 +26,8 @@
     import { axiosProxy } from '@/api/axios.ts';
     import { validateForm } from '@/helper/form.ts';
     import { ElMessage } from 'element-plus';
+    import { globalWorkReportModal } from '../global.ts';
 
-    const props = defineProps({
-        workId: {
-            type: String,
-            default: ""
-        }
-    })
-
-    const enableShow = defineModel<boolean>("show")
     const reportTypes = ref<paths["/report/types"]["get"]["responses"]["200"]["content"]["application/json"]>()
     const selectedType = ref<number>(1)
     const reportContent = ref<string>("")
@@ -64,12 +57,12 @@
             paths["/report"]["post"]["requestBody"]["content"]["application/json"],
             paths["/report"]["post"]["responses"]["200"]["content"]["application/json"]
         >("/report", {
-            workId: props.workId,
+            workId: globalWorkReportModal.workId.value,
             reportType: selectedType.value,
             reason: reportContent.value
         })
         ElMessage("举报成功")
-        enableShow.value = false
+        globalWorkReportModal.close()
     }
 
     onMounted(async () => {

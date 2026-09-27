@@ -5,7 +5,7 @@
       <div class="ext-items">
         <AppIcon type="image" size="1.2rem" />
       </div>
-      <FormButton text="发送" @click="sendMsg" />
+      <FormButton color="orange" text="发送" @click="sendMsg" />
     </div>
   </div>
 </template>
@@ -34,7 +34,7 @@
     gap: 1rem;
     .bottom-bar {
       display: grid;
-      grid-template-columns: 5fr 1fr;
+      grid-template-columns: 1fr auto;
       .ext-items {
         padding: 0 0.5rem;
         display: flex;

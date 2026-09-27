@@ -166,7 +166,7 @@ export class ClientUserService extends BaseService {
         let filePath = ""
 
         await formParser.exec(async (header) => {
-            filePath = this.fileStorage.getFilePath(`/user-avatars/${current.payload.userId}`, header.contentType)
+            filePath = `/user-avatars/${current.payload.userId}${header.contentType}`
             return await this.fileStorage.getWritableStream(filePath)
         }, [FileExtEnum.Jpg, FileExtEnum.Png])
 

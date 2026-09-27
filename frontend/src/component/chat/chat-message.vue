@@ -1,29 +1,43 @@
 <template>
     <div
-    v-if="props.sessionType === 1 || props.sessionType === 2"
-    class="private-message message"
-    :class="{
-        'private-message-self': props.userId === storage.initData.value?.user.id,
-        'private-message-other': props.userId !== storage.initData.value?.user.id,
-    }"
-    @click="clickMessage"
+        v-if="props.sessionType === 1 || props.sessionType === 2"
+        class="normal-message"
+        :class="{
+            'normal-message-self': props.userId === storage.initData.value?.user.id,
+            'normal-message-other': props.userId !== storage.initData.value?.user.id,
+        }"
+        @click="clickMessage"
     >
         <UserAvatar :user-id="props.userId" width="3rem" :img-url="props.userAvatarUrl" />
+        
+        <!-- 文本消息 -->
         <div
-        class="msg-content"
-        :class="{
-            'private-content-self': props.userId === storage.initData.value?.user.id,
-            'private-content-other': props.userId !== storage.initData.value?.user.id,
-        }"
+            v-if="props.messageType === 1"
+            class="msg-content"
+            :class="{
+                'text-content-self': props.userId === storage.initData.value?.user.id,
+                'text-content-other': props.userId !== storage.initData.value?.user.id,
+            }"
         >
             {{ props.messageContent }}
         </div>
+        
+        <!-- 作品分享 -->
+        <WorkCard
+            v-if="props.messageType === 3"
+            :work-id="props.messagePayload?.[3]?.work_id || ''"
+            :work-title="props.messagePayload?.[3]?.title || ''"
+            :work-cover-url="props.messagePayload?.[3]?.cover_url || ''"
+            :user-id="props.messagePayload?.[3]?.user_id || ''"
+            :user-name="props.messagePayload?.[3]?.user_name || ''"
+            :user-avatar-url="props.messagePayload?.[3]?.user_avatar || ''"
+        />
     </div>
 
     <div 
-    v-if="props.sessionType === 3" 
-    class="system-message message"
-    @click="clickMessage"
+        v-if="props.sessionType === 3" 
+        class="system-message"
+        @click="clickMessage"
     >
         <div class="system-title">{{ getSystemTitle(props.messageType) }}</div>
         <div class="system-content">{{ props.messageContent }}</div>
@@ -39,12 +53,27 @@
     import { storage } from '@/storage';
     import UserAvatar from '../user/UserAvatar.vue';
     import AppIcon from '../common/AppIcon.vue';
+    import WorkCard from '../work/work-card.vue';
 
     const props = defineProps<{
         userId: string;
         userAvatarUrl: string;
         messageContent: string;
         messageType: number;
+        messagePayload?: {
+            1?: Record<string, never> | undefined;
+            2?: {
+                report_id: string;
+            };
+            3?: {
+                work_id: string;
+                title: string;
+                cover_url: string;
+                user_id: string;
+                user_name: string;
+                user_avatar: string;
+            };
+        };
         sessionType?: number;
     }>()
     const emits = defineEmits<{
@@ -69,15 +98,7 @@
 </script>
 
 <style scoped>
-    .message {
-        cursor: pointer;
-        transition: transform 0.3s ease-in-out;
-    }
-    .message:hover {
-        transform: scale(1.03);
-    }
-
-    .private-message {
+    .normal-message {
         display: flex;
         align-items: center;
         gap: 0.6rem;
@@ -90,25 +111,27 @@
     }
 
     /* 私聊会话类型css属性 */
-    .private-message-self {
+    .normal-message-self {
         align-self: end;
         flex-direction: row-reverse;
     }
-    .private-message-other {
+    .normal-message-other {
         align-self: start;
         flex-direction: row;
     }
-    .private-content-self {
+    .text-content-self {
         color: white;
         background-color: #0084ff;
     }
-    .private-content-other {
+    .text-content-other {
         color: black;
         background-color: var(--root-bg-gray);
     }
 
     /* 系统会话类型css属性 */
     .system-message {
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
         display: flex;
         flex-direction: column;
         padding: 1.2rem;
@@ -130,5 +153,8 @@
             font-size: 0.8rem;
             color: var(--root-gray);
         }
+    }
+    .system-message:hover {
+        transform: scale(1.03);
     }
 </style>

@@ -28,11 +28,11 @@
     },
     width: {
       type: String,
-      default: '70vw'
+      default: 'auto'
     },
     height: {
       type: String,
-      default: '90vh'
+      default: 'auto'
     },
     // 步骤条索引
     stepIndex: {
@@ -74,8 +74,6 @@
       background-color: white;
       margin: 5vh auto;
       border-radius: 15px;
-      height: 90vh;
-      width: 70vw;
       max-height: 100vh;
       overflow: hidden;
       .step {

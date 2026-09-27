@@ -96,7 +96,12 @@
           </div>
         </ScrollContainer>
         <div class="publish-form">
-          <WorkShareFloating v-model:show="isShowShareFloating" />
+          <WorkShareFloating
+            v-model:show="isShowShareFloating"
+            :workId="work?.work.id || ''"
+            :title="work?.work.title || ''"
+            :coverUrl="work?.images[0]?.path || ''"
+          />
           <div :class="{'reply-content': true, 'focus': isInputFocus && replyTarget !== undefined}">
             回复{{ replyTarget?.replyUserName }} {{ replyTarget?.replyContent }} : 
           </div>

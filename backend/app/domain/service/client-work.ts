@@ -229,7 +229,7 @@ export class ClientWorkService extends BaseService {
     for (let i = 0; i < workImageCount; i++) {
       await formParser.exec(async (fieldHeader: FormFieldHeader) => {
         const imageId = uuidv4()
-        const filePath = this.fileStorage.getFilePath(`/work-images/${imageId}`, fieldHeader.contentType)
+        const filePath = `/work-images/${imageId}${fieldHeader.contentType}`
         images.push({
           id: imageId,
           work_id: workId,
