@@ -3,6 +3,7 @@
     <FloatingWindow 
         v-model:show="isShow"
         v-show="isShow"
+        class="floating"
     >
         <div class="inner">
             <div 
@@ -48,5 +49,12 @@
         .inner-item:hover {
             background-color: var(--root-bg-gray);
         }
+    }
+
+    .floating {
+        top: 50%;
+        transform: translateY(-50%) translateX(100%);
+        right: 0;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
 </style>

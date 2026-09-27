@@ -3,45 +3,50 @@
     <ScrollContainer
       trigger-type="bottom"
       :load-more-callback="getSessions"
-      class="sessions"
     >
-      <div class="title">我的消息</div>
-      <SessionCard
-        v-for="session in sessions"
-        v-model:selected-id="selectedSessionId"
-        :key="session.session.id"
-        :sessionId="session.session.id"
-        :sessionType="session.session.type"
-        :userId="session.user.id"
-        :userAvatarUrl="session.user.avatar_url"
-        :userName="session.user.name"
-        :latestMsg="session.latestMessage ? session.latestMessage.content : ''"
-        :msgTime="session.latestMessage ? session.latestMessage.created_at : ''"
-        :unreadCount="session.unreadCount"
-        @click="switchSession(session.session.id)"
-      />
-    </ScrollContainer>
-    <div class="chat-panel" v-show="selectedSessionId !== ''">
+      <div class="sessions">
+        <div class="title">我的消息</div>
+        <SessionCard
+          v-for="session in sessions"
+          v-model:selected-id="selectedSessionId"
+          :key="session.session.id"
+          :sessionId="session.session.id"
+          :sessionType="session.session.type"
+          :userId="session.user.id"
+          :userAvatarUrl="session.user.avatar_url"
+          :userName="session.user.name"
+          :latestMsg="session.latestMessage ? session.latestMessage.content : ''"
+          :msgTime="session.latestMessage ? session.latestMessage.created_at : ''"
+          :unreadCount="session.unreadCount"
+          @click="switchSession(session.session.id)"
+        />
+      </div>
+  </ScrollContainer>
+    <div class="chat-panel" v-if="selectedSessionId !== ''">
       <ScrollContainer
         trigger-type="reverse-top"
         :load-more-callback="getMessages"
         ref="msgScrollRef"
-        class="chat-messages"
-        :class="{
-          'system': sessions.get(selectedSessionId)?.session.type === 3,
-        }"
+        :style="{ height: '100%', width: '100%' }"
       >
-        <ChatMessage
-          v-for="msg in messages"
-          :key="msg.message.id"
-          :userId="msg.user.id"
-          :userAvatarUrl="msg.user.avatar_url"
-          :messageType="msg.message.type"
-          :messageContent="msg.message.content"
-          :messagePayload="msg.message.payload"
-          :sessionType="sessions.get(selectedSessionId)?.session.type"
-          @clickMessage="clickMessage(msg)"
-        />
+        <div
+          class="chat-messages"
+          :class="{
+            'system': sessions.get(selectedSessionId)?.session.type === 3,
+          }"
+        >
+          <ChatMessage
+            v-for="msg in messages"
+            :key="msg.message.id"
+            :userId="msg.user.id"
+            :userAvatarUrl="msg.user.avatar_url"
+            :messageType="msg.message.type"
+            :messageContent="msg.message.content"
+            :messagePayload="msg.message.payload"
+            :sessionType="sessions.get(selectedSessionId)?.session.type"
+            @clickMessage="clickMessage(msg)"
+          />
+        </div>
       </ScrollContainer>
       <ChatSender 
         @send-msg="sendMsg" 
@@ -98,7 +103,11 @@
       const data = await axiosProxy.get<
         paths["/chat/get/messages"]["get"]["parameters"]["query"],
         paths["/chat/get/messages"]["get"]["responses"]["200"]["content"]["application/json"]
-      >("/chat/get/messages", { page: page, pageSize: size, sessionId: selectedSessionId.value })
+      >("/chat/get/messages", { 
+        page: page, 
+        pageSize: size, 
+        sessionId: selectedSessionId.value
+      })
       return data.messages
     })
     return messages.value.isEnd
@@ -113,7 +122,6 @@
     selectedSessionId.value = sessionId
     messages.value.clear()
     msgScrollRef.value?.reset()
-    await getMessages()
   }
 
   // 发送消息
@@ -150,8 +158,6 @@
   }
 
   onMounted(async () => {
-    // 加载当前用户会话数据
-    await getSessions()
     // 创建新会话(该接口会幂等返回已存在的会话)
     await onMountedCreateSession()
   })
@@ -172,8 +178,6 @@
     sessions.value.unshift(sessionData)
     // 切换选中会话为新创建的会话
     selectedSessionId.value = sessionData.session.id
-    // 获取该会话消息
-    await getMessages()
   }
 
 </script>
@@ -182,12 +186,12 @@
 .chat-page {
   display: grid;
   grid-template-columns: 1fr 3fr;
+  grid-template-rows: 100%;
 
   .sessions {
-    height: 100%;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+    height: auto;
+    display: grid;
+    grid-template-columns: 100%;
     .title {
       font-size: large;
       padding: 2rem;

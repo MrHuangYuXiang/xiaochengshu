@@ -14,13 +14,13 @@
   >
     <div class="container">
       <div class="top">
-        <div class="avatar"><UserAvatar  :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
+        <div class="avatar"><UserAvatar width="10rem" :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
         <div class="info">
           <div class="name">
             <div class="text">{{ user?.user.name }}</div>
             <div class="btn-group" v-if="user?.user.id !== storage.initData.value?.user.id">
-              <FormButton :text="formatFollowStatus(user?.user.is_follow || 0, user?.user.is_followed || 0)" @click="follow"/>
-              <FormButton text="私信" @click="redirectToChatPage" />
+              <FormButton color="orange" :text="formatFollowStatus(user?.user.is_follow || 0, user?.user.is_followed || 0)" @click="follow"/>
+              <FormButton color="default" text="私信" @click="redirectToChatPage" />
             </div>
           </div>
           <div class="tag">

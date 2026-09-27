@@ -52,7 +52,7 @@
             <FormRadio v-model="permissionSelected" text="仅自己可见" :value="2"></FormRadio>
           </div>
         </div>
-        <div class="publish-btn"><FormButton text="发布" @click="publish"></FormButton></div>
+        <div class="publish-btn"><FormButton color="orange" text="发布" @click="publish"></FormButton></div>
       </div>
       <div v-else-if="currentCategory === 'article'" class="publish-form publish-article">
         <div style="margin-top: 300px; color: #999;">功能正在开发中...</div>
@@ -201,10 +201,8 @@
 
 <style scoped lang="scss">
   .publish-page {
-    width: 100%;
-    height: 100%;
     overflow: auto;
-    padding-bottom: 20px;
+    padding: 2rem;
   }
 
   .publish-form {

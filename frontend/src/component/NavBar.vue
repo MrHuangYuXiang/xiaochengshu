@@ -15,11 +15,10 @@
     >
       <el-icon><component :is="Setting"></component></el-icon>
       <div>设置</div>
-      <SelectFloating 
+      <SelectFloating
         @clickOption="clickMenuItem"
         v-model:show="isShowSettingFloating"
         :options="settingItems"
-        direction="right"
       />
     </div>
   </div>

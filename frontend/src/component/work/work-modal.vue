@@ -5,7 +5,11 @@
 -->
 
 <template>
-  <BaseModal v-model:show="globalWorkModal.isShow.value">
+  <BaseModal 
+    v-model:show="globalWorkModal.isShow.value"
+    width="60vw"
+    height="90vh"
+  >
     <div class="work-modal">
       <div class="left">
         <ImageSlider
@@ -303,9 +307,6 @@
     >(`/work`, {
       workId: globalWorkModal.workId.value
     })
-
-    // 获取评论
-    await getTopComments()
   })
 </script>
 

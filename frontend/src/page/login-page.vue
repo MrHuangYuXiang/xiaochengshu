@@ -24,7 +24,7 @@
           />
           <FormButton text="登录" @click="clickLogin" type="glass" color="orange" />
           <AppDivider text="用其他方式登录" color="black" />
-          <FormButton text="微信登录" type="glass" />
+          <FormButton color="default" text="微信登录" type="glass" />
           <div class="bottom">如果你是新用户,将会自动注册</div>
         </div>
       </div>

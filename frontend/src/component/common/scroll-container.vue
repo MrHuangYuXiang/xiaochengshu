@@ -1,5 +1,12 @@
 <template>
-  <div class="scroll-container" @scroll="scrollToBottom">
+  <div 
+    ref="scrollContainerRef"
+    class="scroll-container" 
+    :style="{
+      flexDirection: props.triggerType === 'bottom' ? 'column' : 'column-reverse'
+    }"
+    @scroll="scrollToBottom"
+  >
     <slot></slot>
     <div class="tip" v-if="isEnd">没有更多了^^</div>
     <div class="tip" v-if="isLoading">加载中...</div>
@@ -69,9 +76,10 @@
   }
 
   // 重置状态
-  const reset = () => {
+  const reset = async () => {
     isEnd.value = false
     isLoading.value = false
+    await scrollMain()
   }
 
   defineExpose({
@@ -83,14 +91,13 @@
 <style scoped lang="scss">
   .scroll-container {
     overflow: auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    display: flex;
+    align-items: stretch;
     .tip {
       font-size: 0.9rem;
       color: var(--root-gray);
       padding: 1rem 0;
-      justify-self: center;
+      text-align: center;
     }
   }
 </style>

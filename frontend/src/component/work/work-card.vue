@@ -19,7 +19,7 @@
                 />
             </div>
         </div>
-        <SelectFloating 
+        <SelectFloating
             :options="[{ id: 1, text: '举报该作品' }]"
             @clickOption="clickFloatingHandler"
             v-model:show="isShowFloating"
@@ -63,7 +63,7 @@
         border-radius: 15px;
         row-gap: 0.25rem;
         .image {
-            min-width: 8rem;
+            min-width: 9rem;
             min-height: 10rem;
             background-size: cover;
         }

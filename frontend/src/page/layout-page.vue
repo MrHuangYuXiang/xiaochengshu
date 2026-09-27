@@ -69,6 +69,7 @@
     overflow-y: hidden;
     display: grid;
     grid-template-columns: auto 1fr;
+    grid-template-rows: 100%;
     align-items: start;
     .left {
       display: grid;
@@ -79,7 +80,6 @@
       }
     }
     .right {
-      padding: 2rem;
       height: 100%;
     }
   }
