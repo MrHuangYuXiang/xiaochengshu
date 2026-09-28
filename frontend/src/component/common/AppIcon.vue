@@ -72,6 +72,12 @@
       type: String,
       default: 'var(--root-gray)'
     },
+
+    // 交互效果
+    interactive: {
+      type: Boolean,
+      default: false
+    }
   })
 </script>
 

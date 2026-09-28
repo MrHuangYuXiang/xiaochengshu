@@ -1,20 +1,20 @@
 <template>
   <div class="comment-card">
     <div class="avatar">
-      <UserAvatar :img-url="props.avatarUrl" width="2.5rem"/>
+      <UserAvatar :img-url="props.userAvatarUrl" width="2.5rem"/>
     </div>
     <div class="text">
       <div class="top">
         <div> {{ props.userName }} </div>
       </div>
-      <div class="content"> <span class="reply-user" v-show="props.parentUserName !== ''">回复 {{ props.parentUserName }} : </span> {{ props.content }}</div>
-      <div class="time">{{ formatTime(props.createdAt) }}</div>
+      <div class="content"> <span class="reply-user" v-show="props.parentUserName !== ''">回复 {{ props.parentUserName }} : </span> {{ props.commentContent }}</div>
+      <div class="time">{{ formatTime(props.commentCreatedAt) }}</div>
       <div class="bottom">
         <div class="bottom-item" @click="emits('clickReply')">
           <AppIcon type="chat" text="回复" />
           <div>回复</div>
         </div>
-        <div class="bottom-item">
+        <div class="bottom-item" @click="emits('clickLike')">
           <AppIcon v-if="props.isLiked === 0" type="heart" />
           <AppIcon v-else type="heart-fill" :fill="'red'" />
           <div>{{ props.likeCount }}</div>
@@ -30,21 +30,23 @@
   import AppIcon from '../common/AppIcon.vue';
   import { formatTime } from '@/helper/format';
 
-  const emits = defineEmits(["clickReply"])
+  const emits = defineEmits<{
+    (e: 'clickReply'): void;
+    (e: 'clickLike'): void;
+  }>()
 
   const props = withDefaults(defineProps<
     {
+      commentId: string;
+      commentContent: string;
+      commentCreatedAt: string;
       userName: string;
+      userAvatarUrl: string;
       parentUserName: string;
-      avatarUrl: string;
-      content: string;
-      createdAt: string;
       isLiked: number;
       likeCount: number;
     }
   >(), {})
-
-  // const emits = defineEmits(['reply', 'like'])
 </script>
 
 <style scoped lang="scss">
@@ -85,8 +87,8 @@
         align-items: center;
         gap: 10px;
         .bottom-item {
-          transition: all 0.3s ease-in-out;
           cursor: pointer;
+          transition: all 0.15s ease-in-out;
           display: flex;
           align-items: center;
           gap: 3px;
@@ -94,7 +96,10 @@
           color: var(--root-gray);
         }
         .bottom-item:hover {
-          transform: scale(1.1);
+          transform: scale(1.2);
+        }
+        .bottom-item:active {
+          transform: scale(0.8);
         }
       }
     }

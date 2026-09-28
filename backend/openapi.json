@@ -1081,7 +1081,7 @@
                     "type": "string"
                   },
                   "isLike": {
-                    "type": "boolean"
+                    "type": "integer"
                   }
                 }
               }
@@ -1122,7 +1122,7 @@
                     "type": "string"
                   },
                   "isCollect": {
-                    "type": "boolean"
+                    "type": "integer"
                   }
                 }
               }
@@ -1484,7 +1484,7 @@
                     "type": "string"
                   },
                   "isLike": {
-                    "type": "boolean"
+                    "type": "integer"
                   }
                 }
               }

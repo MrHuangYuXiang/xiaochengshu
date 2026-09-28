@@ -6,12 +6,20 @@
         }"
         @click.self="clickImage"
     >
-        <div class="switch-btn switch-prev" v-show="props.currentIndex > 0" @click="emits('switch', props.currentIndex - 1)">
-          <AppIcon type="chevron-left" :fill="'white'" />
-        </div>
-        <div class="switch-btn switch-next" v-show="props.currentIndex < props.totalCount - 1" @click="emits('switch', props.currentIndex + 1)">
-          <AppIcon type="chevron-right" :fill="'white'" />
-        </div>
+        <AppIcon
+            type="chevron-left"
+            :fill="'white'"
+            class="switch-btn switch-prev"
+            v-if="props.currentIndex > 0"
+            @click="emits('switch', props.currentIndex - 1)"
+        />
+        <AppIcon 
+            type="chevron-right" 
+            :fill="'white'"
+            class="switch-btn switch-next" 
+            v-if="props.currentIndex < props.totalCount - 1" 
+            @click="emits('switch', props.currentIndex + 1)"
+        />
         <slot></slot>
     </div>
 </template>
@@ -91,16 +99,14 @@
         background-repeat: no-repeat;
         background-color: var(--root-bg-gray);
         .switch-btn {
-            transition: all 0.3s ease-in-out;
+            transition: transform 0.25s ease-in-out;
+            width: 2rem;
+            height: 2rem;
+            padding: 0.5rem;
             position: absolute;
-            width: 30px;
-            aspect-ratio: 1 / 1;
             top: 50%;
-            transform: translateY(-50%);
             border-radius: 50%;
             cursor: pointer;
-            visibility: hidden;
-            opacity: 0;
             background: rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(1px);
             display: flex;
@@ -108,24 +114,15 @@
             justify-content: center;
         }
         .switch-next {
-            right: 10px;
-            transform: translateX(7px);
+            right: 1rem;
         }
         .switch-prev {
-            left: 10px;
-            transform: translateX(-7px);
+            left: 1rem;
         }
         .switch-btn:hover {
             background: rgba(0, 0, 0, 0.3);
             transform: scale(1.1);
         }
-    }
-    .image:hover {
-      .switch-btn {
-        visibility: visible;
-        opacity: 1;
-        transform: translateX(0%);
-      }
     }
     .hoverable {
         cursor: pointer;

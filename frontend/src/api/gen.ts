@@ -719,7 +719,7 @@ export interface paths {
                 content: {
                     "application/json": {
                         workId: string;
-                        isLike: boolean;
+                        isLike: number;
                     };
                 };
             };
@@ -762,7 +762,7 @@ export interface paths {
                 content: {
                     "application/json": {
                         workId: string;
-                        isCollect: boolean;
+                        isCollect: number;
                     };
                 };
             };
@@ -944,7 +944,7 @@ export interface paths {
                     "application/json": {
                         commentId: string;
                         workId: string;
-                        isLike: boolean;
+                        isLike: number;
                     };
                 };
             };

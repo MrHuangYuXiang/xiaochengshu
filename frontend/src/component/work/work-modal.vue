@@ -11,18 +11,17 @@
     height="90vh"
   >
     <div class="work-modal">
-      <div class="left">
-        <ImageSlider
-          class="image"
-          :src="work?.images[currentImageIndex]?.path || ''"
-          :enable-preview="true"
-          :enable-switch="true"
-          :current-index="currentImageIndex"
-          :total-count="work?.images.length"
-          @switch="(index) => { currentImageIndex = index }"
-        />
-      </div>
+      <ImageSlider
+        class="image"
+        :src="work?.images[currentImageIndex]?.path || ''"
+        :enable-preview="true"
+        :enable-switch="true"
+        :current-index="currentImageIndex"
+        :total-count="work?.images.length"
+        @switch="(index) => { currentImageIndex = index }"
+      />
       <div class="right">
+        <!-- 用户信息 -->
         <UserFollowCard
           class="user"
           :user-id="work?.user?.id || ''"
@@ -32,6 +31,8 @@
           :is-follow="work?.user?.is_follow || 0"
           :is-followed="work?.user?.is_followed || 0"
         />
+
+        <!-- 作品内容以及评论 -->
         <ScrollContainer
           ref="scrollContainerRef"
           :loadMoreCallback="getTopComments"
@@ -47,9 +48,10 @@
               <CommentCard
                 v-for="comment in comments" :key="comment.comment.id"
                 :userName="comment.user.name"
-                :avatarUrl="comment.user.avatar_url"
-                :content="comment.comment.content"
-                :createdAt="comment.comment.created_at"
+                :userAvatarUrl="comment.user.avatar_url"
+                :commentId="comment.comment.id"
+                :commentContent="comment.comment.content"
+                :commentCreatedAt="comment.comment.created_at"
                 :parentUserName="''"
                 :isLiked="comment.isLiked"
                 :likeCount="comment.likeCount"
@@ -60,18 +62,21 @@
                   rootCommentId: comment.comment.id,
                   replyContent: comment.comment.content,
                   replyUserName: comment.user.name
-                })">
+                })"
+                @click-like="likeComment('comment', comment.comment.id, '')"
+              >
                 <template #bottom>
                   <div class="reply" v-show="repliesMap.get(comment.comment.id)!.count() > 0">
                     <CommentCard
-                    v-for="reply in repliesMap.get(comment.comment.id)!"
+                    v-for="reply in repliesMap.get(comment.comment.id)"
                     :key="reply.data.comment.id"
                     class="reply-item"
                     :parentUserName="reply.data.comment.parent_id === comment.comment.id ? '' : reply.parent!.data.user.name"
                     :userName="reply.data.user.name"
-                    :avatarUrl="reply.data.user.avatar_url"
-                    :content="reply.data.comment.content"
-                    :createdAt="reply.data.comment.created_at"
+                    :userAvatarUrl="reply.data.user.avatar_url"
+                    :commentId="reply.data.comment.id"
+                    :commentContent="reply.data.comment.content"
+                    :commentCreatedAt="reply.data.comment.created_at"
                     :isLiked="reply.data.isLiked"
                     :likeCount="reply.data.likeCount"
                     @clickReply="triggerFocus({
@@ -80,6 +85,7 @@
                       replyContent: reply.data.comment.content,
                       replyUserName: reply.data.user.name
                     })"
+                    @click-like="likeComment('reply', comment.comment.id, reply.data.comment.id)"
                     />
                   </div>
                   <div class="more" v-show="comment.replyCount > 0">
@@ -99,6 +105,8 @@
             </div>
           </div>
         </ScrollContainer>
+
+        <!-- 评论表单 -->
         <div class="publish-form">
           <WorkShareFloating
             v-if="work"
@@ -125,18 +133,18 @@
               v-model="inputContent"
             />
             <div :class="{'focus': isInputFocus, 'interaction': true}">
-              <div class="item">
-                <AppIcon v-if="work?.isLiked === 0" type="heart" class="icon" />
-                <AppIcon v-else type="heart-fill" fill="red" class="icon" />
+              <div class="item" @click="likeWork">
+                <AppIcon v-if="work?.isLiked === 0" type="heart" />
+                <AppIcon v-else type="heart-fill" fill="red" />
                 <div>{{ work?.likeCount }}</div>
               </div>
-              <div class="item">
-                <AppIcon v-if="work?.isCollected === 0" type="star" class="icon" />
-                <AppIcon v-else type="star-fill" fill="yellow" class="icon" />
+              <div class="item" @click="collectWork">
+                <AppIcon v-if="work?.isCollected === 0" type="star" />
+                <AppIcon v-else type="star-fill" fill="yellow" />
                 <div>{{ work?.collectCount }}</div>
               </div>
               <div class="item">
-                <AppIcon type="share" class="icon" @click="isShowShareFloating = true" />
+                <AppIcon type="share" @click="isShowShareFloating = true" />
               </div>
             </div>
           </div>
@@ -155,7 +163,7 @@
   import UserFollowCard from '../user/user-follow-card.vue';
   import AppIcon from '../common/AppIcon.vue';
   import FormButton from '../form/form-button.vue';
-  import CommentCard from './CommentCard.vue';
+  import CommentCard from './comment-card.vue';
   import FormInput from '../form/form-input.vue';
   import ScrollContainer from '../common/scroll-container.vue';
   import ImageSlider from '../image/image-slider.vue';
@@ -300,7 +308,63 @@
     reply?.clear()
   }
 
-  // 挂载后加载作品和评论信息
+  // 点赞作品
+  const likeWork = async () => {
+    if (!work.value) return
+
+    await axiosProxy.post<
+      paths["/like/work"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/like/work"]["post"]["responses"]["200"]["content"]["application/json"]
+    >("/like/work", {
+      workId: work.value.work.id,
+      isLike: work.value.isLiked === 1 ? 0 : 1,
+    })
+
+    // 更新点赞状态
+    work.value.isLiked = work.value.isLiked === 1 ? 0 : 1
+    work.value.likeCount = work.value.isLiked === 1 ? work.value.likeCount + 1 : work.value.likeCount - 1
+    ElMessage(work.value.isLiked === 1 ? "点赞成功" : "取消点赞成功")
+  }
+
+  // 收藏作品
+  const collectWork = async () => {
+    if (!work.value) return
+
+    await axiosProxy.post<
+      paths["/collect/work"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/collect/work"]["post"]["responses"]["200"]["content"]["application/json"]
+    >("/collect/work", {
+      workId: work.value.work.id,
+      isCollect: work.value.isCollected === 1 ? 0 : 1,
+    })
+
+    // 更新收藏状态
+    work.value.isCollected = work.value.isCollected === 1 ? 0 : 1
+    work.value.collectCount = work.value.isCollected === 1 ? work.value.collectCount + 1 : work.value.collectCount - 1
+    ElMessage(work.value.isCollected === 1 ? "收藏成功" : "取消收藏成功")
+  }
+
+  // 点赞评论
+  const likeComment = async (type: "comment" | "reply", commentId: string, replyId: string) => {
+    const comment = type === "comment" ? comments.value.get(commentId) : repliesMap.value.get(commentId)?.get(replyId)
+    if (!comment) return
+
+    await axiosProxy.post<
+      paths["/like/work/comment"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/like/work/comment"]["post"]["responses"]["200"]["content"]["application/json"]
+    >("/like/work/comment", {
+      commentId: comment.comment.id,
+      workId: work.value!.work.id,
+      isLike: comment.isLiked === 1 ? 0 : 1,
+    })
+
+    // 更新点赞状态
+    comment.isLiked = comment.isLiked === 1 ? 0 : 1
+    comment.likeCount = comment.isLiked === 1 ? comment.likeCount + 1 : comment.likeCount - 1
+    ElMessage(comment.isLiked === 1 ? "点赞成功" : "取消点赞成功")
+  }
+
+  // 挂载后加载作品
   onMounted(async () => {
     if (!globalWorkModal.isShow.value) return
 
@@ -321,13 +385,9 @@
     display: grid;
     grid-template-columns: 60% 40%;
     grid-template-rows: 100%;
-    .left {
+    .image {
       border-right: 1px solid #e5e5e5;
-      .image {
-        width: 100%;
-        height: 100%;
-        background-size: contain;
-      }
+      background-size: contain;
     }
     .right {
       display: grid;
@@ -431,14 +491,17 @@
             transition: all 0.2s ease-in-out;
             opacity: 1;
             .item {
+              transition: all 0.15s ease-in-out;
               cursor: pointer;
               display: flex;
               align-items: center;
               gap: 4px;
-              .icon {
-                width: 1.2rem;
-                height: 1.2rem;
-              }
+            }
+            .item:hover {
+              transform: scale(1.2);
+            }
+            .item:active {
+              transform: scale(0.8);
             }
           }
           .interaction.focus {
