@@ -31,7 +31,7 @@
       </div>
 
       <div class="next">
-        <AppButton :text="activeIndex === 3 ? '去探索!' : '下一步'" width="20%" @click="clickNext" />
+        <AppButton :text="activeIndex === 3 ? '去探索!' : '下一步'" width="20%" @click="clickNext" color="default"/>
       </div>
     </div>
   </BaseModal>

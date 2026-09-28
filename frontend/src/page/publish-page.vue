@@ -1,63 +1,62 @@
 <template>
   <div class="publish-page">
-    <AppSegment :fields="[{text: '发布图文', key: 'image'}, {text: '发布文章', key: 'article'}]" @change-field="(key) => currentCategory = key">
-      <div v-if="currentCategory === 'image'" class="publish-form publish-image">
-        <div class="form-item">
-          <div class="item-label">文章标题</div>
-          <FormInput ref="titleInputRef" type="textarea" placeholder="请输入文章标题" v-model="form.title" :rule="titleValidator"></FormInput>
-        </div>
-        <div class="form-item">
-          <div class="item-label">文章正文</div>
-          <FormInput ref="contentInputRef" :rows="20" type="textarea" placeholder="请输入文章正文" v-model="form.content" :rule="contentValidator"></FormInput>
-        </div>
-        <div class="form-item">
-          <div class="item-label">设置封面</div>
-          <div
-            :class="{'cover-image': true, 'none': coverImage === null}" 
-            :style="{ backgroundImage: `url(${coverImage?.url || ''})` }"
+    <AppSegment :fields="[{text: '发布图文', key: 'image'}, {text: '发布文章', key: 'article'}]" @change-field="(key) => currentCategory = key" />
+    <div v-if="currentCategory === 'image'" class="publish-form publish-image">
+      <div class="form-item">
+        <div class="item-label">文章标题</div>
+        <FormInput ref="titleInputRef" type="textarea" placeholder="请输入文章标题" v-model="form.title" :rule="titleValidator"></FormInput>
+      </div>
+      <div class="form-item">
+        <div class="item-label">文章正文</div>
+        <FormInput ref="contentInputRef" :rows="20" type="textarea" placeholder="请输入文章正文" v-model="form.content" :rule="contentValidator"></FormInput>
+      </div>
+      <div class="form-item">
+        <div class="item-label">设置封面</div>
+        <div
+          :class="{'cover-image': true, 'none': coverImage === null}" 
+          :style="{ backgroundImage: `url(${coverImage?.url || ''})` }"
+        >
+          <span v-show="coverImage === null">请选择封面图片</span>
+      </div>
+      </div>
+      <div class="form-item">
+        <div class="item-label">文章图片</div>
+        <div class="image-uploader">
+          <input type="file" accept="image/jpeg"  style="display: none;" ref="inputRef" @change="changeFile" multiple />
+          <ImageSlider
+          class="item image"
+          v-for="(file, index) in files"
+          :key="file.url!"
+          :src="file.url"
+          :is-upload-image="false"
           >
-            <span v-show="coverImage === null">请选择封面图片</span>
-        </div>
-        </div>
-        <div class="form-item">
-          <div class="item-label">文章图片</div>
-          <div class="image-uploader">
-            <input type="file" accept="image/jpeg"  style="display: none;" ref="inputRef" @change="changeFile" multiple />
-            <ImageSlider
-            class="item image"
-            v-for="(file, index) in files"
-            :key="file.url!"
-            :src="file.url"
-            :is-upload-image="false"
-            >
-              <div class="image-options" @click.self="globalImagePreview.show(file.url)">
-                  <div class="image-option" @click="setCover(file.file, file.url, index)">设为封面</div>
-                  <div class="image-option" @click="deleteImage(file.file, file.url, index)">删除</div>
-              </div>
-            </ImageSlider>
-            <div
-              class="item upload-btn"
-              @mouseenter="uploadBtnFill = 'var(--root-orange)'"
-              @mouseleave="uploadBtnFill = 'var(--root-gray)'"
-              @click="inputRef?.click()"
-            >
-              <AppIcon type="plus" :fill="uploadBtnFill" />
+            <div class="image-options" @click.self="globalImagePreview.show(file.url)">
+                <div class="image-option" @click="setCover(file.file, file.url, index)">设为封面</div>
+                <div class="image-option" @click="deleteImage(file.file, file.url, index)">删除</div>
             </div>
+          </ImageSlider>
+          <div
+            class="item upload-btn"
+            @mouseenter="uploadBtnFill = 'var(--root-orange)'"
+            @mouseleave="uploadBtnFill = 'var(--root-gray)'"
+            @click="inputRef?.click()"
+          >
+            <AppIcon type="plus" :fill="uploadBtnFill" />
           </div>
         </div>
-        <div class="form-item">
-          <div class="item-label">谁可以看</div>
-          <div class="form-btn-group">
-            <FormRadio v-model="permissionSelected" text="公开" :value="1"></FormRadio>
-            <FormRadio v-model="permissionSelected" text="仅自己可见" :value="2"></FormRadio>
-          </div>
+      </div>
+      <div class="form-item">
+        <div class="item-label">谁可以看</div>
+        <div class="form-btn-group">
+          <FormRadio v-model="permissionSelected" text="公开" :value="1"></FormRadio>
+          <FormRadio v-model="permissionSelected" text="仅自己可见" :value="2"></FormRadio>
         </div>
-        <div class="publish-btn"><FormButton color="orange" text="发布" @click="publish"></FormButton></div>
       </div>
-      <div v-else-if="currentCategory === 'article'" class="publish-form publish-article">
-        <div style="margin-top: 300px; color: #999;">功能正在开发中...</div>
-      </div>
-    </AppSegment>
+      <div class="publish-btn"><FormButton color="orange" text="发布" @click="publish"></FormButton></div>
+    </div>
+    <div v-else-if="currentCategory === 'article'" class="publish-form publish-article">
+      <div style="margin-top: 300px; color: #999;">功能正在开发中...</div>
+    </div>
   </div>
 </template>
 
@@ -201,8 +200,10 @@
 
 <style scoped lang="scss">
   .publish-page {
-    overflow: auto;
     padding: 2rem;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: auto 1fr;
   }
 
   .publish-form {

@@ -8,7 +8,7 @@
     <div class="dialog">
       <div>{{ globalErrorDialog.content }}</div>
       <div class="btn-group">
-        <AppButton text="确定" @click="confirmErrorDialog" />
+        <AppButton text="确定" @click="confirmErrorDialog" color="default" />
       </div>
     </div>
   </BaseModal>

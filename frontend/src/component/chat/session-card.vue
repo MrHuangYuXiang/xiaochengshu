@@ -1,5 +1,11 @@
 <template>
-  <div class="session-card" :class="{'active': selectedId === props.sessionId}">
+  <div 
+    class="session-card"
+   :class="{
+      'active': selectedId === props.sessionId,
+      'pin': props.sessionIsPin === 1
+    }"
+  >
     <UserAvatar 
       class="session-image"
       :user-id="props.userId"
@@ -10,9 +16,9 @@
     <div class="session-content">
       <div class="session-name">
         <div class="name">{{ getSessionName() }}</div>
-        <div class="time">{{ formatTime(props.msgTime) }}</div>
+        <div class="time">{{ formatTime(props.messageTime) }}</div>
       </div>
-      <div class="msg-content">{{ props.latestMsg || "快去给Ta打个招呼吧^.^" }}</div>
+      <div class="msg-content">{{ getMessage() }}</div>
     </div>
     <div v-if="props.unreadCount > 0" class="unread-count">{{ props.unreadCount }}</div>
   </div>
@@ -28,8 +34,10 @@
     userName: string;
     sessionId: string;
     sessionType: number;
-    latestMsg: string;
-    msgTime: string;
+    sessionIsPin: number;
+    messageContent: string;
+    messageTime: string;
+    messageType: number;
     unreadCount: number;
   }>()
 
@@ -58,6 +66,27 @@
     }
   }
 
+    // 获取最近消息
+  const getMessage = () => {
+    switch (props.messageType) {
+      // 普通消息
+      case 1:
+      // 举报通知
+      case 2:
+        return props.messageContent
+
+      // 作品分享
+      case 3:
+        return "分享了作品"
+      
+      // 无消息
+      case 0:
+        return "快去给Ta打个招呼吧^.^"
+      default:
+        return ""
+    }
+  }
+
   // 卡片选中标志位
   const selectedId = defineModel('selectedId', {
     type: String,
@@ -67,7 +96,6 @@
 
 <style lang="css" scoped>
   .session-card {
-    width: calc(100% - 20px);
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.5rem;
@@ -76,12 +104,16 @@
     padding: 10px;
     border-radius: 20px;
     transition: all 0.3s ease-in-out;
+    border: 1.5px solid rgba(0,0,0,0.1);
+    border-top: none;
+    white-space: nowrap;
     .session-content {
       display: grid;
       grid-template-columns: auto;
       .session-name {
         display: grid;
         grid-template-columns: auto 1fr auto;
+        column-gap: 3rem;
         align-items: center;
         .name {
           grid-column: 1;
@@ -122,12 +154,13 @@
     }
   }
 
-  .session-card:hover,
-  .session-card.active {
+  .session-card.pin {
     background-color: var(--root-bg-gray);
   }
 
-  .session-card:hover {
-    transform: translateX(10px);
+  .session-card:hover,
+  .session-card.active
+  {
+    transform: translateX(2rem);
   }
 </style>

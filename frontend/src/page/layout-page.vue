@@ -80,6 +80,7 @@
       }
     }
     .right {
+      overflow: auto;
       height: 100%;
     }
   }

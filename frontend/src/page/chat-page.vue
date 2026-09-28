@@ -12,22 +12,39 @@
           :key="session.session.id"
           :sessionId="session.session.id"
           :sessionType="session.session.type"
+          :sessionIsPin="session.sessionMember.is_pin"
           :userId="session.user.id"
           :userAvatarUrl="session.user.avatar_url"
           :userName="session.user.name"
-          :latestMsg="session.latestMessage ? session.latestMessage.content : ''"
-          :msgTime="session.latestMessage ? session.latestMessage.created_at : ''"
+          :messageContent="session.latestMessage ? session.latestMessage.content : ''"
+          :messageTime="session.latestMessage ? session.latestMessage.created_at : ''"
+          :messageType="session.latestMessage ? session.latestMessage.type : 0"
           :unreadCount="session.unreadCount"
           @click="switchSession(session.session.id)"
         />
       </div>
-  </ScrollContainer>
+    </ScrollContainer>
     <div class="chat-panel" v-if="selectedSessionId !== ''">
+      <div class="message-top">
+        <div class="setting">
+          <AppIcon 
+            type="more"
+            class="setting-icon"
+            fill="black"
+            @click="isShwowSettingFloating = true"
+          />
+          <SelectFloating
+            v-model:show="isShwowSettingFloating"
+            class="setting-floating"
+            :options="settingOptions"
+            @click-option="clickSettingHandler"
+          />
+        </div>
+      </div>
       <ScrollContainer
         trigger-type="reverse-top"
         :load-more-callback="getMessages"
         ref="msgScrollRef"
-        :style="{ height: '100%', width: '100%' }"
       >
         <div
           class="chat-messages"
@@ -62,6 +79,8 @@
   import ChatSender from '@/component/chat/chat-sender.vue';
   import ScrollContainer from '@/component/common/scroll-container.vue';
   import ChatMessage from '@/component/chat/chat-message.vue';
+  import AppIcon from '@/component/common/AppIcon.vue';
+  import SelectFloating from '@/component/common/select-floating.vue';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { SessionSchema, MessageSchema } from '@/api/type.ext';
   import { EnhancedList } from '@/lib/list';
@@ -69,6 +88,7 @@
   import type { paths } from '@/api/gen';
   import { useRoute } from 'vue-router';
   import { globalReportModal } from '@/component/global';
+  import { ElMessage } from 'element-plus';
 
   const route = useRoute()
 
@@ -80,6 +100,18 @@
     (item) => item.message.id,
     10,
   ))
+
+  // 显示设置浮动框
+  const isShwowSettingFloating = ref(false)
+  // 设置选项
+  const settingOptions = [
+    { id: 1, text: '置顶聊天' },
+  ]
+
+  // 切换设置浮动框显示
+  const toggleSettingFloating = () => {
+    isShwowSettingFloating.value = !isShwowSettingFloating.value
+  }
 
   // 当前选中会话id
   const selectedSessionId = ref("");
@@ -157,6 +189,29 @@
     }
   }
 
+  // 点击设置选项
+  const clickSettingHandler = async (id: number) => {
+    switch (id) {
+      // 置顶聊天
+      case 1:
+        const session = sessions.value.get(selectedSessionId.value)
+        if (!session) return
+
+        session.sessionMember.is_pin = session.sessionMember.is_pin === 1 ? 0 : 1
+        await axiosProxy.post<
+          paths["/chat/pin/session"]["post"]["requestBody"]["content"]["application/json"],
+          undefined
+        >("/chat/pin/session", {
+          sessionMemberId: session.sessionMember.id,
+          isPin: session.sessionMember.is_pin
+        })
+        ElMessage("置顶成功")
+        break;
+      default:
+        break;
+    }
+  }
+
   onMounted(async () => {
     // 创建新会话(该接口会幂等返回已存在的会话)
     await onMountedCreateSession()
@@ -185,13 +240,14 @@
 <style scoped lang="css">
 .chat-page {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: auto 1fr;
   grid-template-rows: 100%;
 
   .sessions {
     height: auto;
     display: grid;
     grid-template-columns: 100%;
+    padding-right: 2rem;
     .title {
       font-size: large;
       padding: 2rem;
@@ -202,25 +258,44 @@
   
   .chat-panel {
     height: 100%;
-    padding-bottom: 1rem;
+    padding: 3rem;
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto 1fr auto;
     grid-template-columns: 100%;
-    justify-items: center;
+    .message-top {
+      display: grid;
+      grid-template-columns: auto;
+      justify-items: end;
+      .setting {
+        position: relative;
+        .setting-icon {
+          cursor: pointer;
+          width: 2rem;
+          height: 2rem;
+        }
+        .setting-floating {
+          left: 0;
+          top: 50%;
+          transform: translateX(-110%) translateY(-50%);
+        }
+      }
+    }
+
     .chat-messages {
       width: 100%;
       gap: 0.5rem;
-      padding: 1rem 3rem;
+      padding: 2rem 0;
       display: flex;
       flex-direction: column-reverse;
       justify-content: end;
       align-items: center;
     }
     .system {
-      grid-row: 2;
+      grid-row: 2 / span 2;
     }
     .chat-sender {
       width: 75%;
+      justify-self: center;
     }
   }
 }

@@ -19,6 +19,7 @@
         @clickOption="clickMenuItem"
         v-model:show="isShowSettingFloating"
         :options="settingItems"
+        class="setting-floating"
       />
     </div>
   </div>
@@ -108,6 +109,11 @@
     }
     .setting {
       position: relative;
+      .setting-floating {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%) translateX(100%);
+      }
     }
   }
 </style>

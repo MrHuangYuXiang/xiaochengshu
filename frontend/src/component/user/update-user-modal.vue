@@ -18,7 +18,7 @@
         <div class="label">简介</div>
         <AppInput type="textarea" placeholder="请输入简介" v-model="form.desc" :rows="4" ref="descInput" :rule="descValidator"></AppInput>
       </div>
-      <AppButton text="保存" @click="clickSave" />
+      <AppButton text="保存" @click="clickSave" color="default" />
     </div>
   </BaseModal>
 </template>
