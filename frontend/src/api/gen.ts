@@ -1037,8 +1037,11 @@ export interface paths {
                                     };
                                     3?: {
                                         work_id: string;
-                                        title: string;
-                                        cover_url: string;
+                                        work_title: string;
+                                        work_cover_url: string;
+                                        user_id: string;
+                                        user_name: string;
+                                        user_avatar_url: string;
                                     };
                                 };
                                 session_id: string;
@@ -1124,8 +1127,11 @@ export interface paths {
                                         };
                                         3?: {
                                             work_id: string;
-                                            title: string;
-                                            cover_url: string;
+                                            work_title: string;
+                                            work_cover_url: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_url: string;
                                         };
                                     };
                                     session_id: string;
@@ -1221,8 +1227,11 @@ export interface paths {
                             };
                             3?: {
                                 work_id: string;
-                                title: string;
-                                cover_url: string;
+                                work_title: string;
+                                work_cover_url: string;
+                                user_id: string;
+                                user_name: string;
+                                user_avatar_url: string;
                             };
                         };
                     };
@@ -1248,8 +1257,11 @@ export interface paths {
                                     };
                                     3?: {
                                         work_id: string;
-                                        title: string;
-                                        cover_url: string;
+                                        work_title: string;
+                                        work_cover_url: string;
+                                        user_id: string;
+                                        user_name: string;
+                                        user_avatar_url: string;
                                     };
                                 };
                                 session_id: string;
@@ -1319,8 +1331,11 @@ export interface paths {
                                         };
                                         3?: {
                                             work_id: string;
-                                            title: string;
-                                            cover_url: string;
+                                            work_title: string;
+                                            work_cover_url: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_url: string;
                                         };
                                     };
                                     session_id: string;
@@ -1582,8 +1597,11 @@ export interface components {
                     };
                     3?: {
                         work_id: string;
-                        title: string;
-                        cover_url: string;
+                        work_title: string;
+                        work_cover_url: string;
+                        user_id: string;
+                        user_name: string;
+                        user_avatar_url: string;
                     };
                 };
                 session_id: string;

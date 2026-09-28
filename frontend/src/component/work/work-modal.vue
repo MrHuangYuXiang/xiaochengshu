@@ -101,10 +101,14 @@
         </ScrollContainer>
         <div class="publish-form">
           <WorkShareFloating
+            v-if="work"
             v-model:show="isShowShareFloating"
-            :workId="work?.work.id || ''"
-            :title="work?.work.title || ''"
-            :coverUrl="work?.images[0]?.path || ''"
+            :workId="work.work.id"
+            :workTitle="work.work.title"
+            :workCoverUrl="work.images[0]!.path"
+            :userId="work.user.id"
+            :userName="work.user.name"
+            :userAvatarUrl="work.user.avatar_url"
           />
           <div :class="{'reply-content': true, 'focus': isInputFocus && replyTarget !== undefined}">
             回复{{ replyTarget?.replyUserName }} {{ replyTarget?.replyContent }} : 

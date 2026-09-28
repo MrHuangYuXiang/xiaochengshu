@@ -39,8 +39,11 @@
 
     const props = defineProps<{
         workId: string;
-        title: string;
-        coverUrl: string;
+        workTitle: string;
+        workCoverUrl: string;
+        userId: string;
+        userName: string;
+        userAvatarUrl: string;
     }>()
 
     const sessions = ref<EnhancedList<SessionSchema>>(new EnhancedList(
@@ -75,8 +78,11 @@
             payload: {
                 3: {
                     work_id: props.workId,
-                    title: props.title,
-                    cover_url: props.coverUrl,
+                    work_title: props.workTitle,
+                    work_cover_url: props.workCoverUrl,
+                    user_id: props.userId,
+                    user_name: props.userName,
+                    user_avatar_url: props.userAvatarUrl,
                 }
             },
         })

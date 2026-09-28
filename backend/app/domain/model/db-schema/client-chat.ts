@@ -49,7 +49,10 @@ export const MessagePayload = objectType({
     }).optional(),
     [ClientChatMessageTypeEnum.WORK_SHARE]: objectType({
         work_id: stringType,
-        title: stringType,
-        cover_url: stringType,
+        work_title: stringType,
+        work_cover_url: stringType,
+        user_id: stringType,
+        user_name: stringType,
+        user_avatar_url: stringType,
     }).optional(),
 })

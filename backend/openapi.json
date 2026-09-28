@@ -1666,17 +1666,29 @@
                               "type": "object",
                               "required": [
                                 "work_id",
-                                "title",
-                                "cover_url"
+                                "work_title",
+                                "work_cover_url",
+                                "user_id",
+                                "user_name",
+                                "user_avatar_url"
                               ],
                               "properties": {
                                 "work_id": {
                                   "type": "string"
                                 },
-                                "title": {
+                                "work_title": {
                                   "type": "string"
                                 },
-                                "cover_url": {
+                                "work_cover_url": {
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "type": "string"
+                                },
+                                "user_name": {
+                                  "type": "string"
+                                },
+                                "user_avatar_url": {
                                   "type": "string"
                                 }
                               }
@@ -1925,17 +1937,29 @@
                                     "type": "object",
                                     "required": [
                                       "work_id",
-                                      "title",
-                                      "cover_url"
+                                      "work_title",
+                                      "work_cover_url",
+                                      "user_id",
+                                      "user_name",
+                                      "user_avatar_url"
                                     ],
                                     "properties": {
                                       "work_id": {
                                         "type": "string"
                                       },
-                                      "title": {
+                                      "work_title": {
                                         "type": "string"
                                       },
-                                      "cover_url": {
+                                      "work_cover_url": {
+                                        "type": "string"
+                                      },
+                                      "user_id": {
+                                        "type": "string"
+                                      },
+                                      "user_name": {
+                                        "type": "string"
+                                      },
+                                      "user_avatar_url": {
                                         "type": "string"
                                       }
                                     }
@@ -2076,17 +2100,29 @@
                               "type": "object",
                               "required": [
                                 "work_id",
-                                "title",
-                                "cover_url"
+                                "work_title",
+                                "work_cover_url",
+                                "user_id",
+                                "user_name",
+                                "user_avatar_url"
                               ],
                               "properties": {
                                 "work_id": {
                                   "type": "string"
                                 },
-                                "title": {
+                                "work_title": {
                                   "type": "string"
                                 },
-                                "cover_url": {
+                                "work_cover_url": {
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "type": "string"
+                                },
+                                "user_name": {
+                                  "type": "string"
+                                },
+                                "user_avatar_url": {
                                   "type": "string"
                                 }
                               }
@@ -2203,17 +2239,29 @@
                         "type": "object",
                         "required": [
                           "work_id",
-                          "title",
-                          "cover_url"
+                          "work_title",
+                          "work_cover_url",
+                          "user_id",
+                          "user_name",
+                          "user_avatar_url"
                         ],
                         "properties": {
                           "work_id": {
                             "type": "string"
                           },
-                          "title": {
+                          "work_title": {
                             "type": "string"
                           },
-                          "cover_url": {
+                          "work_cover_url": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "string"
+                          },
+                          "user_name": {
+                            "type": "string"
+                          },
+                          "user_avatar_url": {
                             "type": "string"
                           }
                         }
@@ -2325,17 +2373,29 @@
                                     "type": "object",
                                     "required": [
                                       "work_id",
-                                      "title",
-                                      "cover_url"
+                                      "work_title",
+                                      "work_cover_url",
+                                      "user_id",
+                                      "user_name",
+                                      "user_avatar_url"
                                     ],
                                     "properties": {
                                       "work_id": {
                                         "type": "string"
                                       },
-                                      "title": {
+                                      "work_title": {
                                         "type": "string"
                                       },
-                                      "cover_url": {
+                                      "work_cover_url": {
+                                        "type": "string"
+                                      },
+                                      "user_id": {
+                                        "type": "string"
+                                      },
+                                      "user_name": {
+                                        "type": "string"
+                                      },
+                                      "user_avatar_url": {
                                         "type": "string"
                                       }
                                     }
@@ -2742,17 +2802,29 @@
                     "type": "object",
                     "required": [
                       "work_id",
-                      "title",
-                      "cover_url"
+                      "work_title",
+                      "work_cover_url",
+                      "user_id",
+                      "user_name",
+                      "user_avatar_url"
                     ],
                     "properties": {
                       "work_id": {
                         "type": "string"
                       },
-                      "title": {
+                      "work_title": {
                         "type": "string"
                       },
-                      "cover_url": {
+                      "work_cover_url": {
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "type": "string"
+                      },
+                      "user_name": {
+                        "type": "string"
+                      },
+                      "user_avatar_url": {
                         "type": "string"
                       }
                     }

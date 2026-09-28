@@ -65,7 +65,7 @@
   import { ref, useTemplateRef } from 'vue'
   import FormRadio from '@/component/form/form-radio.vue';
   import FormInput from '@/component/form/form-input.vue';
-  import AppSegment from '@/component/common/AppSegment.vue';
+  import AppSegment from '@/component/common/app-segment.vue';
   import FormButton from '@/component/form/form-button.vue';
   import AppIcon from '@/component/common/AppIcon.vue';
   import ImageSlider from '@/component/image/image-slider.vue';

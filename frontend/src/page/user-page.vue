@@ -8,53 +8,37 @@
     @close="enableFollowsModalShow = false"
   />
 
-  <ScrollContainer
-    :loadMoreCallback="loadMore" ref="scrollContainerRef"
-    trigger-type="bottom"
-  >
-    <div class="container">
-      <div class="top">
-        <div class="avatar"><UserAvatar width="10rem" :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
-        <div class="info">
-          <div class="name">
-            <div class="text">{{ user?.user.name }}</div>
-            <div class="btn-group" v-if="user?.user.id !== storage.initData.value?.user.id">
-              <FormButton color="orange" :text="formatFollowStatus(user?.user.is_follow || 0, user?.user.is_followed || 0)" @click="follow"/>
-              <FormButton color="default" text="私信" @click="redirectToChatPage" />
-            </div>
-          </div>
-          <div class="tag">
-            <div>{{ user?.user.gender === 1 ? "男" : "女" }}</div>
-            <div>{{ formatBirthday(user?.user.birthday || "") }}</div>
-          </div>
-          <div style="opacity: 0.5;font-size: 0.95rem;">{{ user?.user.desc }}</div>
-          <div class="follow">
-            <div @click="showFollowsModal('following', user!.user.id)">关注 {{ user?.followingCount }}</div>
-            <div @click="showFollowsModal('follower', user!.user.id)">粉丝 {{ user?.followerCount }}</div>
+  <div class="page-box">
+    <div class="top">
+      <div class="avatar"><UserAvatar width="10rem" :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
+      <div class="info">
+        <div class="name">
+          <div class="text">{{ user?.user.name }}</div>
+          <div class="btn-group" v-if="user?.user.id !== storage.initData.value?.user.id">
+            <FormButton color="orange" :text="formatFollowStatus(user?.user.is_follow || 0, user?.user.is_followed || 0)" @click="follow"/>
+            <FormButton color="default" text="私信" @click="redirectToChatPage" />
           </div>
         </div>
-      </div>
-      <div class="category">
-        <AppSegment
-          :fields="[{text: '我的', key: 'self'}, {text: '喜欢', key: 'like'}, {text: '收藏', key: 'collect'}]"
-          @changeField="changeWorksType"
-        >
-          <WorkGrid ref="workGridRef" />
-        </AppSegment>
+        <div class="tag">
+          <div>{{ user?.user.gender === 1 ? "男" : "女" }}</div>
+          <div>{{ formatBirthday(user?.user.birthday || "") }}</div>
+        </div>
+        <div style="opacity: 0.5;font-size: 0.95rem;">{{ user?.user.desc }}</div>
+        <div class="follow">
+          <div @click="showFollowsModal('following', user!.user.id)">关注 {{ user?.followingCount }}</div>
+          <div @click="showFollowsModal('follower', user!.user.id)">粉丝 {{ user?.followerCount }}</div>
+        </div>
       </div>
     </div>
-  </ScrollContainer>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, useTemplateRef } from 'vue'
+  import { ref } from 'vue'
   import { useRoute } from 'vue-router';
   import UserAvatar from '@/component/user/UserAvatar.vue'
-  import WorkGrid from '@/component/work/work-grid.vue'
-  import AppSegment from '@/component/common/AppSegment.vue';
   import FormButton from '@/component/form/form-button.vue';
   import FollowModal from '@/component/user/follow-modal.vue';
-  import ScrollContainer from '@/component/common/scroll-container.vue';
   import { onMounted } from 'vue';
   import { axiosProxy } from '@/api/axios';
   import { formatBirthday, formatFollowStatus } from '@/helper/format'
@@ -65,10 +49,6 @@
 
   const route = useRoute();
   const user = ref<paths["/user"]["get"]["responses"]["200"]["content"]["application/json"]>()
-  const workGridRef = useTemplateRef("workGridRef")
-  const scrollContainerRef = useTemplateRef("scrollContainerRef")
-  // 当前作品类型
-  const currentWorksType = ref("self")
   const enableFollowsModalShow = ref(false)
   // 关注/粉丝弹窗类型
   const followsModalType = ref("following")
@@ -83,23 +63,7 @@
     >(`/user`, {
       userId: currentUserId.value,
     })
-
-    // 注意: 这里需要等用户数据加载完成后,手动切换作品类型,确保userId传递成功
-    await changeWorksType(currentWorksType.value)
   })
-
-  // 作品类别分段器切换
-  const changeWorksType = async (key: string) => {
-    currentWorksType.value = key
-    const isEnd = await workGridRef.value!.changeWorksType(key, user.value?.user.id!)
-    scrollContainerRef.value!.reset()
-    if (isEnd) scrollContainerRef.value!.setEnd()
-  }
-
-  // 滚动底部加载更多回调
-  const loadMore = async () => {
-    return await workGridRef.value!.getMore()
-  }
 
   // 展示关注/粉丝列表弹窗
   const showFollowsModal = async (type: "following" | "follower", userId: string) => {
@@ -147,7 +111,7 @@
  </script>
 
 <style scoped lang="scss">
-  .container {
+  .page-box {
     margin-top: 5rem;
     display: flex;
     flex-direction: column;
