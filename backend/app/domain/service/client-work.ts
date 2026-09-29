@@ -60,7 +60,7 @@ export class ClientWorkService extends BaseService {
       as("collectSubQuery")
 
     const work = await db.select({
-      user: followRelationSubQuery._.selectedFields,
+      user: followRelationSubQuery.user,
       work: {
         ...getTableColumns(ClientWorkTable),
       },
@@ -71,7 +71,7 @@ export class ClientWorkService extends BaseService {
     }).
       from(ClientWorkTable).
       where(eq(ClientWorkTable.id, workId)).
-      leftJoin(followRelationSubQuery, eq(ClientWorkTable.user_id, followRelationSubQuery.id)).
+      leftJoin(followRelationSubQuery, eq(ClientWorkTable.user_id, followRelationSubQuery.user.id)).
       leftJoin(likeSubQuery, eq(ClientWorkTable.id, likeSubQuery.likeWorkId)).
       leftJoin(collectSubQuery, eq(ClientWorkTable.id, collectSubQuery.collectWorkId))
 

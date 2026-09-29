@@ -465,63 +465,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "user"
-                  ],
-                  "properties": {
-                    "user": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "created_at",
-                        "updated_at",
-                        "name",
-                        "desc",
-                        "birthday",
-                        "gender",
-                        "avatar_url",
-                        "is_complete_profile",
-                        "is_follow",
-                        "is_followed"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "desc": {
-                          "type": "string"
-                        },
-                        "birthday": {
-                          "type": "string"
-                        },
-                        "gender": {
-                          "type": "integer"
-                        },
-                        "avatar_url": {
-                          "type": "string"
-                        },
-                        "is_complete_profile": {
-                          "type": "integer"
-                        },
-                        "is_follow": {
-                          "type": "integer"
-                        },
-                        "is_followed": {
-                          "type": "integer"
-                        }
-                      }
-                    }
-                  }
+                  "required": [],
+                  "properties": {}
                 }
               }
             }
@@ -561,63 +506,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "user"
-                  ],
-                  "properties": {
-                    "user": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "created_at",
-                        "updated_at",
-                        "name",
-                        "desc",
-                        "birthday",
-                        "gender",
-                        "avatar_url",
-                        "is_complete_profile",
-                        "is_follow",
-                        "is_followed"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "desc": {
-                          "type": "string"
-                        },
-                        "birthday": {
-                          "type": "string"
-                        },
-                        "gender": {
-                          "type": "integer"
-                        },
-                        "avatar_url": {
-                          "type": "string"
-                        },
-                        "is_complete_profile": {
-                          "type": "integer"
-                        },
-                        "is_follow": {
-                          "type": "integer"
-                        },
-                        "is_followed": {
-                          "type": "integer"
-                        }
-                      }
-                    }
-                  }
+                  "required": [],
+                  "properties": {}
                 }
               }
             }

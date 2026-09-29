@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-  import BaseModal from '../common/BaseModal.vue';
+  import BaseModal from './BaseModal.vue';
   import AppButton from '../form/form-button.vue';
   import { globalErrorDialog } from '../global.ts';
   import { useRouter } from 'vue-router';

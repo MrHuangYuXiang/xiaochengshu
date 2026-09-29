@@ -61,12 +61,7 @@ export const getInitDataOutput = objectType({
 // 获取用户的关注/粉丝输入
 export const getUserFollowsInput = objectType({
     ...page,
-    /**
-     * 查询类型
-     * "following" 关注
-     * "follower" 粉丝
-     */
-    type: stringType,
+    type: stringType.refine((val) => ["following", "follower"].includes(val), { message: "非法的查询类型" }),
     userId: stringType
 })
 
@@ -79,22 +74,10 @@ export const getUserFollowsOutput = objectType({
 // 关注/取关用户输入
 export const followUserInput = objectType({
     userId: stringType,
-
-    // 是否关注了该用户
     isFollow: numberType,
-})
-
-// 关注/取关用户输出
-export const followUserOutput = objectType({
-    user: UserSchemaWithFollow,
 })
 
 // 移除粉丝输入
 export const removeFollowerInput = objectType({
     userId: stringType,
-})
-
-// 移除粉丝输出
-export const removeFollowerOutput = objectType({
-    user: UserSchemaWithFollow,
 })

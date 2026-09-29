@@ -29,8 +29,6 @@ import {
     getUserFollowsInput,
     getUserFollowsOutput,
     removeFollowerInput,
-    followUserOutput,
-    removeFollowerOutput,
 } from "./domain/model/dto/client-user.js"
 import { reportWorkInput, getReportTypesOutput, getReportDetailInput, getReportDetailOutput } from "./domain/model/dto/client-report.js"
 import express from "express"
@@ -100,8 +98,8 @@ export class Server implements ServerPort {
         this.registerHandler("POST", '/upload/user/avatar', null, null, clientUserService.uploadUserAvatar.bind(clientUserService)) // 上传头像
         this.registerHandler("POST", '/update/user/info', updateUserInfoInput, null, clientUserService.updateUserInfo.bind(clientUserService)) // 更新用户信息
         this.registerHandler("GET", '/user/follows', getUserFollowsInput, getUserFollowsOutput, clientUserService.getUserFollows.bind(clientUserService)) // 获取用户关注/粉丝
-        this.registerHandler("POST", '/follow/user', followUserInput, followUserOutput, clientUserService.followUser.bind(clientUserService)) // 关注用户
-        this.registerHandler("POST", '/remove/follower', removeFollowerInput, removeFollowerOutput, clientUserService.removeFollower.bind(clientUserService)) // 移除粉丝
+        this.registerHandler("POST", '/follow/user', followUserInput, null, clientUserService.followUser.bind(clientUserService)) // 关注用户
+        this.registerHandler("POST", '/remove/follower', removeFollowerInput, null, clientUserService.removeFollower.bind(clientUserService)) // 移除粉丝
 
         // 作品模块
         this.registerHandler("GET", '/work', getWorkDetailInput, getWorkDetailOutput, clientWorkService.getWorkDetail.bind(clientWorkService)) // 获取作品详情

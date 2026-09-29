@@ -33,11 +33,13 @@ export class BaseService {
 
         return current.tx.
             select({
-                ...getTableColumns(ClientUserTable),
-                // 当前用户是否关注该用户标志位
-                is_follow: sql<number>`CASE WHEN followTable1.id IS NULL THEN 0 ELSE 1 END`.as("isFollow"),
-                // 当前用户是否被该用户关注标志位
-                is_followed: sql<number>`CASE WHEN followTable2.id IS NULL THEN 0 ELSE 1 END`.as("isFollowed"),
+                user: {
+                    ...getTableColumns(ClientUserTable),
+                    // 当前用户是否关注该用户标志位
+                    is_follow: sql<number>`CASE WHEN followTable1.id IS NULL THEN 0 ELSE 1 END`.as("isFollow"),
+                    // 当前用户是否被该用户关注标志位
+                    is_followed: sql<number>`CASE WHEN followTable2.id IS NULL THEN 0 ELSE 1 END`.as("isFollowed"),
+                },
             }).
             from(ClientUserTable).
             leftJoin(followTableAlias1, and(

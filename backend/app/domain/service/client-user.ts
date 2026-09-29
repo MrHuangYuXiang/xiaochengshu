@@ -15,7 +15,6 @@ import {
     getUserFollowsInput,
     getUserFollowsOutput,
     removeFollowerInput,
-    followUserOutput,
 } from "../model/dto/client-user.js";
 import type { EnhancedResponse } from "../model/dto/index.js";
 import type { Request } from "express";
@@ -28,6 +27,7 @@ import { AppError } from "../../lib/app-error.js";
 import { getPageParams } from "../../helper/http.js";
 import { ClientChatMessageTypeEnum, ClientChatSessionTypeEnum } from "../model/enum/client-chat.js";
 import { FileExtEnum } from "../model/enum/file.js";
+import e from "express";
 
 // FIXME: 该服务下的接口需要重写加锁逻辑,锁需要放在事务外面,避免mvcc快照导致锁失效
 export class ClientUserService extends BaseService {
@@ -140,15 +140,15 @@ export class ClientUserService extends BaseService {
         const followRelationSubQuery = this.getFollowRelationSubQuery()
 
         const user = await current.tx.select({
-            user: followRelationSubQuery._.selectedFields,
-            "followingCount": current.tx.select({ "count": count(ClientFollowTable.id).as("followingCount") }).from(ClientFollowTable).where(eq(ClientFollowTable.follower_id, res.locals.query!.userId)).as("followingCount"),
-            "followerCount": current.tx.select({ "count": count(ClientFollowTable.id).as("followerCount") }).from(ClientFollowTable).where(eq(ClientFollowTable.following_id, res.locals.query!.userId)).as("followerCount"),
-            "workCount": current.tx.select({ "count": count(ClientWorkTable.id).as("workCount") }).from(ClientWorkTable).where(eq(ClientWorkTable.user_id, res.locals.query!.userId)).as("workCount"),
-            "likeCount": current.tx.select({ "count": count(ClientWorkLikeTable.id).as("likeCount") }).from(ClientWorkLikeTable).where(eq(ClientWorkLikeTable.user_id, res.locals.query!.userId)).as("likeCount"),
-            "collectCount": current.tx.select({ "count": count(ClientWorkCollectTable.id).as("collectCount") }).from(ClientWorkCollectTable).where(eq(ClientWorkCollectTable.user_id, res.locals.query!.userId)).as("collectCount"),
+            user: followRelationSubQuery.user,
+            followingCount: current.tx.select({ "count": count(ClientFollowTable.id).as("followingCount") }).from(ClientFollowTable).where(eq(ClientFollowTable.follower_id, res.locals.query!.userId)).as("followingCount"),
+            followerCount: current.tx.select({ "count": count(ClientFollowTable.id).as("followerCount") }).from(ClientFollowTable).where(eq(ClientFollowTable.following_id, res.locals.query!.userId)).as("followerCount"),
+            workCount: current.tx.select({ "count": count(ClientWorkTable.id).as("workCount") }).from(ClientWorkTable).where(eq(ClientWorkTable.user_id, res.locals.query!.userId)).as("workCount"),
+            likeCount: current.tx.select({ "count": count(ClientWorkLikeTable.id).as("likeCount") }).from(ClientWorkLikeTable).where(eq(ClientWorkLikeTable.user_id, res.locals.query!.userId)).as("likeCount"),
+            collectCount: current.tx.select({ "count": count(ClientWorkCollectTable.id).as("collectCount") }).from(ClientWorkCollectTable).where(eq(ClientWorkCollectTable.user_id, res.locals.query!.userId)).as("collectCount"),
         }).
             from(followRelationSubQuery).
-            where(eq(followRelationSubQuery.id, res.locals.query!.userId))
+            where(eq(followRelationSubQuery.user.id, res.locals.query!.userId))
 
         if (user.length == 0) {
             throw new AppError("用户不存在")
@@ -206,11 +206,11 @@ export class ClientUserService extends BaseService {
 
                 const users = await current.tx.
                     select({
-                        ...followRelationSubQuery._.selectedFields,
+                        ...followRelationSubQuery.user,
                     }).
                     from(ClientFollowTable).
                     where(eq(ClientFollowTable.follower_id, res.locals.query!.userId)).
-                    innerJoin(followRelationSubQuery, eq(followRelationSubQuery.id, ClientFollowTable.following_id)).
+                    innerJoin(followRelationSubQuery, eq(followRelationSubQuery.user.id, ClientFollowTable.following_id)).
                     orderBy(desc(ClientFollowTable.created_at)).
                     limit(page.limit).
                     offset(page.offset)
@@ -232,14 +232,15 @@ export class ClientUserService extends BaseService {
 
                 const users = await current.tx.
                     select({
-                        ...followRelationSubQuery._.selectedFields,
+                        ...followRelationSubQuery.user,
                     }).
                     from(ClientFollowTable).
                     where(eq(ClientFollowTable.following_id, res.locals.query!.userId)).
-                    innerJoin(followRelationSubQuery, eq(followRelationSubQuery.id, ClientFollowTable.follower_id)).
+                    innerJoin(followRelationSubQuery, eq(followRelationSubQuery.user.id, ClientFollowTable.follower_id)).
                     orderBy(desc(ClientFollowTable.created_at)).
                     limit(page.limit).
                     offset(page.offset)
+
                 res.json(getUserFollowsOutput.parse({
                     users,
                     count: followerCount[0]!.followerCount,
@@ -255,74 +256,28 @@ export class ClientUserService extends BaseService {
     async followUser(req: Request, res: EnhancedResponse<null, typeof followUserInput>) {
         const current = getCurrent()
 
-        switch (res.locals.body!.isFollow) {
-            case 0:
-                const user = await current.tx.
-                    select().
-                    from(ClientFollowTable).
-                    where(and(
-                        eq(ClientFollowTable.follower_id, current.payload.userId),
-                        eq(ClientFollowTable.following_id, res.locals.body!.userId),
-                    ))
-
-                // 关注用户
-                if (user.length !== 0) {
-                    throw new AppError("已关注该用户")
-                }
-
-                await current.tx.insert(ClientFollowTable).values({
-                    follower_id: current.payload.userId,
-                    following_id: res.locals.body!.userId,
-                })
-                break
-            case 1:
-                await current.tx.delete(ClientFollowTable).
-                    where(and(
-                        eq(ClientFollowTable.follower_id, current.payload.userId),
-                        eq(ClientFollowTable.following_id, res.locals.body!.userId),
-                    ))
-                break
-            default:
-                throw new AppError("关注状态错误")
+        if (res.locals.body!.isFollow === 1) {
+            await current.tx.insert(ClientFollowTable).values({
+                follower_id: current.payload.userId,
+                following_id: res.locals.body!.userId,
+            })
+        } else {
+            await current.tx.delete(ClientFollowTable).
+                where(and(
+                    eq(ClientFollowTable.follower_id, current.payload.userId),
+                    eq(ClientFollowTable.following_id, res.locals.body!.userId),
+                ))
         }
-
-        const user = await this.queryUserWithFollow(res.locals.body!.userId)
-        res.json(followUserOutput.parse({
-            user,
-        }))
     }
 
     // 移除粉丝
     async removeFollower(req: Request, res: EnhancedResponse<null, typeof removeFollowerInput>) {
         const current = getCurrent()
-
         await current.tx.
             delete(ClientFollowTable).
             where(and(
                 eq(ClientFollowTable.follower_id, res.locals.body!.userId),
                 eq(ClientFollowTable.following_id, current.payload.userId)
             ))
-
-        const user = await this.queryUserWithFollow(res.locals.body!.userId)
-        res.json(followUserOutput.parse({
-            user,
-        }))
-    }
-
-    async queryUserWithFollow(userId: string) {
-        const current = getCurrent()
-        const followRelationSubQuery = this.getFollowRelationSubQuery()
-
-
-        const user = await current.tx.
-            select({
-                ...followRelationSubQuery._.selectedFields,
-            }).
-            from(followRelationSubQuery).
-            where(eq(followRelationSubQuery.id, userId))
-        if (user[0] === undefined) {
-            throw new AppError("用户不存在")
-        }
-        return user[0]
     }
 }
