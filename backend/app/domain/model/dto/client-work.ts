@@ -102,16 +102,32 @@ export const createWorkCommentInput = objectType({
 // 创建评论输出
 export const createWorkCommentOutput = objectType(workCommentAggregate)
 
+// 作品互动公共输入字段
+export const workInteractInputFields = {
+    workId: stringType,
+    workTitle: stringType,
+    workCoverUrl: stringType,
+    workUserId: stringType,
+}
+
 // 点赞作品输入
 export const likeWorkInput = objectType({
-    workId: stringType,
+    ...workInteractInputFields,
     isLike: numberType,
 })
 
 // 收藏作品输入
 export const collectWorkInput = objectType({
-    workId: stringType,
+    ...workInteractInputFields,
     isCollect: numberType,
+})
+
+// 分享作品输入
+export const shareWorkInput = objectType({
+    ...workInteractInputFields,
+    workUserName: stringType,
+    workUserAvatarPath: stringType,
+    sessionId: stringType,
 })
 
 // 点赞/取消点赞作品评论输入

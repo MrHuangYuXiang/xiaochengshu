@@ -5,7 +5,7 @@ import { alias } from "drizzle-orm/mysql-core"
 import { ClientWorkCollectTable, ClientWorkCommentLikeTable, ClientWorkCommentTable, ClientWorkImageTable, ClientWorkLikeTable, ClientWorkTable } from "../model/db-schema/client-work.js"
 import type { FileStoragePort } from "../../port/file-storage-port.js"
 import type { ClientManagerPort } from "../../port/client-manager-port.js"
-import { ClientChatMessageTable, ClientChatSessionMemberTable, ClientChatSessionTable, MessagePayload } from "../model/db-schema/client-chat.js"
+import { ClientChatMessageTable, ClientChatSessionMemberTable, ClientChatSessionTable, DbChatMessagePayload } from "../model/db-schema/client-chat.js"
 import { v4 as uuidv4 } from "uuid";
 import { ClientChatSessionTypeEnum, ClientChatMessageTypeEnum } from "../model/enum/client-chat.js"
 import { ClientEventType, pushChatMessageClientEvent } from "../model/dto/client-event.js"
@@ -98,49 +98,49 @@ export class BaseService {
             where(eq(ClientWorkCommentLikeTable.work_id, workId))
     }
 
-    private async baseCreateSession(
-        type: ClientChatSessionTypeEnum,
-    ) {
-        const sessionId = uuidv4()
-        const current = getCurrent()
-
-        // 创建会话
-        await current.tx.insert(ClientChatSessionTable).values({
-            id: sessionId,
-            type: type,
-        })
-
-        return sessionId
-    }
-
-    private async baseCreateSessionMember(
-        members: typeof ClientChatSessionMemberTable.$inferInsert[],
-    ) {
-        const current = getCurrent()
-
-        // 创建会话成员
-        await current.tx.insert(ClientChatSessionMemberTable).values(members)
-    }
-
-
     /**
-     * 创建系统会话
+     * 创建默认会话(系统会话, 作品互动, 评论互动, 关注互动)
      */
-    async baseCreateSystemSession(
+    async baseCreateDefaultSession(
         userId: string,
     ) {
         const current = getCurrent()
+        const systemSessionId = uuidv4()
+        const workSessionId = uuidv4()
 
-        const sessionId = await this.baseCreateSession(ClientChatSessionTypeEnum.SYSTEM)
-        await current.tx.insert(ClientChatSessionMemberTable).values({
-            session_id: sessionId,
-            user_id: userId,
-            last_read_seq: 0,
-            other_user_id: userId,
-            is_pin: 0,
-        })
+        const sessions = [
+            // 系统会话
+            {
+                id: systemSessionId,
+                type: ClientChatSessionTypeEnum.SYSTEM,
+            },
+            // 作品互动会话
+            {
+                id: workSessionId,
+                type: ClientChatSessionTypeEnum.WORK_NOTICE,
+            }
+        ]
+        
+        // 对于默认会话,只包含一个会话成员并且为当前用户
+        const members = [
+            // 系统会话成员
+            {
+                session_id: systemSessionId,
+                user_id: userId,
+                other_user_id: userId,
+            },
+            // 作品互动会话成员
+            {
+                session_id: workSessionId,
+                user_id: userId,
+                other_user_id: userId,
+            }
+        ]
 
-        return { sessionId }
+        await current.tx.insert(ClientChatSessionTable).values(sessions)
+        await current.tx.insert(ClientChatSessionMemberTable).values(members)
+
+        return { sessionId: systemSessionId }
     }
 
     /** 
@@ -152,21 +152,23 @@ export class BaseService {
         userId1: string,
         userId2: string,
     ) {
-        const sessionId = await this.baseCreateSession(ClientChatSessionTypeEnum.PRIVATE)
-        await this.baseCreateSessionMember([
+        const current = getCurrent()
+
+        const sessionId = uuidv4()
+        await current.tx.insert(ClientChatSessionTable).values({
+            id: sessionId,
+            type: ClientChatSessionTypeEnum.PRIVATE,
+        })
+        await current.tx.insert(ClientChatSessionMemberTable).values([
             {
                 session_id: sessionId,
                 user_id: userId1,
-                last_read_seq: 0,
                 other_user_id: userId2,
-                is_pin: 0,
             },
             {
                 session_id: sessionId,
                 user_id: userId2,
-                last_read_seq: 0,
                 other_user_id: userId1,
-                is_pin: 0,
             },
         ])
 
@@ -178,7 +180,7 @@ export class BaseService {
      */
     async baseSendChatMessage(
         message: typeof ClientChatMessageTable.$inferInsert,
-        payload: z.infer<typeof MessagePayload>,
+        payload: z.infer<typeof DbChatMessagePayload>,
     ) {
         const current = getCurrent()
         const msgId = uuidv4()
@@ -206,10 +208,15 @@ export class BaseService {
             innerJoin(ClientChatSessionTable, eq(ClientChatSessionTable.id, ClientChatMessageTable.session_id)).
             where(eq(ClientChatMessageTable.id, msgId))
 
-        // 推送消息给对应用户客户端,系统消息将不会推送
+        /** 
+         * 推送消息给对应用户客户端
+         * 私聊会话将推送给该会话发送方以外的所有用户
+         * 其他默认会话将推送给本人
+         */
         for (const item of members) {
             if (
-                item.member.user_id !== message.user_id
+                item.member.user_id !== message.user_id ||
+                item.session.type !== ClientChatSessionTypeEnum.PRIVATE
             ) {
                 this.clientManager.push(
                     item.member.user_id,

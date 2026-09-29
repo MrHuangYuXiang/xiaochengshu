@@ -19,15 +19,19 @@ import {
   likeWorkCommentInput,
   createWorkCommentInput,
   deleteWorkInput,
+  workInteractInputFields,
 } from "../model/dto/client-work.js";
 import { v4 as uuidv4 } from "uuid";
 import { getPageParams } from "../../helper/http.js";
 import { handleRawSqlRes } from "../../helper/sql.js";
 import { FormParser, MemoryWritableStream, type FormFieldHeader } from "../../lib/framework-ext.js";
-import { AppError } from "../../lib/app-error.js";
+import { AppError, throwServerError, throwServerBusy } from "../../lib/app-error.js";
 import { WorkImageTypeEnum } from "../model/enum/client-work.js";
 import { FileExtEnum } from "../model/enum/file.js";
 import { getTableConfig } from "drizzle-orm/mysql-core";
+import { ClientChatMessageTypeEnum, ClientChatSessionTypeEnum } from "../model/enum/client-chat.js";
+import { ClientChatSessionMemberTable, ClientChatSessionTable, DbWorkNoticeMessagePayload } from "../model/db-schema/client-chat.js";
+import type z from "zod";
 
 export class ClientWorkService extends BaseService {
   /**
@@ -451,12 +455,20 @@ export class ClientWorkService extends BaseService {
   // 点赞作品
   async likeWork(req: Request, res: EnhancedResponse<null, typeof likeWorkInput>) {
     const current = getCurrent()
+    
+    // 点赞作品
     if (res.locals.body!.isLike) {
       await current.tx.insert(ClientWorkLikeTable).values({
         work_id: res.locals.body!.workId,
         user_id: current.payload.userId,
       })
-    } else {
+
+      // 发送互动消息
+      this.sendWorkMessage(res.locals.body!, ClientChatMessageTypeEnum.WORK_LIKE_NOTICE)
+    }
+    
+    // 取消点赞作品
+    else {
       await current.tx.delete(ClientWorkLikeTable).where(and(
         eq(ClientWorkLikeTable.work_id, res.locals.body!.workId),
         eq(ClientWorkLikeTable.user_id, current.payload.userId),
@@ -472,6 +484,9 @@ export class ClientWorkService extends BaseService {
         work_id: res.locals.body!.workId,
         user_id: current.payload.userId,
       })
+
+      // 发送互动消息
+      this.sendWorkMessage(res.locals.body!, ClientChatMessageTypeEnum.WORK_COLLECT_NOTICE)
     } else {
       await current.tx.delete(ClientWorkCollectTable).where(and(
         eq(ClientWorkCollectTable.work_id, res.locals.body!.workId),
@@ -494,6 +509,45 @@ export class ClientWorkService extends BaseService {
         eq(ClientWorkCommentLikeTable.comment_id, res.locals.body!.commentId),
         eq(ClientWorkCommentLikeTable.user_id, current.payload.userId),
       ))
+    }
+  }
+
+  // 发送作品互动消息
+  async sendWorkMessage(
+    reqParams: {[K in keyof typeof workInteractInputFields]: z.infer<typeof workInteractInputFields[K]>},
+    messageType: ClientChatMessageTypeEnum,
+  ) {
+    const current = getCurrent()
+
+    // 查询作品作者的作品互动会话
+    const session = await current.tx.
+      select().
+      from(ClientChatSessionTable).
+      leftJoin(ClientChatSessionMemberTable, eq(ClientChatSessionTable.id, ClientChatSessionMemberTable.session_id)).
+      where(and(
+        eq(ClientChatSessionMemberTable.user_id, reqParams.workUserId),
+        eq(ClientChatSessionTable.type, ClientChatSessionTypeEnum.WORK_NOTICE),
+      ))
+
+    // 发送互动消息
+    if (session[0]) {
+      this.baseSendChatMessage({
+        session_id: session[0].client_chat_session.id,
+        user_id: reqParams.workUserId,
+        type: messageType,
+        content: "",
+      }, {
+        [messageType]: {
+          work_id: reqParams.workId,
+          work_title: reqParams.workTitle,
+          work_cover_url: reqParams.workCoverUrl,
+          user_id: current.payload.userId,
+          user_name: current.payload.userName,
+          user_avatar_path: current.payload.userAvatarPath,
+        }
+      })
+    } else {
+      throwServerError()
     }
   }
 }

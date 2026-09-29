@@ -6,6 +6,8 @@ type BasePayload = {
 }
 
 type ClientPayload = {
+    userName: string,
+    userAvatarPath: string,
 }
 
 type AdminPayload = {
@@ -25,7 +27,7 @@ export const genClientJWT = (
     }
 
     if (!clientPayload) {
-        clientPayload = {}
+        clientPayload = { userName: "", userAvatarPath: "" }
     }
 
     return "Bearer " + jwt.sign({

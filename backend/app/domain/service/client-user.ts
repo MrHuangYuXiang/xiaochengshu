@@ -47,6 +47,8 @@ export class ClientUserService extends BaseService {
     async login(req: Request, res: EnhancedResponse<null, typeof loginInput>) {
         const current = getCurrent()
         let userId = ""
+        let userName = ""
+        let userAvatarPath = ""
 
         // TODO: 开发阶段默认验证码: 666666, 下同
         if (res.locals.body!.code != "666666") {
@@ -56,21 +58,25 @@ export class ClientUserService extends BaseService {
         const user = await current.tx.select().from(ClientUserTable).where(eq(ClientUserTable.phone_number, res.locals.body!.phoneNumber))
 
         // 用户不存在自动注册,以下为初始化逻辑
-        if (user.length == 0) {
+        if (!user[0]) {
             // 创建用户
             userId = uuidv4()
+            userName = res.locals.body!.phoneNumber
+            userAvatarPath = ""
             await current.tx.insert(ClientUserTable).values({
                 id: userId,
                 phone_number: res.locals.body!.phoneNumber,
-                name: res.locals.body!.phoneNumber,
+                name: userName,
                 desc: "",
                 birthday: new Date(),
                 gender: 1,
-                avatar_url: "",
+                avatar_url: userAvatarPath,
                 is_complete_profile: 0,
             })
-            // 创建系统会话
-            const ids = await this.baseCreateSystemSession(userId)
+            
+            // 创建默认会话
+            const ids = await this.baseCreateDefaultSession(userId)
+
             // 系统会话发送欢迎消息
             await this.baseSendChatMessage({
                 type: ClientChatMessageTypeEnum.TEXT,
@@ -78,12 +84,15 @@ export class ClientUserService extends BaseService {
                 session_id: ids.sessionId,
                 content: "小橙书欢迎你的加入!",
             }, { [ClientChatMessageTypeEnum.TEXT]: {} })
-        } else {
-            userId = user[0]!.id
+        } 
+        else {
+            userId = user[0].id
+            userName = user[0].name
+            userAvatarPath = user[0].avatar_url
         }
 
         res.json(loginOutput.parse({
-            token: genClientJWT({ userId }, {}),
+            token: genClientJWT({ userId }, { userName, userAvatarPath }),
         }))
     }
 
@@ -106,7 +115,7 @@ export class ClientUserService extends BaseService {
         // 后端维持心跳,同时续约jwt
         const n = setInterval(() => {
             this.clientManager.push(current.payload.userId, ClientEventType.heartbeat, heartbeatClientEvent.parse({
-                jwt: genClientJWT({ userId: current.payload.userId }, {}),
+                jwt: genClientJWT({ userId: current.payload.userId }, { userName: current.payload.userName, userAvatarPath: current.payload.userAvatarPath }),
             }))
         }, parseInt(getEnv("PERSISTENT_HEARTBEAT_INTERVAL")))
 

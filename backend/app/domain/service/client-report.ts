@@ -37,12 +37,12 @@ export class ClientReportService extends BaseService {
             ))
         if (sessionId[0]) {
             await this.baseSendChatMessage({
-                type: ClientChatMessageTypeEnum.REPORT_NOTIFICATION,
+                type: ClientChatMessageTypeEnum.REPORT_NOTICE,
                 user_id: sessionId[0].client_chat_session_member.other_user_id,
                 session_id: sessionId[0].client_chat_session.id,
                 content: "你的举报已受理,预计将在3个工作日内处理完毕,谢谢你对维护社区环境做出的贡献!",
             }, {
-                [ClientChatMessageTypeEnum.REPORT_NOTIFICATION]: {
+                [ClientChatMessageTypeEnum.REPORT_NOTICE]: {
                     report_id: reportId,
                 }
             })
