@@ -4,13 +4,13 @@
       :userId="props.userId" 
       :imgUrl="props.userAvatarUrl" 
       :width="props.avatarSize"
-      />
+    />
     <div class="name">{{ props.userName }}</div>
     <AppButton
       class="btn"
-      v-if="props.userId !== storage.initData.value?.user.id"
+      v-if="props.isShowBtn"
       :text="props.btnText"
-      color="default"
+      :color="props.btnColor"
       @click="emits('clickBtn')"
     />
   </div>
@@ -19,15 +19,20 @@
 <script setup lang="ts">
   import UserAvatar from './UserAvatar.vue';
   import AppButton from '../form/form-button.vue';
-  import { storage } from '@/storage.ts';
 
-  const props = defineProps<{
+  const props = withDefaults(defineProps<{
     userId: string,
     userName: string,
     userAvatarUrl: string,
-    avatarSize: string,
+    avatarSize?: string,
+    isShowBtn?: boolean,
     btnText: string,
-  }>()
+    btnColor?: "default" | "orange",
+  }>(), {
+    isShowBtn: true,
+    btnColor: "default",
+    avatarSize: "1rem",
+  })
 
   const emits = defineEmits<{
     (e: 'clickBtn'): void
@@ -36,7 +41,6 @@
 
 <style scoped lang="scss">
   .user-card {
-    padding: 1rem;
     display: grid;
     grid-template-columns: auto auto 1fr auto;
     grid-template-rows: auto;

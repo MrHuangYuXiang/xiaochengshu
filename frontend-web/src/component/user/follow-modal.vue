@@ -1,20 +1,35 @@
 <template>
-  <BaseModal v-model:show="enableShow">
+  <BaseModal
+    width="auto"
+    height="90vh"
+    v-model:show="globalFollowModal.isShow.value"
+  >
     <ScrollContainer
       ref="scrollContainerRef"
       :load-more-callback="getUserFollows"
       trigger-type="bottom"
+      class="scroll"
     >
       <div class="follows-modal">
-        <div class="top">{{ type === "following" ? "关注" : "粉丝" }} {{ `(${allCount})` }}</div>
+        <div class="top">{{ globalFollowModal.type.value === "following" ? "关注" : "粉丝" }} {{ `(${allCount})` }}</div>
         <div v-for="user in users" :key="user.id">
           <UserFollowCard
+            v-if="globalFollowModal.type.value === 'following' || globalFollowModal.userId.value !== storage.initData.value?.user.id"
             :userId="user.id"
             :userName="user.name"
             :userAvatarUrl="user.avatar_url"
             avatarSize="2rem"
             :isFollow="user.is_follow"
             :isFollowed="user.is_followed"
+            :followCallback="followUser"
+          />
+          <UserCard
+            v-else
+            :userId="user.id"
+            :userName="user.name"
+            :userAvatarUrl="user.avatar_url"
+            btn-text="移除粉丝"
+            @click-btn="removeFollower(user.id)"
           />
         </div>
       </div>
@@ -24,32 +39,17 @@
 
 <script setup lang="ts">
   import UserFollowCard from './user-follow-card.vue';
+  import UserCard from './user-card.vue';
   import ScrollContainer from '../common/scroll-container.vue';
-  import { onMounted, ref, useTemplateRef } from 'vue';
+  import { ref } from 'vue';
   import BaseModal from '../common/BaseModal.vue';
   import { axiosProxy } from '@/api/axios.ts';
   import type { paths } from '@/api/gen.ts';
   import { EnhancedList } from '@/lib/list.ts';
+  import { globalFollowModal } from '../global.ts';
+import { ElMessage } from 'element-plus';
+import { storage } from '@/storage.ts';
 
-  const props = defineProps({
-    /**
-     * 弹窗类型
-     * following: 关注
-     * follower: 粉丝
-     */
-    type: {
-      type: String,
-      default: "following",
-    },
-    userId: {
-      type: String,
-      default: "",
-    }
-  })
-
-  const enableShow = defineModel<boolean>("show")
-
-  const scrollContainerRef = useTemplateRef("scrollContainerRef")
   const users = ref<EnhancedList<
     paths["/user/follows"]["get"]["responses"]["200"]["content"]["application/json"]["users"][number]
     >>(
@@ -70,8 +70,8 @@
       >(`/user/follows`, {
         page: currentPage,
         pageSize: pageSize,
-        type: props.type,
-        userId: props.userId,
+        type: globalFollowModal.type.value,
+        userId: globalFollowModal.userId.value,
       })
       allCount.value = res.count
       return res.users
@@ -79,25 +79,42 @@
     return users.value.isEnd
   }
 
-  // 挂载后获取关注/粉丝信息
-  onMounted(async () => {
-    await getUserFollows()
-  })
+  // 关注用户
+  const followUser = (userId: string) => {
+    const user = users.value.get(userId)
+    if (user) {
+      user.is_follow = user.is_follow === 0 ? 1 : 0
+      return user.is_follow
+    }
+    return 0
+  }
+
+  // 移除粉丝
+  const removeFollower = async (userId: string) => {
+    await axiosProxy.get<
+      paths["/remove/follower"]["post"]["requestBody"]["content"]["application/json"],
+      undefined
+    >(`/user/follows`, {
+      userId: userId,
+    })
+    users.value.delete(userId)
+    ElMessage("移除成功")
+  }
 </script>
 
 <style scoped lang="scss">
-  .follows-modal {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 50px;
-    gap: 10px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    .top {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 20px;
+  .scroll {
+    height: 100%;
+    .follows-modal {
+      display: grid;
+      padding: 2rem;
+      grid-template-columns: minmax(15vw, auto);
+      grid-template-rows: auto;
+      .top {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
     }
   }
 </style>

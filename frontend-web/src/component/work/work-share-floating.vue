@@ -18,7 +18,7 @@
                 :userAvatarUrl="session.user.avatar_url"
                 avatarSize="2rem"
                 btnText="分享"
-                @click-btn="shareWork(session.session.id)"
+                @clickBtn="shareWork(session.session.id)"
             >
             </UserCard>
         </div>
@@ -51,7 +51,7 @@
         5,
     ))
     const isShow = defineModel<boolean>('show');
-    
+
     // 获取当前用户会话
     const getSessions = async() => {
         await sessions.value.pagePush(async (currentPage, pageSize) => {
@@ -114,6 +114,7 @@
             padding-top: 1rem;
             display: grid;
             grid-template-columns: 1fr;
+            row-gap: 1rem;
             padding-bottom: 0.5rem;
         }
     }

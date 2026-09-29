@@ -1,13 +1,4 @@
 <template>
-  <!-- 关注/粉丝列表弹窗 -->
-  <FollowModal
-    v-if="enableFollowsModalShow"
-    width="30vw"
-    :type="followsModalType"
-    :userId="user?.user.id"
-    @close="enableFollowsModalShow = false"
-  />
-
   <div class="page-box">
     <div class="top">
       <div class="avatar"><UserAvatar width="10rem" :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
@@ -15,7 +6,6 @@
         <div class="name">
           <div class="text">{{ user?.user.name }}</div>
           <div class="btn-group" v-if="user?.user.id !== storage.initData.value?.user.id">
-            <FormButton color="orange" :text="formatFollowStatus(user?.user.is_follow || 0, user?.user.is_followed || 0)" @click="follow"/>
             <FormButton color="default" text="私信" @click="redirectToChatPage" />
           </div>
         </div>
@@ -25,8 +15,18 @@
         </div>
         <div style="opacity: 0.5;font-size: 0.95rem;">{{ user?.user.desc }}</div>
         <div class="follow">
-          <div @click="showFollowsModal('following', user!.user.id)">关注 {{ user?.followingCount }}</div>
-          <div @click="showFollowsModal('follower', user!.user.id)">粉丝 {{ user?.followerCount }}</div>
+          <div
+            v-if="user"
+            @click="globalFollowModal.show('following', user.user.id)"
+          >
+            关注 {{ user?.followingCount }}
+          </div>
+          <div
+            v-if="user"
+            @click="globalFollowModal.show('follower', user.user.id)"
+          >
+            粉丝 {{ user?.followerCount }}
+          </div>
         </div>
       </div>
     </div>
@@ -38,20 +38,17 @@
   import { useRoute } from 'vue-router';
   import UserAvatar from '@/component/user/UserAvatar.vue'
   import FormButton from '@/component/form/form-button.vue';
-  import FollowModal from '@/component/user/follow-modal.vue';
   import { onMounted } from 'vue';
   import { axiosProxy } from '@/api/axios';
-  import { formatBirthday, formatFollowStatus } from '@/helper/format'
+  import { formatBirthday } from '@/helper/format'
   import type { paths } from '@/api/gen'
   import { storage } from '@/storage';
   import { ElMessage } from 'element-plus';
   import router from '@/router';
+  import { globalFollowModal } from '@/component/global'; 
 
   const route = useRoute();
   const user = ref<paths["/user"]["get"]["responses"]["200"]["content"]["application/json"]>()
-  const enableFollowsModalShow = ref(false)
-  // 关注/粉丝弹窗类型
-  const followsModalType = ref("following")
 
   // 挂载钩子
   onMounted(async () => {
@@ -65,29 +62,8 @@
     })
   })
 
-  // 展示关注/粉丝列表弹窗
-  const showFollowsModal = async (type: "following" | "follower", userId: string) => {
-    followsModalType.value = type
-    enableFollowsModalShow.value = true
-  }
-
   // 关注用户
   const follow = async () => {
-    await axiosProxy.post<
-    paths["/follow/user"]["post"]["requestBody"]["content"]["application/json"],
-    null
-    >(`/follow/user`, {
-      userId: user.value?.user.id!,
-      isFollow: user.value?.user.is_follow!,
-    })
-
-    user.value = await axiosProxy.get<
-    paths["/user"]["get"]["parameters"]["query"],
-    paths["/user"]["get"]["responses"]["200"]["content"]["application/json"]
-    >(`/user`, {
-      userId: user.value?.user.id!,
-    })
-
     ElMessage("操作成功")
   }
 

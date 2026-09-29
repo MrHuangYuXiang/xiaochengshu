@@ -139,6 +139,24 @@ class GlobalWorkReportModal extends GlobalBase {
   }
 }
 
+// 关注/粉丝弹窗
+class GlobalFollowModal extends GlobalBase {
+  public type: Ref<string>
+  public userId: Ref<string>
+
+  constructor() {
+    super()
+    this.type = ref("following")
+    this.userId = ref("")
+  }
+
+  show(type: "following" | "follower", userId: string) {
+    this.isShow.value = true
+    this.type.value = type
+    this.userId.value = userId
+  }
+}
+
 class GlobalUpdateUserModal extends GlobalBase {
 }
 
@@ -149,3 +167,4 @@ export const globalErrorDialog = new GlobalErrorDialog()
 export const globalWorkModal = new GlobalWorkModal()
 export const globalReportModal = new GlobalReportModal()
 export const globalWorkReportModal = new GlobalWorkReportModal()
+export const globalFollowModal = new GlobalFollowModal()

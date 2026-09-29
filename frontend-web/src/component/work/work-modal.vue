@@ -24,12 +24,14 @@
         <!-- 用户信息 -->
         <UserFollowCard
           class="user"
-          :user-id="work?.user?.id || ''"
-          :user-name="work?.user?.name || ''"
-          :user-avatar-url="work?.user?.avatar_url || ''"
+          v-if="work"
+          :user-id="work.user.id"
+          :user-name="work.user.name"
+          :user-avatar-url="work.user.avatar_url"
           avatarSize="3rem"
-          :is-follow="work?.user?.is_follow || 0"
-          :is-followed="work?.user?.is_followed || 0"
+          :is-follow="work.user.is_follow"
+          :is-followed="work.user.is_followed"
+          :follow-callback="followCallback"
         />
 
         <!-- 作品内容以及评论 -->
@@ -364,6 +366,15 @@
     ElMessage(comment.isLiked === 1 ? "点赞成功" : "取消点赞成功")
   }
 
+  // 关注用户回调
+  const followCallback = () => {
+    if (work.value) {
+      work.value.user.is_follow = work.value?.user.is_follow === 1 ? 0 : 1
+      return work.value?.user.is_follow
+    }
+    return 0
+  }
+
   // 挂载后加载作品
   onMounted(async () => {
     if (!globalWorkModal.isShow.value) return
@@ -394,6 +405,7 @@
       grid-template-rows: auto 1fr auto;
       grid-template-columns: 100%;
       .user {
+        padding: 1rem;
         border-bottom: 1px solid #e5e5e5;
       }
 

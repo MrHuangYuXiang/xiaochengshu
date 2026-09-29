@@ -108,11 +108,6 @@
     { id: 1, text: '置顶聊天' },
   ]
 
-  // 切换设置浮动框显示
-  const toggleSettingFloating = () => {
-    isShwowSettingFloating.value = !isShwowSettingFloating.value
-  }
-
   // 当前选中会话id
   const selectedSessionId = ref("");
   const msgScrollRef = useTemplateRef("msgScrollRef")
@@ -240,7 +235,7 @@
 <style scoped lang="css">
 .chat-page {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 1fr 3fr;
   grid-template-rows: 100%;
 
   .sessions {
