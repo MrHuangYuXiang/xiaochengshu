@@ -20,6 +20,7 @@ import {
   createWorkCommentInput,
   deleteWorkInput,
   workInteractInputFields,
+  shareWorkInput,
 } from "../model/dto/client-work.js";
 import { v4 as uuidv4 } from "uuid";
 import { getPageParams } from "../../helper/http.js";
@@ -464,7 +465,7 @@ export class ClientWorkService extends BaseService {
       })
 
       // 发送互动消息
-      this.sendWorkMessage(res.locals.body!, ClientChatMessageTypeEnum.WORK_LIKE_NOTICE)
+      await this.sendInteractionMessage(res.locals.body!, ClientChatMessageTypeEnum.WORK_LIKE_NOTICE)
     }
     
     // 取消点赞作品
@@ -486,13 +487,41 @@ export class ClientWorkService extends BaseService {
       })
 
       // 发送互动消息
-      this.sendWorkMessage(res.locals.body!, ClientChatMessageTypeEnum.WORK_COLLECT_NOTICE)
+      await this.sendInteractionMessage(res.locals.body!, ClientChatMessageTypeEnum.WORK_COLLECT_NOTICE)
     } else {
       await current.tx.delete(ClientWorkCollectTable).where(and(
         eq(ClientWorkCollectTable.work_id, res.locals.body!.workId),
         eq(ClientWorkCollectTable.user_id, current.payload.userId),
       ))
     }
+  }
+
+  // 分享作品
+  async shareWork(req: Request, res: EnhancedResponse<null, typeof shareWorkInput>) {
+    const current = getCurrent()
+
+    // 向目标会话发送分享消息
+    await this.baseSendChatMessage({
+      session_id: res.locals.body!.sessionId,
+      user_id: current.payload.userId,
+      type: ClientChatMessageTypeEnum.WORK_SHARE,
+      content: "",
+    }, {
+      [ClientChatMessageTypeEnum.WORK_SHARE]: {
+        work_id: res.locals.body!.workId,
+        work_title: res.locals.body!.workTitle,
+        work_cover_url: res.locals.body!.workCoverUrl,
+        work_user_id: res.locals.body!.workUserId,
+        work_user_name: res.locals.body!.workUserName,
+        work_user_avatar_path: res.locals.body!.workUserAvatarPath,
+      }
+    })
+
+    // 向作品作者发送互动消息
+    await this.sendInteractionMessage(
+      res.locals.body!,
+      ClientChatMessageTypeEnum.WORK_FORWARD_NOTICE,
+    )
   }
 
   // 点赞评论
@@ -512,8 +541,8 @@ export class ClientWorkService extends BaseService {
     }
   }
 
-  // 发送作品互动消息
-  async sendWorkMessage(
+  // 发送互动消息
+  async sendInteractionMessage(
     reqParams: {[K in keyof typeof workInteractInputFields]: z.infer<typeof workInteractInputFields[K]>},
     messageType: ClientChatMessageTypeEnum,
   ) {
@@ -526,7 +555,7 @@ export class ClientWorkService extends BaseService {
       leftJoin(ClientChatSessionMemberTable, eq(ClientChatSessionTable.id, ClientChatSessionMemberTable.session_id)).
       where(and(
         eq(ClientChatSessionMemberTable.user_id, reqParams.workUserId),
-        eq(ClientChatSessionTable.type, ClientChatSessionTypeEnum.WORK_NOTICE),
+        eq(ClientChatSessionTable.type, ClientChatSessionTypeEnum.INTERACTION),
       ))
 
     // 发送互动消息

@@ -83,6 +83,8 @@ export const middlewareWrapper = (
 const authMiddleware = (req: Request, res: Response): Payload => {
     const defaultPayload: Payload = {
         userId: "",
+        userName: "",
+        userAvatarPath: "",
         adminEmployeeId: "",
         adminRole: 0
     }

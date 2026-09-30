@@ -114,10 +114,10 @@ export class BaseService {
                 id: systemSessionId,
                 type: ClientChatSessionTypeEnum.SYSTEM,
             },
-            // 作品互动会话
+            // 互动会话
             {
                 id: workSessionId,
-                type: ClientChatSessionTypeEnum.WORK_NOTICE,
+                type: ClientChatSessionTypeEnum.INTERACTION,
             }
         ]
         

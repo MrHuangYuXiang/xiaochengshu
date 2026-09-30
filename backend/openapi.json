@@ -964,10 +964,22 @@
                 "type": "object",
                 "required": [
                   "workId",
+                  "workTitle",
+                  "workCoverUrl",
+                  "workUserId",
                   "isLike"
                 ],
                 "properties": {
                   "workId": {
+                    "type": "string"
+                  },
+                  "workTitle": {
+                    "type": "string"
+                  },
+                  "workCoverUrl": {
+                    "type": "string"
+                  },
+                  "workUserId": {
                     "type": "string"
                   },
                   "isLike": {
@@ -1005,14 +1017,87 @@
                 "type": "object",
                 "required": [
                   "workId",
+                  "workTitle",
+                  "workCoverUrl",
+                  "workUserId",
                   "isCollect"
                 ],
                 "properties": {
                   "workId": {
                     "type": "string"
                   },
+                  "workTitle": {
+                    "type": "string"
+                  },
+                  "workCoverUrl": {
+                    "type": "string"
+                  },
+                  "workUserId": {
+                    "type": "string"
+                  },
                   "isCollect": {
                     "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/share/work": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workId",
+                  "workTitle",
+                  "workCoverUrl",
+                  "workUserId",
+                  "workUserName",
+                  "workUserAvatarPath",
+                  "sessionId"
+                ],
+                "properties": {
+                  "workId": {
+                    "type": "string"
+                  },
+                  "workTitle": {
+                    "type": "string"
+                  },
+                  "workCoverUrl": {
+                    "type": "string"
+                  },
+                  "workUserId": {
+                    "type": "string"
+                  },
+                  "workUserName": {
+                    "type": "string"
+                  },
+                  "workUserAvatarPath": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string"
                   }
                 }
               }
@@ -1558,9 +1643,40 @@
                                 "work_id",
                                 "work_title",
                                 "work_cover_url",
+                                "work_user_id",
+                                "work_user_name",
+                                "work_user_avatar_path"
+                              ],
+                              "properties": {
+                                "work_id": {
+                                  "type": "string"
+                                },
+                                "work_title": {
+                                  "type": "string"
+                                },
+                                "work_cover_url": {
+                                  "type": "string"
+                                },
+                                "work_user_id": {
+                                  "type": "string"
+                                },
+                                "work_user_name": {
+                                  "type": "string"
+                                },
+                                "work_user_avatar_path": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "4": {
+                              "type": "object",
+                              "required": [
+                                "work_id",
+                                "work_title",
+                                "work_cover_url",
                                 "user_id",
                                 "user_name",
-                                "user_avatar_url"
+                                "user_avatar_path"
                               ],
                               "properties": {
                                 "work_id": {
@@ -1578,7 +1694,69 @@
                                 "user_name": {
                                   "type": "string"
                                 },
-                                "user_avatar_url": {
+                                "user_avatar_path": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "5": {
+                              "type": "object",
+                              "required": [
+                                "work_id",
+                                "work_title",
+                                "work_cover_url",
+                                "user_id",
+                                "user_name",
+                                "user_avatar_path"
+                              ],
+                              "properties": {
+                                "work_id": {
+                                  "type": "string"
+                                },
+                                "work_title": {
+                                  "type": "string"
+                                },
+                                "work_cover_url": {
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "type": "string"
+                                },
+                                "user_name": {
+                                  "type": "string"
+                                },
+                                "user_avatar_path": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "6": {
+                              "type": "object",
+                              "required": [
+                                "work_id",
+                                "work_title",
+                                "work_cover_url",
+                                "user_id",
+                                "user_name",
+                                "user_avatar_path"
+                              ],
+                              "properties": {
+                                "work_id": {
+                                  "type": "string"
+                                },
+                                "work_title": {
+                                  "type": "string"
+                                },
+                                "work_cover_url": {
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "type": "string"
+                                },
+                                "user_name": {
+                                  "type": "string"
+                                },
+                                "user_avatar_path": {
                                   "type": "string"
                                 }
                               }
@@ -1829,9 +2007,40 @@
                                       "work_id",
                                       "work_title",
                                       "work_cover_url",
+                                      "work_user_id",
+                                      "work_user_name",
+                                      "work_user_avatar_path"
+                                    ],
+                                    "properties": {
+                                      "work_id": {
+                                        "type": "string"
+                                      },
+                                      "work_title": {
+                                        "type": "string"
+                                      },
+                                      "work_cover_url": {
+                                        "type": "string"
+                                      },
+                                      "work_user_id": {
+                                        "type": "string"
+                                      },
+                                      "work_user_name": {
+                                        "type": "string"
+                                      },
+                                      "work_user_avatar_path": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "4": {
+                                    "type": "object",
+                                    "required": [
+                                      "work_id",
+                                      "work_title",
+                                      "work_cover_url",
                                       "user_id",
                                       "user_name",
-                                      "user_avatar_url"
+                                      "user_avatar_path"
                                     ],
                                     "properties": {
                                       "work_id": {
@@ -1849,7 +2058,69 @@
                                       "user_name": {
                                         "type": "string"
                                       },
-                                      "user_avatar_url": {
+                                      "user_avatar_path": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "5": {
+                                    "type": "object",
+                                    "required": [
+                                      "work_id",
+                                      "work_title",
+                                      "work_cover_url",
+                                      "user_id",
+                                      "user_name",
+                                      "user_avatar_path"
+                                    ],
+                                    "properties": {
+                                      "work_id": {
+                                        "type": "string"
+                                      },
+                                      "work_title": {
+                                        "type": "string"
+                                      },
+                                      "work_cover_url": {
+                                        "type": "string"
+                                      },
+                                      "user_id": {
+                                        "type": "string"
+                                      },
+                                      "user_name": {
+                                        "type": "string"
+                                      },
+                                      "user_avatar_path": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "6": {
+                                    "type": "object",
+                                    "required": [
+                                      "work_id",
+                                      "work_title",
+                                      "work_cover_url",
+                                      "user_id",
+                                      "user_name",
+                                      "user_avatar_path"
+                                    ],
+                                    "properties": {
+                                      "work_id": {
+                                        "type": "string"
+                                      },
+                                      "work_title": {
+                                        "type": "string"
+                                      },
+                                      "work_cover_url": {
+                                        "type": "string"
+                                      },
+                                      "user_id": {
+                                        "type": "string"
+                                      },
+                                      "user_name": {
+                                        "type": "string"
+                                      },
+                                      "user_avatar_path": {
                                         "type": "string"
                                       }
                                     }
@@ -1992,9 +2263,40 @@
                                 "work_id",
                                 "work_title",
                                 "work_cover_url",
+                                "work_user_id",
+                                "work_user_name",
+                                "work_user_avatar_path"
+                              ],
+                              "properties": {
+                                "work_id": {
+                                  "type": "string"
+                                },
+                                "work_title": {
+                                  "type": "string"
+                                },
+                                "work_cover_url": {
+                                  "type": "string"
+                                },
+                                "work_user_id": {
+                                  "type": "string"
+                                },
+                                "work_user_name": {
+                                  "type": "string"
+                                },
+                                "work_user_avatar_path": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "4": {
+                              "type": "object",
+                              "required": [
+                                "work_id",
+                                "work_title",
+                                "work_cover_url",
                                 "user_id",
                                 "user_name",
-                                "user_avatar_url"
+                                "user_avatar_path"
                               ],
                               "properties": {
                                 "work_id": {
@@ -2012,7 +2314,69 @@
                                 "user_name": {
                                   "type": "string"
                                 },
-                                "user_avatar_url": {
+                                "user_avatar_path": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "5": {
+                              "type": "object",
+                              "required": [
+                                "work_id",
+                                "work_title",
+                                "work_cover_url",
+                                "user_id",
+                                "user_name",
+                                "user_avatar_path"
+                              ],
+                              "properties": {
+                                "work_id": {
+                                  "type": "string"
+                                },
+                                "work_title": {
+                                  "type": "string"
+                                },
+                                "work_cover_url": {
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "type": "string"
+                                },
+                                "user_name": {
+                                  "type": "string"
+                                },
+                                "user_avatar_path": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "6": {
+                              "type": "object",
+                              "required": [
+                                "work_id",
+                                "work_title",
+                                "work_cover_url",
+                                "user_id",
+                                "user_name",
+                                "user_avatar_path"
+                              ],
+                              "properties": {
+                                "work_id": {
+                                  "type": "string"
+                                },
+                                "work_title": {
+                                  "type": "string"
+                                },
+                                "work_cover_url": {
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "type": "string"
+                                },
+                                "user_name": {
+                                  "type": "string"
+                                },
+                                "user_avatar_path": {
                                   "type": "string"
                                 }
                               }
@@ -2131,9 +2495,40 @@
                           "work_id",
                           "work_title",
                           "work_cover_url",
+                          "work_user_id",
+                          "work_user_name",
+                          "work_user_avatar_path"
+                        ],
+                        "properties": {
+                          "work_id": {
+                            "type": "string"
+                          },
+                          "work_title": {
+                            "type": "string"
+                          },
+                          "work_cover_url": {
+                            "type": "string"
+                          },
+                          "work_user_id": {
+                            "type": "string"
+                          },
+                          "work_user_name": {
+                            "type": "string"
+                          },
+                          "work_user_avatar_path": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "4": {
+                        "type": "object",
+                        "required": [
+                          "work_id",
+                          "work_title",
+                          "work_cover_url",
                           "user_id",
                           "user_name",
-                          "user_avatar_url"
+                          "user_avatar_path"
                         ],
                         "properties": {
                           "work_id": {
@@ -2151,7 +2546,69 @@
                           "user_name": {
                             "type": "string"
                           },
-                          "user_avatar_url": {
+                          "user_avatar_path": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "5": {
+                        "type": "object",
+                        "required": [
+                          "work_id",
+                          "work_title",
+                          "work_cover_url",
+                          "user_id",
+                          "user_name",
+                          "user_avatar_path"
+                        ],
+                        "properties": {
+                          "work_id": {
+                            "type": "string"
+                          },
+                          "work_title": {
+                            "type": "string"
+                          },
+                          "work_cover_url": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "string"
+                          },
+                          "user_name": {
+                            "type": "string"
+                          },
+                          "user_avatar_path": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "6": {
+                        "type": "object",
+                        "required": [
+                          "work_id",
+                          "work_title",
+                          "work_cover_url",
+                          "user_id",
+                          "user_name",
+                          "user_avatar_path"
+                        ],
+                        "properties": {
+                          "work_id": {
+                            "type": "string"
+                          },
+                          "work_title": {
+                            "type": "string"
+                          },
+                          "work_cover_url": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "string"
+                          },
+                          "user_name": {
+                            "type": "string"
+                          },
+                          "user_avatar_path": {
                             "type": "string"
                           }
                         }
@@ -2265,9 +2722,40 @@
                                       "work_id",
                                       "work_title",
                                       "work_cover_url",
+                                      "work_user_id",
+                                      "work_user_name",
+                                      "work_user_avatar_path"
+                                    ],
+                                    "properties": {
+                                      "work_id": {
+                                        "type": "string"
+                                      },
+                                      "work_title": {
+                                        "type": "string"
+                                      },
+                                      "work_cover_url": {
+                                        "type": "string"
+                                      },
+                                      "work_user_id": {
+                                        "type": "string"
+                                      },
+                                      "work_user_name": {
+                                        "type": "string"
+                                      },
+                                      "work_user_avatar_path": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "4": {
+                                    "type": "object",
+                                    "required": [
+                                      "work_id",
+                                      "work_title",
+                                      "work_cover_url",
                                       "user_id",
                                       "user_name",
-                                      "user_avatar_url"
+                                      "user_avatar_path"
                                     ],
                                     "properties": {
                                       "work_id": {
@@ -2285,7 +2773,69 @@
                                       "user_name": {
                                         "type": "string"
                                       },
-                                      "user_avatar_url": {
+                                      "user_avatar_path": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "5": {
+                                    "type": "object",
+                                    "required": [
+                                      "work_id",
+                                      "work_title",
+                                      "work_cover_url",
+                                      "user_id",
+                                      "user_name",
+                                      "user_avatar_path"
+                                    ],
+                                    "properties": {
+                                      "work_id": {
+                                        "type": "string"
+                                      },
+                                      "work_title": {
+                                        "type": "string"
+                                      },
+                                      "work_cover_url": {
+                                        "type": "string"
+                                      },
+                                      "user_id": {
+                                        "type": "string"
+                                      },
+                                      "user_name": {
+                                        "type": "string"
+                                      },
+                                      "user_avatar_path": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "6": {
+                                    "type": "object",
+                                    "required": [
+                                      "work_id",
+                                      "work_title",
+                                      "work_cover_url",
+                                      "user_id",
+                                      "user_name",
+                                      "user_avatar_path"
+                                    ],
+                                    "properties": {
+                                      "work_id": {
+                                        "type": "string"
+                                      },
+                                      "work_title": {
+                                        "type": "string"
+                                      },
+                                      "work_cover_url": {
+                                        "type": "string"
+                                      },
+                                      "user_id": {
+                                        "type": "string"
+                                      },
+                                      "user_name": {
+                                        "type": "string"
+                                      },
+                                      "user_avatar_path": {
                                         "type": "string"
                                       }
                                     }
@@ -2512,103 +3062,6 @@
           }
         }
       }
-    },
-    "/admin/login": {
-      "post": {
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "响应模型",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "token"
-                  ],
-                  "properties": {
-                    "token": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "description": "请求体参数",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "employee_id",
-                  "password"
-                ],
-                "properties": {
-                  "employee_id": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/admin/add/user": {
-      "post": {
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "响应模型",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "required": [],
-                  "properties": {}
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "description": "请求体参数",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "employee_id",
-                  "role",
-                  "name",
-                  "password"
-                ],
-                "properties": {
-                  "employee_id": {
-                    "type": "string"
-                  },
-                  "role": {
-                    "type": "integer"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -2694,9 +3147,40 @@
                       "work_id",
                       "work_title",
                       "work_cover_url",
+                      "work_user_id",
+                      "work_user_name",
+                      "work_user_avatar_path"
+                    ],
+                    "properties": {
+                      "work_id": {
+                        "type": "string"
+                      },
+                      "work_title": {
+                        "type": "string"
+                      },
+                      "work_cover_url": {
+                        "type": "string"
+                      },
+                      "work_user_id": {
+                        "type": "string"
+                      },
+                      "work_user_name": {
+                        "type": "string"
+                      },
+                      "work_user_avatar_path": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "4": {
+                    "type": "object",
+                    "required": [
+                      "work_id",
+                      "work_title",
+                      "work_cover_url",
                       "user_id",
                       "user_name",
-                      "user_avatar_url"
+                      "user_avatar_path"
                     ],
                     "properties": {
                       "work_id": {
@@ -2714,7 +3198,69 @@
                       "user_name": {
                         "type": "string"
                       },
-                      "user_avatar_url": {
+                      "user_avatar_path": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "5": {
+                    "type": "object",
+                    "required": [
+                      "work_id",
+                      "work_title",
+                      "work_cover_url",
+                      "user_id",
+                      "user_name",
+                      "user_avatar_path"
+                    ],
+                    "properties": {
+                      "work_id": {
+                        "type": "string"
+                      },
+                      "work_title": {
+                        "type": "string"
+                      },
+                      "work_cover_url": {
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "type": "string"
+                      },
+                      "user_name": {
+                        "type": "string"
+                      },
+                      "user_avatar_path": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "6": {
+                    "type": "object",
+                    "required": [
+                      "work_id",
+                      "work_title",
+                      "work_cover_url",
+                      "user_id",
+                      "user_name",
+                      "user_avatar_path"
+                    ],
+                    "properties": {
+                      "work_id": {
+                        "type": "string"
+                      },
+                      "work_title": {
+                        "type": "string"
+                      },
+                      "work_cover_url": {
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "type": "string"
+                      },
+                      "user_name": {
+                        "type": "string"
+                      },
+                      "user_avatar_path": {
                         "type": "string"
                       }
                     }

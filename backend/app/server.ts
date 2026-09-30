@@ -16,6 +16,7 @@ import {
     collectWorkInput,
     likeWorkCommentInput,
     deleteWorkInput,
+    shareWorkInput,
 } from "./domain/model/dto/client-work.js"
 import {
     smsSendInput,
@@ -44,7 +45,6 @@ import { adminAddUserInput, adminLoginInput, adminLoginOutput } from "./domain/m
 import { AdminUserService } from "./domain/service/admin-user.js"
 import { AdminReportService } from "./domain/service/admin-report.js"
 import type { FileStoragePort } from "./port/file-storage-port.js"
-import { getReportsInput, getReportsOutput } from "./domain/model/dto/admin-report.js"
 
 export interface ServerPort {
     Run(): void
@@ -75,8 +75,6 @@ export class Server implements ServerPort {
         const clientReportService = new ClientReportService(this.fileStorage, this.clientManager)
         const clientUserService = new ClientUserService(this.fileStorage, this.clientManager)
         const clientWorkService = new ClientWorkService(this.fileStorage, this.clientManager)
-        const adminUserService = new AdminUserService(this.fileStorage, this.clientManager)
-        const adminReportService = new AdminReportService(this.fileStorage, this.clientManager)
 
         // express中间件注册
         this.app.use(express.json())
@@ -108,6 +106,7 @@ export class Server implements ServerPort {
         this.registerHandler("POST", '/delete/work', deleteWorkInput, null, clientWorkService.deleteWork.bind(clientWorkService)) // 删除作品
         this.registerHandler("POST", '/like/work', likeWorkInput, null, clientWorkService.likeWork.bind(clientWorkService)) // 点赞作品
         this.registerHandler("POST", '/collect/work', collectWorkInput, null, clientWorkService.collectWork.bind(clientWorkService)) // 收藏作品
+        this.registerHandler("POST", '/share/work', shareWorkInput, null, clientWorkService.shareWork.bind(clientWorkService)) // 分享作品
         this.registerHandler("GET", '/work/comments', getWorkCommentsInput, getWorkCommentsOutput, clientWorkService.getWorkComments.bind(clientWorkService)) // 获取作品评论/回复
         this.registerHandler("POST", '/create/work/comment', createWorkCommentInput, createWorkCommentOutput, clientWorkService.createWorkComment.bind(clientWorkService)) // 评论作品
         this.registerHandler("POST", '/like/work/comment', likeWorkCommentInput, null, clientWorkService.likeWorkComment.bind(clientWorkService)) // 点赞评论
@@ -125,14 +124,6 @@ export class Server implements ServerPort {
         this.registerHandler("GET", '/report', getReportDetailInput, getReportDetailOutput, clientReportService.getReportDetail.bind(clientReportService)) // 查询举报详情
 
         // 直播模块
-
-        /** 以下为后台系统api,面向企业后台管理 */
-
-        // 用户模块
-        this.registerHandler("POST", '/admin/login', adminLoginInput, adminLoginOutput, adminUserService.login.bind(adminUserService)) // 登录
-        this.registerHandler("POST", '/admin/add/user', adminAddUserInput, null, adminUserService.addUser.bind(adminUserService)) // 添加新员工
-
-        // 举报模块
 
         this.app.use('/api', this.router)
 
