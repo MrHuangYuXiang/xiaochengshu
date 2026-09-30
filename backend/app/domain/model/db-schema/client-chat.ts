@@ -43,7 +43,7 @@ export const ClientChatMessageTable = mysqlTable("client_chat_message", {
 export const DbWorkNoticeMessagePayload = {
     work_id: stringType,
     work_title: stringType,
-    work_cover_url: stringType,
+    work_cover_image_path: stringType,
     user_id: stringType,
     user_name: stringType,
     user_avatar_path: stringType,
@@ -60,7 +60,7 @@ export const DbChatMessagePayload = objectType({
     [ClientChatMessageTypeEnum.WORK_SHARE]: objectType({
         work_id: stringType,
         work_title: stringType,
-        work_cover_url: stringType,
+        work_cover_image_path: stringType,
         work_user_id: stringType,
         work_user_name: stringType,
         work_user_avatar_path: stringType,

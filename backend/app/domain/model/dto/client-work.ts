@@ -106,7 +106,7 @@ export const createWorkCommentOutput = objectType(workCommentAggregate)
 export const workInteractInputFields = {
     workId: stringType,
     workTitle: stringType,
-    workCoverUrl: stringType,
+    workCoverImagePath: stringType,
     workUserId: stringType,
 }
 

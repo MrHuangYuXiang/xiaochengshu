@@ -49,6 +49,7 @@ export const UserSchemaWithFollow = objectType({
 const workCommonFields = {
     title: stringType,
     permission: numberType,
+    user_id: stringType,
 }
 
 // 作品简单模型

@@ -396,21 +396,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            user: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                name: string;
-                                desc: string;
-                                birthday: string;
-                                gender: number;
-                                avatar_url: string;
-                                is_complete_profile: number;
-                                is_follow: number;
-                                is_followed: number;
-                            };
-                        };
+                        "application/json": unknown;
                     };
                 };
             };
@@ -452,21 +438,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            user: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                name: string;
-                                desc: string;
-                                birthday: string;
-                                gender: number;
-                                avatar_url: string;
-                                is_complete_profile: number;
-                                is_follow: number;
-                                is_followed: number;
-                            };
-                        };
+                        "application/json": unknown;
                     };
                 };
             };
@@ -521,6 +493,7 @@ export interface paths {
                                 updated_at: string;
                                 title: string;
                                 permission: number;
+                                user_id: string;
                                 content: string;
                             };
                             images: {
@@ -595,6 +568,7 @@ export interface paths {
                                     updated_at: string;
                                     title: string;
                                     permission: number;
+                                    user_id: string;
                                 };
                                 cover_image: {
                                     id: string;
@@ -719,6 +693,9 @@ export interface paths {
                 content: {
                     "application/json": {
                         workId: string;
+                        workTitle: string;
+                        workCoverImagePath: string;
+                        workUserId: string;
                         isLike: number;
                     };
                 };
@@ -762,7 +739,58 @@ export interface paths {
                 content: {
                     "application/json": {
                         workId: string;
+                        workTitle: string;
+                        workCoverImagePath: string;
+                        workUserId: string;
                         isCollect: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/share/work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        workId: string;
+                        workTitle: string;
+                        workCoverImagePath: string;
+                        workUserId: string;
+                        workUserName: string;
+                        workUserAvatarPath: string;
+                        sessionId: string;
                     };
                 };
             };
@@ -1038,10 +1066,34 @@ export interface paths {
                                     3?: {
                                         work_id: string;
                                         work_title: string;
-                                        work_cover_url: string;
+                                        work_cover_image_path: string;
+                                        work_user_id: string;
+                                        work_user_name: string;
+                                        work_user_avatar_path: string;
+                                    };
+                                    4?: {
+                                        work_id: string;
+                                        work_title: string;
+                                        work_cover_image_path: string;
                                         user_id: string;
                                         user_name: string;
-                                        user_avatar_url: string;
+                                        user_avatar_path: string;
+                                    };
+                                    5?: {
+                                        work_id: string;
+                                        work_title: string;
+                                        work_cover_image_path: string;
+                                        user_id: string;
+                                        user_name: string;
+                                        user_avatar_path: string;
+                                    };
+                                    6?: {
+                                        work_id: string;
+                                        work_title: string;
+                                        work_cover_image_path: string;
+                                        user_id: string;
+                                        user_name: string;
+                                        user_avatar_path: string;
                                     };
                                 };
                                 session_id: string;
@@ -1128,10 +1180,34 @@ export interface paths {
                                         3?: {
                                             work_id: string;
                                             work_title: string;
-                                            work_cover_url: string;
+                                            work_cover_image_path: string;
+                                            work_user_id: string;
+                                            work_user_name: string;
+                                            work_user_avatar_path: string;
+                                        };
+                                        4?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
                                             user_id: string;
                                             user_name: string;
-                                            user_avatar_url: string;
+                                            user_avatar_path: string;
+                                        };
+                                        5?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_path: string;
+                                        };
+                                        6?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_path: string;
                                         };
                                     };
                                     session_id: string;
@@ -1228,10 +1304,34 @@ export interface paths {
                             3?: {
                                 work_id: string;
                                 work_title: string;
-                                work_cover_url: string;
+                                work_cover_image_path: string;
+                                work_user_id: string;
+                                work_user_name: string;
+                                work_user_avatar_path: string;
+                            };
+                            4?: {
+                                work_id: string;
+                                work_title: string;
+                                work_cover_image_path: string;
                                 user_id: string;
                                 user_name: string;
-                                user_avatar_url: string;
+                                user_avatar_path: string;
+                            };
+                            5?: {
+                                work_id: string;
+                                work_title: string;
+                                work_cover_image_path: string;
+                                user_id: string;
+                                user_name: string;
+                                user_avatar_path: string;
+                            };
+                            6?: {
+                                work_id: string;
+                                work_title: string;
+                                work_cover_image_path: string;
+                                user_id: string;
+                                user_name: string;
+                                user_avatar_path: string;
                             };
                         };
                     };
@@ -1258,10 +1358,34 @@ export interface paths {
                                     3?: {
                                         work_id: string;
                                         work_title: string;
-                                        work_cover_url: string;
+                                        work_cover_image_path: string;
+                                        work_user_id: string;
+                                        work_user_name: string;
+                                        work_user_avatar_path: string;
+                                    };
+                                    4?: {
+                                        work_id: string;
+                                        work_title: string;
+                                        work_cover_image_path: string;
                                         user_id: string;
                                         user_name: string;
-                                        user_avatar_url: string;
+                                        user_avatar_path: string;
+                                    };
+                                    5?: {
+                                        work_id: string;
+                                        work_title: string;
+                                        work_cover_image_path: string;
+                                        user_id: string;
+                                        user_name: string;
+                                        user_avatar_path: string;
+                                    };
+                                    6?: {
+                                        work_id: string;
+                                        work_title: string;
+                                        work_cover_image_path: string;
+                                        user_id: string;
+                                        user_name: string;
+                                        user_avatar_path: string;
                                     };
                                 };
                                 session_id: string;
@@ -1332,10 +1456,34 @@ export interface paths {
                                         3?: {
                                             work_id: string;
                                             work_title: string;
-                                            work_cover_url: string;
+                                            work_cover_image_path: string;
+                                            work_user_id: string;
+                                            work_user_name: string;
+                                            work_user_avatar_path: string;
+                                        };
+                                        4?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
                                             user_id: string;
                                             user_name: string;
-                                            user_avatar_url: string;
+                                            user_avatar_path: string;
+                                        };
+                                        5?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_path: string;
+                                        };
+                                        6?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_path: string;
                                         };
                                     };
                                     session_id: string;
@@ -1484,96 +1632,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description 请求体参数 */
-            requestBody: {
-                content: {
-                    "application/json": {
-                        employee_id: string;
-                        password: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description 响应模型 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            token: string;
-                        };
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/add/user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description 请求体参数 */
-            requestBody: {
-                content: {
-                    "application/json": {
-                        employee_id: string;
-                        role: number;
-                        name: string;
-                        password: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description 响应模型 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": unknown;
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1598,10 +1656,34 @@ export interface components {
                     3?: {
                         work_id: string;
                         work_title: string;
-                        work_cover_url: string;
+                        work_cover_image_path: string;
+                        work_user_id: string;
+                        work_user_name: string;
+                        work_user_avatar_path: string;
+                    };
+                    4?: {
+                        work_id: string;
+                        work_title: string;
+                        work_cover_image_path: string;
                         user_id: string;
                         user_name: string;
-                        user_avatar_url: string;
+                        user_avatar_path: string;
+                    };
+                    5?: {
+                        work_id: string;
+                        work_title: string;
+                        work_cover_image_path: string;
+                        user_id: string;
+                        user_name: string;
+                        user_avatar_path: string;
+                    };
+                    6?: {
+                        work_id: string;
+                        work_title: string;
+                        work_cover_image_path: string;
+                        user_id: string;
+                        user_name: string;
+                        user_avatar_path: string;
                     };
                 };
                 session_id: string;

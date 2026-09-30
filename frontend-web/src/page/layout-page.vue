@@ -1,7 +1,6 @@
 <template>
   <!-- 全局组件挂载区 -->
   <ImagePreview />
-  <MsgTip />
   <ErrorDialog></ErrorDialog>
   <WorkModal v-if="globalWorkModal.isShow.value"></WorkModal>
   <ReportModal v-if="globalReportModal.isShow.value"></ReportModal>
@@ -26,7 +25,6 @@
   import InitUserModal from '@/component/user/InitUserModal.vue';
   import UpdateUserModal from '@/component/user/update-user-modal.vue';
   import ErrorDialog from '@/component/common/ErrorDialog.vue';
-  import MsgTip from '@/component/chat/msg-tip.vue';
   import ImagePreview from '@/component/image/image-preview.vue';
   import WorkModal from '@/component/work/work-modal.vue';
   import ReportModal from '@/component/report/report-modal.vue';
@@ -36,16 +34,40 @@
   import { useRouter } from 'vue-router';
   import { storage } from '@/storage';
   import { clientEvent } from '@/api/event';
-  import type { paths } from '@/api/gen';
+  import type { components, paths } from '@/api/gen';
   import { axiosProxy } from '@/api/axios';
-  import { globalWorkModal, globalReportModal, globalUpdateUserModal, globalWorkReportModal, globalFollowModal } from '@/component/global';
+  import { globalWorkModal, globalReportModal, globalUpdateUserModal, globalWorkReportModal, globalFollowModal, globalErrorDialog } from '@/component/global';
 
   const router = useRouter();
   const enableInitUserModalShow = ref(false)
 
+  /** 以下为客户端事件推送全局回调函数 */
+
+  // 服务器错误
+  const errorCallback = async (data: unknown) => {
+    // 接收到错误,清理相关资源,由于后端主动断开tcp连接,客户端不需要主动断
+    globalErrorDialog.show((data as components["schemas"]["errorClientEvent"]).msg)
+    storage.clear()
+  }
+
+  // 心跳续约
+  const heartbeatCallback = async (data: unknown) => {
+    // jwt续约
+    storage.setToken((data as components["schemas"]["heartbeatClientEvent"]).jwt)
+  }
+
+  // 聊天消息推送
+  const chatMessagePushCallback = async (data: unknown) => {
+  }
+
   onBeforeMount(async () => {
     // 连接后端事件推送
     await clientEvent.connect()
+
+    // 注册全局回调函数
+    clientEvent.registerCallback("error", errorCallback)
+    clientEvent.registerCallback("heartbeat", heartbeatCallback)
+    clientEvent.registerCallback("pushChatMessage", chatMessagePushCallback)
 
     // 获取初始化数据
     storage.setInitData(

@@ -61,7 +61,7 @@
             >("/chat/get/sessions", {
                 page: currentPage,
                 pageSize: pageSize,
-            })).sessions
+            })).sessions.filter((item) => item.session.type === 1)
         })
         return sessions.value.isEnd
     }
@@ -69,23 +69,18 @@
     // 分享作品
     const shareWork = async (sessionId: string) => {
         await axiosProxy.post<
-            paths["/chat/send/message"]["post"]["requestBody"]["content"]["application/json"],
-            paths["/chat/send/message"]["post"]["responses"]["200"]["content"]["application/json"]
-        >("/chat/send/message", {
+            paths["/share/work"]["post"]["requestBody"]["content"]["application/json"],
+            paths["/share/work"]["post"]["responses"]["200"]["content"]["application/json"]
+        >("/share/work", {
             sessionId: sessionId,
-            content: "",
-            type: 3,
-            payload: {
-                3: {
-                    work_id: props.workId,
-                    work_title: props.workTitle,
-                    work_cover_url: props.workCoverUrl,
-                    user_id: props.userId,
-                    user_name: props.userName,
-                    user_avatar_url: props.userAvatarUrl,
-                }
-            },
+            workId: props.workId,
+            workTitle: props.workTitle,
+            workCoverImagePath: props.workCoverUrl,
+            workUserId: props.userId,
+            workUserName: props.userName,
+            workUserAvatarPath: props.userAvatarUrl,
         })
+
         ElMessage('分享成功');
     }
 </script>

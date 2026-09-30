@@ -314,17 +314,21 @@
   const likeWork = async () => {
     if (!work.value) return
 
+    // 更新点赞状态
+    work.value.isLiked = work.value.isLiked === 1 ? 0 : 1
+    work.value.likeCount = work.value.isLiked === 1 ? work.value.likeCount + 1 : work.value.likeCount - 1
+
     await axiosProxy.post<
       paths["/like/work"]["post"]["requestBody"]["content"]["application/json"],
       paths["/like/work"]["post"]["responses"]["200"]["content"]["application/json"]
     >("/like/work", {
       workId: work.value.work.id,
-      isLike: work.value.isLiked === 1 ? 0 : 1,
+      workTitle: work.value.work.title,
+      workCoverImagePath: work.value.images[0]?.path || '',
+      workUserId: work.value.work.user_id,
+      isLike: work.value.isLiked,
     })
 
-    // 更新点赞状态
-    work.value.isLiked = work.value.isLiked === 1 ? 0 : 1
-    work.value.likeCount = work.value.isLiked === 1 ? work.value.likeCount + 1 : work.value.likeCount - 1
     ElMessage(work.value.isLiked === 1 ? "点赞成功" : "取消点赞成功")
   }
 
@@ -332,17 +336,21 @@
   const collectWork = async () => {
     if (!work.value) return
 
+    // 更新收藏状态
+    work.value.isCollected = work.value.isCollected === 1 ? 0 : 1
+    work.value.collectCount = work.value.isCollected === 1 ? work.value.collectCount + 1 : work.value.collectCount - 1
+
     await axiosProxy.post<
       paths["/collect/work"]["post"]["requestBody"]["content"]["application/json"],
       paths["/collect/work"]["post"]["responses"]["200"]["content"]["application/json"]
     >("/collect/work", {
       workId: work.value.work.id,
-      isCollect: work.value.isCollected === 1 ? 0 : 1,
+      workTitle: work.value.work.title,
+      workCoverImagePath: work.value.images[0]?.path || '',
+      workUserId: work.value.work.user_id,
+      isCollect: work.value.isCollected,
     })
 
-    // 更新收藏状态
-    work.value.isCollected = work.value.isCollected === 1 ? 0 : 1
-    work.value.collectCount = work.value.isCollected === 1 ? work.value.collectCount + 1 : work.value.collectCount - 1
     ElMessage(work.value.isCollected === 1 ? "收藏成功" : "取消收藏成功")
   }
 

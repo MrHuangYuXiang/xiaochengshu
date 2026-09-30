@@ -510,7 +510,7 @@ export class ClientWorkService extends BaseService {
       [ClientChatMessageTypeEnum.WORK_SHARE]: {
         work_id: res.locals.body!.workId,
         work_title: res.locals.body!.workTitle,
-        work_cover_url: res.locals.body!.workCoverUrl,
+        work_cover_image_path: res.locals.body!.workCoverImagePath,
         work_user_id: res.locals.body!.workUserId,
         work_user_name: res.locals.body!.workUserName,
         work_user_avatar_path: res.locals.body!.workUserAvatarPath,
@@ -560,7 +560,7 @@ export class ClientWorkService extends BaseService {
 
     // 发送互动消息
     if (session[0]) {
-      this.baseSendChatMessage({
+      await this.baseSendChatMessage({
         session_id: session[0].client_chat_session.id,
         user_id: reqParams.workUserId,
         type: messageType,
@@ -569,7 +569,7 @@ export class ClientWorkService extends BaseService {
         [messageType]: {
           work_id: reqParams.workId,
           work_title: reqParams.workTitle,
-          work_cover_url: reqParams.workCoverUrl,
+          work_cover_image_path: reqParams.workCoverImagePath,
           user_id: current.payload.userId,
           user_name: current.payload.userName,
           user_avatar_path: current.payload.userAvatarPath,
