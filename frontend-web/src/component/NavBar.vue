@@ -8,6 +8,12 @@
     >
       <el-icon><component :is="item.icon"></component></el-icon>
       <div>{{ item.title }}</div>
+      <div 
+        :class="{'statistic-show': showStatistic(item.index)}"
+        class="statistic"
+      >
+        {{ storage.initData.value?.unreadMessageCount || 0 }}
+    </div> 
     </div>
     <div 
       class="nav-item setting"
@@ -77,29 +83,48 @@
         break
     }
   }
+
+  // 是否显示导航卡片右侧元素
+  const showStatistic = (index: number) => {
+    return index === 3 && (storage.initData.value?.unreadMessageCount || 0) > 0
+  }
  </script>
 
 <style scoped lang="scss">
   .nav {
     display: grid;
-    grid-template-columns: auto;
-    grid-auto-rows: auto;
+    grid-template-columns: 100%;
     gap: 0.5rem;
     padding: 1rem;
     .nav-item {
       cursor: pointer;
       display: grid;
-      grid-template-columns: auto auto;
+      grid-template-columns: auto auto 1fr;
       border-radius: 15px;
-      padding: 1rem 2rem;
-      padding-right: 6rem;
-      display: flex;
+      padding: 1rem;
       column-gap: 0.5rem;
       align-items: center;
       text-decoration: none;
       color: black;
       font-weight: 600;
       white-space: nowrap;
+      .statistic {
+        opacity: 0;
+        height: 100%;
+        aspect-ratio: 1 / 1;
+        justify-self: end;
+        border-radius: 100%;
+        background-color: red;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.85rem;
+      }
+      .statistic-show {
+        opacity: 1;
+      }
     }
     .nav-item:hover {
       background-color: #f5f5f5;

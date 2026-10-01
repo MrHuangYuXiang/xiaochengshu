@@ -58,6 +58,7 @@
 
   // 聊天消息推送
   const chatMessagePushCallback = async (data: unknown) => {
+    if (storage.initData.value) storage.initData.value.unreadMessageCount += 1
   }
 
   onBeforeMount(async () => {
@@ -65,9 +66,9 @@
     await clientEvent.connect()
 
     // 注册全局回调函数
-    clientEvent.registerCallback("error", errorCallback)
-    clientEvent.registerCallback("heartbeat", heartbeatCallback)
-    clientEvent.registerCallback("pushChatMessage", chatMessagePushCallback)
+    clientEvent.registerCallback("global", "error", errorCallback)
+    clientEvent.registerCallback("global", "heartbeat", heartbeatCallback)
+    clientEvent.registerCallback("global", "pushChatMessage", chatMessagePushCallback)
 
     // 获取初始化数据
     storage.setInitData(
@@ -96,7 +97,7 @@
     align-items: start;
     .left {
       display: grid;
-      grid-template-columns: auto;
+      grid-template-columns: 100%;
       .brand {
         padding: 2rem;
         text-align: center;

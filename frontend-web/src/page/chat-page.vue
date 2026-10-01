@@ -85,10 +85,12 @@
   import type { SessionSchema, MessageSchema } from '@/api/type.ext';
   import { EnhancedList } from '@/lib/list';
   import { axiosProxy } from '@/api/axios';
-  import type { paths } from '@/api/gen';
+  import type { components, paths } from '@/api/gen';
   import { useRoute } from 'vue-router';
   import { globalReportModal } from '@/component/global';
   import { ElMessage } from 'element-plus';
+  import { clientEvent } from '@/api/event'
+import { storage } from '@/storage';
 
   const route = useRoute()
 
@@ -149,6 +151,13 @@
     selectedSessionId.value = sessionId
     messages.value.clear()
     msgScrollRef.value?.reset()
+
+    // 更新未读信息数据
+    const session = sessions.value.get(selectedSessionId.value)
+    if (session && storage.initData.value) {
+      storage.initData.value.unreadMessageCount -= session.unreadCount
+      session.unreadCount = 0
+    }
   }
 
   // 发送消息
@@ -207,9 +216,31 @@
     }
   }
 
+  // 消息推送页面回调
+  const messagePushPageCallback = async (data: unknown) => {
+    const event = data as components["schemas"]["pushChatMessageEvent"]
+
+    sessions.value.delete(event.message.session_id)
+
+    // 获取新的会话信息并插入
+    const session = await axiosProxy.get<
+      paths["/chat/get/session"]["get"]["parameters"]["query"],
+      paths["/chat/get/session"]["get"]["responses"]["200"]["content"]["application/json"]
+    >(`/chat/get/session`, { sessionId: event.message.session_id })
+    if (session.session) sessions.value.unshift(session.session)
+
+    // 如果当前正在和该会话聊天,则插入消息
+    if (selectedSessionId.value === event.message.session_id) {
+      messages.value.unshift(event)
+    }
+  }
+
   onMounted(async () => {
     // 创建新会话(该接口会幂等返回已存在的会话)
     await onMountedCreateSession()
+
+    // 注册客户端事件页面回调
+    clientEvent.registerCallback("page", "pushChatMessage", messagePushPageCallback)
   })
 
   // 挂载钩子:创建会话逻辑
@@ -229,7 +260,6 @@
     // 切换选中会话为新创建的会话
     selectedSessionId.value = sessionData.session.id
   }
-
 </script>
 
 <style scoped lang="css">

@@ -63,7 +63,6 @@
 
   // 挂载时自动执行一次回调
   onMounted(async () => {
-    console.log('scroll-container mounted, auto load more')
     await scrollMain()
   })
 

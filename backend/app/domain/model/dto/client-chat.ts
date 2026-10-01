@@ -17,7 +17,7 @@ import { DbChatMessagePayload } from "../db-schema/client-chat.js";
 import { ClientChatMessageTypeEnum } from "../enum/client-chat.js";
 
 // 会话聚合模型
-export const chatSessionAggregate = {
+export const sessionAggregate = {
     session: chatSessionSchema,
     sessionMember: chatSessionMemberSchema,
     user: userSchema,
@@ -39,16 +39,26 @@ export const createSessionInput = objectType({
 });
 
 // 创建会话输出
-export const createSessionOutput = objectType(chatSessionAggregate);
+export const createSessionOutput = objectType(sessionAggregate);
 
-// 查询会话输入
+// 查询会话列表输入
 export const getSessionsInput = objectType({
     ...page,
 });
 
-// 查询会话输出
+// 查询会话列表输出
 export const getSessionsOutput = objectType({
-    sessions: arrayType(objectType(chatSessionAggregate)),
+    sessions: arrayType(objectType(sessionAggregate)),
+});
+
+// 查询单个会话输入
+export const getSessionInput = objectType({
+    sessionId: stringType,
+});
+
+// 查询单个会话输出
+export const getSessionOutput = objectType({
+    session: objectType(sessionAggregate).optional(),
 });
 
 // 置顶会话输入

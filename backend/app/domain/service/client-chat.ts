@@ -2,7 +2,7 @@ import type { Request } from "express";
 import type { EnhancedResponse } from "../model/dto/index.js";
 import { ClientChatSessionTable, ClientChatSessionMemberTable, ClientChatMessageTable } from "../model/db-schema/client-chat.js";
 import { ClientUserTable } from "../model/db-schema/client-user.js";
-import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, pinSessionInput, sendMessageInput, sendMessageOutput, type createSessionInput } from "../model/dto/client-chat.js";
+import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionInput, getSessionOutput, getSessionsInput, getSessionsOutput, pinSessionInput, sendMessageInput, sendMessageOutput, type createSessionInput } from "../model/dto/client-chat.js";
 import { getCurrent } from "../../lib/local-stroage.js";
 import { v4 as uuidv4 } from "uuid";
 import { and, count, desc, eq, getTableColumns, gt, inArray, lt, max, not, SQL, sql } from "drizzle-orm";
@@ -25,7 +25,6 @@ export class ClientChatService extends BaseService {
             leftJoin(ClientChatMessageTable, eq(ClientChatSessionMemberTable.session_id, ClientChatMessageTable.session_id)).
             where(and(
                 eq(ClientChatSessionMemberTable.user_id, current.payload.userId),
-                not(eq(ClientChatMessageTable.user_id, current.payload.userId)),
                 gt(ClientChatMessageTable.inc_seq, ClientChatSessionMemberTable.last_read_seq),
             )).
             groupBy(ClientChatSessionMemberTable.session_id).
@@ -58,7 +57,7 @@ export class ClientChatService extends BaseService {
             leftJoin(latestMessageSubQuery, eq(latestMessageSubQuery.session_id, ClientChatSessionTable.id)).
             leftJoin(ClientChatMessageTable, eq(ClientChatMessageTable.inc_seq, latestMessageSubQuery.maxIncSeq)).
             where(whereCond).
-            orderBy(desc(ClientChatSessionMemberTable.is_pin));
+            orderBy(desc(ClientChatSessionMemberTable.is_pin), desc(unreadMessageSubQuery.unreadCount));
     }
 
     /**
@@ -110,24 +109,30 @@ export class ClientChatService extends BaseService {
         }
     }
 
-    // 查询会话
+    // 查询单个会话
+    async getSession(req: Request, res: EnhancedResponse<typeof getSessionInput, null>) {
+        const whereCond = eq(ClientChatSessionTable.id, res.locals.query!.sessionId)
+        const sessions = await this.selectSessions(whereCond)
+        res.json(getSessionOutput.parse({
+            session: sessions[0],
+        }))
+    }
+
+    // 查询会话列表
     async getSessions(req: Request, res: EnhancedResponse<typeof getSessionsInput, null>) {
         const current = getCurrent();
         const page = getPageParams(res);
-        let sessionIds: string[] = []
 
-        sessionIds = (await current.tx.select().
+        const sessionIds = (await current.tx.select().
             from(ClientChatSessionMemberTable).
             where(eq(ClientChatSessionMemberTable.user_id, current.payload.userId)).
             limit(page.limit).
             offset(page.offset)).map((session) => session.session_id);
-
         const whereCond = inArray(ClientChatSessionTable.id, sessionIds)
-
-        const data = await this.selectSessions(whereCond);
+        const sessions = await this.selectSessions(whereCond);
 
         res.json(getSessionsOutput.parse({
-            sessions: data,
+            sessions: sessions,
         }));
     }
 

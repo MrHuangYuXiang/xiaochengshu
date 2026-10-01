@@ -73,6 +73,7 @@ export interface paths {
                                 avatar_url: string;
                                 is_complete_profile: number;
                             };
+                            unreadMessageCount: number;
                         };
                     };
                 };
@@ -1217,6 +1218,122 @@ export interface paths {
                                 };
                                 unreadCount: number;
                             }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/chat/get/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    sessionId: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            session?: {
+                                session: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    type: number;
+                                };
+                                sessionMember: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    session_id: string;
+                                    user_id: string;
+                                    last_read_seq: number;
+                                    is_pin: number;
+                                    other_user_id: string;
+                                };
+                                user: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    name: string;
+                                    desc: string;
+                                    birthday: string;
+                                    gender: number;
+                                    avatar_url: string;
+                                    is_complete_profile: number;
+                                };
+                                latestMessage: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    type: number;
+                                    payload: {
+                                        1?: Record<string, never>;
+                                        2?: {
+                                            report_id: string;
+                                        };
+                                        3?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
+                                            work_user_id: string;
+                                            work_user_name: string;
+                                            work_user_avatar_path: string;
+                                        };
+                                        4?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_path: string;
+                                        };
+                                        5?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_path: string;
+                                        };
+                                        6?: {
+                                            work_id: string;
+                                            work_title: string;
+                                            work_cover_image_path: string;
+                                            user_id: string;
+                                            user_name: string;
+                                            user_avatar_path: string;
+                                        };
+                                    };
+                                    session_id: string;
+                                    user_id: string;
+                                    content: string;
+                                    inc_seq: number;
+                                };
+                                unreadCount: number;
+                            };
                         };
                     };
                 };

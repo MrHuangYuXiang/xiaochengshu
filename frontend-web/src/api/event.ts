@@ -28,6 +28,9 @@ class ClientEvent {
       if (this.globalCallbackMap.has(type)) {
         await this.globalCallbackMap.get(type)!(data)
       }
+      if (this.pageCallbackMap.has(type)) {
+        await this.pageCallbackMap.get(type)!(data)
+      }
     })
     this.worker.port.postMessage({
       type: "connect",

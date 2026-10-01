@@ -28,9 +28,9 @@
             :work-id="props.messagePayload?.[3]?.work_id || ''"
             :work-title="props.messagePayload?.[3]?.work_title || ''"
             :work-cover-url="props.messagePayload?.[3]?.work_cover_url || ''"
-            :user-id="props.messagePayload?.[3]?.user_id || ''"
-            :user-name="props.messagePayload?.[3]?.user_name || ''"
-            :user-avatar-url="props.messagePayload?.[3]?.user_avatar_url || ''"
+            :user-id="props.messagePayload?.[3]?.work_user_id || ''"
+            :user-name="props.messagePayload?.[3]?.work_user_name || ''"
+            :user-avatar-url="props.messagePayload?.[3]?.work_user_avatar_url || ''"
         />
     </div>
 
@@ -69,9 +69,9 @@
                 work_id: string;
                 work_title: string;
                 work_cover_url: string;
-                user_id: string;
-                user_name: string;
-                user_avatar_url: string;
+                work_user_id: string;
+                work_user_name: string;
+                work_user_avatar_url: string;
             };
         };
         sessionType?: number;

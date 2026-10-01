@@ -36,7 +36,7 @@ import express from "express"
 import { routeMap } from "./lib/framework-ext.js"
 import { doc } from "./lib/framework-ext.js"
 import { z } from "zod"
-import { createSessionInput, createSessionOutput, getMessagesInput, getMessagesOutput, getSessionsInput, getSessionsOutput, pinSessionInput, sendMessageInput, sendMessageOutput } from "./domain/model/dto/client-chat.js"
+import { createSessionInput, createSessionOutput, getMessagesInput, getMessagesOutput, getSessionInput, getSessionOutput, getSessionsInput, getSessionsOutput, pinSessionInput, sendMessageInput, sendMessageOutput } from "./domain/model/dto/client-chat.js"
 import { LocalMutexAdapter } from "./port/mutex-adapter.js"
 import { LocalFileStorageAdapter } from "./port/file-storage-adapter.js"
 import { LocalClientManagerAdapter } from "./port/client-manager-adapter.js"
@@ -114,6 +114,7 @@ export class Server implements ServerPort {
         // 聊天模块
         this.registerHandler("POST", '/chat/create/session', createSessionInput, createSessionOutput, clientChatService.createSession.bind(clientChatService)) // 创建会话
         this.registerHandler("GET", '/chat/get/sessions', getSessionsInput, getSessionsOutput, clientChatService.getSessions.bind(clientChatService)) // 查询会话
+        this.registerHandler("GET", '/chat/get/session', getSessionInput, getSessionOutput, clientChatService.getSession.bind(clientChatService)) // 查询会话
         this.registerHandler("POST", '/chat/pin/session', pinSessionInput, null, clientChatService.pinSession.bind(clientChatService)) // 置顶会话
         this.registerHandler("POST", '/chat/send/message', sendMessageInput, sendMessageOutput, clientChatService.sendMessage.bind(clientChatService)) // 发送消息
         this.registerHandler("GET", '/chat/get/messages', getMessagesInput, getMessagesOutput, clientChatService.getMessages.bind(clientChatService)) // 查询消息

@@ -10,7 +10,7 @@
       class="session-image"
       :user-id="props.userId"
       :img-url="getSessionImageUrl(props.sessionType)"
-      :is-upload="props.sessionType === 3 ? false : true"
+      :is-upload="props.sessionType === 3 || props.sessionType === 4 ? false : true"
       width="60px"
     />
     <div class="session-content">
@@ -18,9 +18,11 @@
         <div class="name">{{ getSessionName() }}</div>
         <div class="time">{{ formatTime(props.messageTime) }}</div>
       </div>
-      <div class="msg-content">{{ getMessage() }}</div>
+      <div class="msg-content">
+        <div class="message">{{ getMessage() }}</div>
+        <div v-if="props.unreadCount > 0" class="unread-count">{{ props.unreadCount }}</div>
+      </div>
     </div>
-    <div v-if="props.unreadCount > 0" class="unread-count">{{ props.unreadCount }}</div>
   </div>
 </template>
 
@@ -48,8 +50,10 @@
       case 2:
         return props.userAvatarUrl;
       case 3:
-      default:
         return '/images/setting.png';
+      case 4:
+        return '/images/interaction.png';
+      default:
     }
   }
 
@@ -61,8 +65,10 @@
         return props.userName;
       case 3:
         return "系统通知";
+      case 4:
+        return "互动消息"
       default:
-          return '未知会话';
+        return '未知会话';
     }
   }
 
@@ -78,7 +84,19 @@
       // 作品分享
       case 3:
         return "分享了作品"
+
+      // 作品点赞通知
+      case 4:
+        return "您的作品收到了新的点赞"
       
+      // 作品收藏通知
+      case 5:
+        return "您的作品被收藏了"
+
+      // 作品转发通知
+      case 6:
+        return "您的作品被转发了"
+
       // 无消息
       case 0:
         return "快去给Ta打个招呼吧^.^"
@@ -109,11 +127,12 @@
     white-space: nowrap;
     .session-content {
       display: grid;
-      grid-template-columns: auto;
+      grid-template-columns: 100%;
+      align-items: center;
+      overflow: hidden;
       .session-name {
         display: grid;
-        grid-template-columns: auto 1fr auto;
-        column-gap: 3rem;
+        grid-template-columns: auto 1fr;
         align-items: center;
         .name {
           grid-column: 1;
@@ -121,36 +140,34 @@
           font-weight: 500;
         }
         .time {
-          grid-column: 3;
+          justify-self: end;
           font-size: 0.7rem;
           color: var(--root-gray);
           font-weight: 500;
         }
       }
       .msg-content {
-        grid-column: 1;
-        font-size: 0.75rem;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        color: var(--root-gray-dark);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        font-size: 0.8rem;
+        .message {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          color: var(--root-gray-dark);
+        }
+        .unread-count {
+          height: 100%;
+          aspect-ratio: 1 / 1;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          color: white;
+          background-color: red;
+        }
       }
-    }
-    .unread-count {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      right: 1rem;
-      font-size: 0.8rem;
-      font-weight: bold;
-      height: 1.4rem;
-      width: 1.4rem;
-      color: white;
-      background-color: red;
-      border-radius: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
   }
 
