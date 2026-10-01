@@ -56,6 +56,7 @@ export const loginOutput = objectType({
 // 获取初始化数据输出
 export const getInitDataOutput = objectType({
     user: userSchema,
+    unreadMessageCount: numberType,
 })
 
 // 获取用户的关注/粉丝输入

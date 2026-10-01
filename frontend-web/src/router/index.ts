@@ -6,7 +6,7 @@ import LoginPage from '@/page/login-page.vue'
 import PublishPage from '@/page/publish-page.vue'
 import ChatPage from '@/page/chat-page.vue'
 import LivePage from '@/page/live-page.vue'
-import { checkLogin } from './middleware';
+import { middleware } from './middleware';
 
 const routes = [
   { path: "/login", component: LoginPage, name: "LoginPage" },
@@ -27,6 +27,6 @@ const router = createRouter({
 })
 
 // 注册中间件
-router.beforeEach(checkLogin);
+router.beforeEach(middleware);
 
 export default router

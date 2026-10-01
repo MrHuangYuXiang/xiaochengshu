@@ -35,7 +35,8 @@
                 "schema": {
                   "type": "object",
                   "required": [
-                    "user"
+                    "user",
+                    "unreadMessageCount"
                   ],
                   "properties": {
                     "user": {
@@ -80,6 +81,9 @@
                           "type": "integer"
                         }
                       }
+                    },
+                    "unreadMessageCount": {
+                      "type": "integer"
                     }
                   }
                 }

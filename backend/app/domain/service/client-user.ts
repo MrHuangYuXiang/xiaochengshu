@@ -28,6 +28,7 @@ import { getPageParams } from "../../helper/http.js";
 import { ClientChatMessageTypeEnum, ClientChatSessionTypeEnum } from "../model/enum/client-chat.js";
 import { FileExtEnum } from "../model/enum/file.js";
 import e from "express";
+import { ClientChatMessageTable, ClientChatSessionMemberTable, ClientChatSessionTable } from "../model/db-schema/client-chat.js";
 
 // FIXME: 该服务下的接口需要重写加锁逻辑,锁需要放在事务外面,避免mvcc快照导致锁失效
 export class ClientUserService extends BaseService {
@@ -130,16 +131,30 @@ export class ClientUserService extends BaseService {
     async getInitData(req: Request, res: EnhancedResponse<null, null>) {
         const current = getCurrent()
 
-        // 查询初始化信息并推送初始化事件
-        const result = await current.tx.select(
-            {
-                user: getTableColumns(ClientUserTable),
-            }).
+        // 查询用户信息
+        const user = await current.tx.
+            select().
             from(ClientUserTable).
             where(eq(ClientUserTable.id, current.payload.userId))
 
+        // 查询未读消息数量
+        const unreadMessageCount = await current.tx.
+            select({
+                unreadMessageCount: count(ClientChatMessageTable.id).as("unreadMessageCount"),
+            }).
+            from(ClientChatSessionTable).
+            innerJoin(ClientChatSessionMemberTable, and(
+                eq(ClientChatSessionTable.id, ClientChatSessionMemberTable.session_id),
+                eq(ClientChatSessionMemberTable.user_id, current.payload.userId),
+            )).
+            innerJoin(ClientChatMessageTable, and(
+                eq(ClientChatSessionTable.id, ClientChatMessageTable.session_id),
+                gt(ClientChatMessageTable.inc_seq, ClientChatSessionMemberTable.last_read_seq),
+            ))
+
         res.json(getInitDataOutput.parse({
-            ...result[0],
+            user: user[0],
+            unreadMessageCount: unreadMessageCount[0]?.unreadMessageCount || 0,
         }))
     }
 

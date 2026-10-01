@@ -5,12 +5,16 @@ import SharedWorker from "./share.ts?sharedworker"
  * 客户端事件推送
  */
 class ClientEvent {
-  // 回调映射表,该表用于存储所有事件类型的回调函数
-  callbackMap: Map<string, (data: unknown) => Promise<void>>
+  // 全局回调映射表
+  globalCallbackMap: Map<string, (data: unknown) => Promise<void>>
+  // 页面回调映射表
+  pageCallbackMap: Map<string, (data: unknown) => Promise<void>>
+
   worker: SharedWorker | null = null
 
   constructor() {
-    this.callbackMap = new Map<string, (data: unknown) => Promise<void>>()
+    this.globalCallbackMap = new Map<string, (data: unknown) => Promise<void>>()
+    this.pageCallbackMap = new Map<string, (data: unknown) => Promise<void>>()
   }
 
   // 建立事件推送连接
@@ -21,8 +25,8 @@ class ClientEvent {
     this.worker.port.start()
     this.worker.port.addEventListener("message", async (msg) => {
       const { type, data } = msg.data as { type: string, data: unknown }
-      if (this.callbackMap.has(type)) {
-        await this.callbackMap.get(type)!(data)
+      if (this.globalCallbackMap.has(type)) {
+        await this.globalCallbackMap.get(type)!(data)
       }
     })
     this.worker.port.postMessage({
@@ -40,8 +44,16 @@ class ClientEvent {
   }
 
   // 注册回调函数
-  public async registerCallback(eventType: string, callback: (data: unknown) => Promise<void>) {
-    this.callbackMap.set(eventType, callback)
+  public async registerCallback(
+    callbackType: "global" | "page",
+    eventType: string, 
+    callback: (data: unknown) => Promise<void>
+  ) {
+    if (callbackType === "global") {
+      this.globalCallbackMap.set(eventType, callback)
+    } else {
+      this.pageCallbackMap.set(eventType, callback)
+    }
   }
 }
 
