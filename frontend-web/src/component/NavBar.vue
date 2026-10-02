@@ -109,6 +109,7 @@
       font-weight: 600;
       white-space: nowrap;
       .statistic {
+        margin-left: 2rem;
         opacity: 0;
         height: 100%;
         aspect-ratio: 1 / 1;

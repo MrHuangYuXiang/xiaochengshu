@@ -1,11 +1,19 @@
 <template>
-    <div 
-        :class="{'image': true, 'hoverable': props.enableHover}"
-        :style="{
-            backgroundImage: `url(${getImageUrl()})`,
+    <div
+        :class="{
+            'image': true
         }"
-        @click.self="clickImage"
-    >
+        >
+        <img 
+            :src="getImageUrl()"
+            :style="{ 
+                objectFit: props.objectFit
+            }"
+            :class="{
+                hoverable: props.enableHover,
+            }"
+            @click="clickImage"
+        >
         <AppIcon
             type="chevron-left"
             :fill="'white'"
@@ -20,7 +28,6 @@
             v-if="props.currentIndex < props.totalCount - 1" 
             @click="emits('switch', props.currentIndex + 1)"
         />
-        <slot></slot>
     </div>
 </template>
 
@@ -29,44 +36,26 @@
     import { globalImagePreview } from "@/component/global.ts"
 
     const uploadUrl = import.meta.env.VITE_UPLOAD_URL
-    const props = defineProps({
-        src: {
-             type: String,
-             default: "",
-        },
-        // 是否为后端upload图片
-        isUploadImage: {
-            type: Boolean,
-            default: true,
-        },
-
-        // 是否开启hover效果
-        enableHover: {
-            type: Boolean,
-            default: false,
-        },
-
-        // 是否开启点击预览大图效果
-        enablePreview: {
-            type: Boolean,
-            default: false,
-        },
-
-        // 是否开启切换图片按钮
-        enableSwitch: {
-            type: Boolean,
-            default: false,
-        },
-        // 当前显示的图片索引
-        currentIndex: {
-            type: Number,
-            default: 0,
-        },
-        // 图片总数量,开启切换功能必须传入!
-        totalCount: {
-            type: Number,
-            default: 0,
-        }
+    const props = withDefaults(defineProps<{
+        src: string,
+        objectFit?: 'contain' | 'cover',
+        isUploadImage?: boolean,
+        enableHover?: boolean,
+        enablePreview?: boolean,
+        enableSwitch?: boolean,
+        currentIndex?: number,
+        totalCount?: number,
+    }>(), {
+        width: "auto",
+        height: "auto",
+        maxHeight: "auto",
+        objectFit: "cover",
+        isUploadImage: true,
+        enableHover: false,
+        enablePreview: false,
+        enableSwitch: false,
+        currentIndex: 0,
+        totalCount: 0,
     })
 
     const emits = defineEmits<{
@@ -92,12 +81,25 @@
 
 <style scoped lang="scss">
     .image {
+        height: auto;
+        width: auto;
         position: relative;
-        border-radius: 15px;
-        transition: all 0.3s ease-in-out;
-        background-position: center center;
-        background-repeat: no-repeat;
         background-color: var(--root-bg-gray);
+        border-radius: 15px;
+        img {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            transition: all 0.3s ease-in-out;
+            display: block;
+            border-radius: 15px;
+        }
+        .hoverable {
+            cursor: pointer;
+        }
+        .hoverable:hover {
+            filter: brightness(0.85);
+        }
         .switch-btn {
             transition: transform 0.25s ease-in-out;
             width: 2rem;
@@ -123,11 +125,5 @@
             background: rgba(0, 0, 0, 0.3);
             transform: scale(1.1);
         }
-    }
-    .hoverable {
-        cursor: pointer;
-    }
-    .hoverable:hover {
-        filter: brightness(0.85);
     }
 </style>

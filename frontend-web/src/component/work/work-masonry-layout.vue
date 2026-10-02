@@ -29,7 +29,7 @@
   import WorkCard from './work-card.vue';
   import ScrollContainer from '../common/scroll-container.vue';
   import AppSegment from '../common/app-segment.vue';
-  import { EnhancedList } from '@/lib/list';
+  import { EnhancedList } from '@/lib/structure.ts';
   import type { WorksSchema } from '@/api/type.ext';
   import { ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen.ts';
@@ -75,8 +75,7 @@
     grid-template-columns: 100%;
     .masonry-box {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(10rem, 15rem));
-      justify-items: stretch;
+      grid-template-columns: repeat(auto-fill, 270px);
       gap: 0.5rem;
     }
   }

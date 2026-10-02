@@ -30,7 +30,7 @@
     import FloatingWindow from '../common/floating-window.vue';
     import ScrollContainer from '../common/scroll-container.vue';
     import UserCard from '../user/user-card.vue';
-    import { EnhancedList } from '@/lib/list.ts';
+    import { EnhancedList } from '@/lib/structure.ts';
     import { ref } from 'vue';
     import type { SessionSchema } from '@/api/type.ext.ts';
     import { axiosProxy } from '@/api/axios.ts';

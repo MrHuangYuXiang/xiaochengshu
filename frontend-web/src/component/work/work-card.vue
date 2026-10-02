@@ -2,7 +2,6 @@
     <div class="card" ref="cardContainerRefs" :id="props.workId">
         <ImageSlider
             :src="`${props.workCoverUrl}`"
-            class="image"
             :enableHover="true"
             @click="globalWorkModal.show(props.workId)"
         />
@@ -62,11 +61,6 @@
         background-color: var(--root-bg-gray);
         border-radius: 15px;
         row-gap: 0.25rem;
-        .image {
-            min-width: 9rem;
-            min-height: 10rem;
-            background-size: cover;
-        }
         .info {
           padding: 0.5rem;
           display: grid;

@@ -49,7 +49,7 @@
         <div
           class="chat-messages"
           :class="{
-            'system': sessions.get(selectedSessionId)?.session.type === 3,
+            'private': sessions.get(selectedSessionId)?.session.type === 1,
           }"
         >
           <ChatMessage
@@ -60,15 +60,16 @@
             :messageType="msg.message.type"
             :messageContent="msg.message.content"
             :messagePayload="msg.message.payload"
+            :messageCreatedAt="msg.message.created_at"
             :sessionType="sessions.get(selectedSessionId)?.session.type"
             @clickMessage="clickMessage(msg)"
           />
         </div>
       </ScrollContainer>
-      <ChatSender 
+      <ChatSender
         @send-msg="sendMsg" 
         class="chat-sender" 
-        v-if="sessions.get(selectedSessionId)?.session.type !== 3"
+        v-if="sessions.get(selectedSessionId)?.session.type === 1"
       />
     </div>
   </div>
@@ -83,14 +84,14 @@
   import SelectFloating from '@/component/common/select-floating.vue';
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { SessionSchema, MessageSchema } from '@/api/type.ext';
-  import { EnhancedList } from '@/lib/list';
+  import { EnhancedList } from '@/lib/structure';
   import { axiosProxy } from '@/api/axios';
   import type { components, paths } from '@/api/gen';
   import { useRoute } from 'vue-router';
-  import { globalReportModal } from '@/component/global';
+  import { globalReportModal, globalWorkModal } from '@/component/global';
   import { ElMessage } from 'element-plus';
   import { clientEvent } from '@/api/event'
-import { storage } from '@/storage';
+  import { storage } from '@/storage';
 
   const route = useRoute()
 
@@ -184,10 +185,15 @@ import { storage } from '@/storage';
         break;
       // 举报通知
       case 2:
-        console.log(msg.message)
         if (!msg.message.payload[2]) return
         globalReportModal.show(msg.message.payload[2].report_id)
         break;
+      // 作品互动消息
+      case 4:
+      case 5:
+      case 6:
+        if (!msg.message.payload[msg.message.type]) return
+        globalWorkModal.show(msg.message.payload[msg.message.type]!.work_id)
       default:
         break;
     }
@@ -227,7 +233,7 @@ import { storage } from '@/storage';
       paths["/chat/get/session"]["get"]["parameters"]["query"],
       paths["/chat/get/session"]["get"]["responses"]["200"]["content"]["application/json"]
     >(`/chat/get/session`, { sessionId: event.message.session_id })
-    if (session.session) sessions.value.unshift(session.session)
+    if (session.session) sessions.value.insert(session.session, (item) => item.sessionMember.is_pin === 0)
 
     // 如果当前正在和该会话聊天,则插入消息
     if (selectedSessionId.value === event.message.session_id) {
@@ -308,18 +314,18 @@ import { storage } from '@/storage';
 
     .chat-messages {
       width: 100%;
-      gap: 0.5rem;
       padding: 2rem 0;
       display: flex;
       flex-direction: column-reverse;
+      align-items: stretch;
       justify-content: end;
-      align-items: center;
-    }
-    .system {
       grid-row: 2 / span 2;
     }
+    .private {
+      grid-row: 2;
+    }
     .chat-sender {
-      width: 75%;
+      width: 100%;
       justify-self: center;
     }
   }

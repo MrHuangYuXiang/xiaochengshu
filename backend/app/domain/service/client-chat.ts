@@ -57,7 +57,7 @@ export class ClientChatService extends BaseService {
             leftJoin(latestMessageSubQuery, eq(latestMessageSubQuery.session_id, ClientChatSessionTable.id)).
             leftJoin(ClientChatMessageTable, eq(ClientChatMessageTable.inc_seq, latestMessageSubQuery.maxIncSeq)).
             where(whereCond).
-            orderBy(desc(ClientChatSessionMemberTable.is_pin), desc(unreadMessageSubQuery.unreadCount));
+            orderBy(desc(ClientChatSessionMemberTable.is_pin), desc(ClientChatMessageTable.inc_seq));
     }
 
     /**

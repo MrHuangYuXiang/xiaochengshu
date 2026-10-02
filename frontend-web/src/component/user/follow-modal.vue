@@ -45,7 +45,7 @@
   import BaseModal from '../common/BaseModal.vue';
   import { axiosProxy } from '@/api/axios.ts';
   import type { paths } from '@/api/gen.ts';
-  import { EnhancedList } from '@/lib/list.ts';
+  import { EnhancedList } from '@/lib/structure.ts';
   import { globalFollowModal } from '../global.ts';
 import { ElMessage } from 'element-plus';
 import { storage } from '@/storage.ts';

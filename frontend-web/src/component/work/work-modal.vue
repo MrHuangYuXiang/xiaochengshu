@@ -12,8 +12,10 @@
   >
     <div class="work-modal">
       <ImageSlider
+        v-if="work"
         class="image"
-        :src="work?.images[currentImageIndex]?.path || ''"
+        :object-fit="'contain'"
+        :src="work.images[currentImageIndex]?.path || ''"
         :enable-preview="true"
         :enable-switch="true"
         :current-index="currentImageIndex"
@@ -174,9 +176,9 @@
   import { onMounted, ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen';
   import type { workCommentSchema, WorkSchema } from '@/api/type.ext'
-  import { Forest } from '@/lib/tree';
+  import { Forest } from '@/lib/structure.ts';
   import { axiosProxy } from '@/api/axios.ts';
-  import { EnhancedList } from '@/lib/list.ts';
+  import { EnhancedList } from '@/lib/structure.ts';
   import { ElMessage } from 'element-plus';
   import { globalWorkModal } from '../global.ts';
 
@@ -404,9 +406,6 @@
     display: grid;
     grid-template-columns: 60% 40%;
     grid-template-rows: 100%;
-    .image {
-      border-right: 1px solid #e5e5e5;
-      background-size: contain;
     }
     .right {
       display: grid;
@@ -551,5 +550,4 @@
         }
       }
     }
-  }
 </style>
