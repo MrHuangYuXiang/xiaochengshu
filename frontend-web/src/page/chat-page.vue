@@ -8,7 +8,7 @@
         <div class="title">我的消息</div>
         <SessionCard
           v-for="session in sessions"
-          v-model:selected-id="selectedSessionId"
+          v-model:selected-id="storage.activeSessionId.value"
           :key="session.session.id"
           :sessionId="session.session.id"
           :sessionType="session.session.type"
@@ -24,7 +24,7 @@
         />
       </div>
     </ScrollContainer>
-    <div class="chat-panel" v-if="selectedSessionId !== ''">
+    <div class="chat-panel" v-if="storage.activeSessionId.value !== ''">
       <div class="message-top">
         <div class="setting">
           <AppIcon 
@@ -45,11 +45,14 @@
         trigger-type="reverse-top"
         :load-more-callback="getMessages"
         ref="msgScrollRef"
+        :style="{
+          height: '100%'
+        }"
       >
         <div
           class="chat-messages"
           :class="{
-            'private': sessions.get(selectedSessionId)?.session.type === 1,
+            'private': sessions.get(storage.activeSessionId.value)?.session.type === 1,
           }"
         >
           <ChatMessage
@@ -61,7 +64,7 @@
             :messageContent="msg.message.content"
             :messagePayload="msg.message.payload"
             :messageCreatedAt="msg.message.created_at"
-            :sessionType="sessions.get(selectedSessionId)?.session.type"
+            :sessionType="sessions.get(storage.activeSessionId.value)?.session.type"
             @clickMessage="clickMessage(msg)"
           />
         </div>
@@ -69,7 +72,7 @@
       <ChatSender
         @send-msg="sendMsg" 
         class="chat-sender" 
-        v-if="sessions.get(selectedSessionId)?.session.type === 1"
+        v-if="sessions.get(storage.activeSessionId.value)?.session.type === 1"
       />
     </div>
   </div>
@@ -82,7 +85,7 @@
   import ChatMessage from '@/component/chat/chat-message.vue';
   import AppIcon from '@/component/common/AppIcon.vue';
   import SelectFloating from '@/component/common/select-floating.vue';
-  import { onMounted, ref, useTemplateRef } from 'vue';
+  import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
   import type { SessionSchema, MessageSchema } from '@/api/type.ext';
   import { EnhancedList } from '@/lib/structure';
   import { axiosProxy } from '@/api/axios';
@@ -111,8 +114,6 @@
     { id: 1, text: '置顶聊天' },
   ]
 
-  // 当前选中会话id
-  const selectedSessionId = ref("");
   const msgScrollRef = useTemplateRef("msgScrollRef")
 
   // 查询会话
@@ -136,7 +137,7 @@
       >("/chat/get/messages", { 
         page: page, 
         pageSize: size, 
-        sessionId: selectedSessionId.value
+        sessionId: storage.activeSessionId.value
       })
       return data.messages
     })
@@ -145,16 +146,16 @@
 
   // 切换当前选中会话
   const switchSession = async (sessionId: string) => {
-    if (selectedSessionId.value === sessionId) {
+    if (storage.activeSessionId.value === sessionId) {
       return
     }
 
-    selectedSessionId.value = sessionId
+    storage.activeSessionId.value = sessionId
     messages.value.clear()
     msgScrollRef.value?.reset()
 
     // 更新未读信息数据
-    const session = sessions.value.get(selectedSessionId.value)
+    const session = sessions.value.get(storage.activeSessionId.value)
     if (session && storage.initData.value) {
       storage.initData.value.unreadMessageCount -= session.unreadCount
       session.unreadCount = 0
@@ -167,7 +168,7 @@
       paths["/chat/send/message"]["post"]["requestBody"]["content"]["application/json"],
       paths["/chat/send/message"]["post"]["responses"]["200"]["content"]["application/json"]
     >("/chat/send/message", {
-      sessionId: selectedSessionId.value,
+      sessionId: storage.activeSessionId.value,
       content: content,
       type: 1,
       payload: {
@@ -204,7 +205,7 @@
     switch (id) {
       // 置顶聊天
       case 1:
-        const session = sessions.value.get(selectedSessionId.value)
+        const session = sessions.value.get(storage.activeSessionId.value)
         if (!session) return
 
         session.sessionMember.is_pin = session.sessionMember.is_pin === 1 ? 0 : 1
@@ -236,7 +237,7 @@
     if (session.session) sessions.value.insert(session.session, (item) => item.sessionMember.is_pin === 0)
 
     // 如果当前正在和该会话聊天,则插入消息
-    if (selectedSessionId.value === event.message.session_id) {
+    if (storage.activeSessionId.value === event.message.session_id) {
       messages.value.unshift(event)
     }
   }
@@ -264,8 +265,16 @@
     })
     sessions.value.unshift(sessionData)
     // 切换选中会话为新创建的会话
-    selectedSessionId.value = sessionData.session.id
+    storage.activeSessionId.value = sessionData.session.id
   }
+
+  onUnmounted(async () => {
+    // 清除活跃会话
+    await axiosProxy.post<
+      undefined,
+      undefined
+    >("/chat/clear/active/session", undefined)
+  })
 </script>
 
 <style scoped lang="css">

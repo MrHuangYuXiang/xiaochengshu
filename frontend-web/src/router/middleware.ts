@@ -6,14 +6,14 @@ export const middleware = (to: any, from: any) => {
   clientEvent.pageCallbackMap.clear()
 
   // 如果当前用户已登录,则不允许访问登录页
-  if (storage.token.value !== null && to.name === "LoginPage") {
+  if (storage.token.value !== undefined && to.name === "LoginPage") {
     return {
       name: "DiscoverPage",
     }
   }
 
   // 如果当前用户未登录,则仅允许访问登录页
-  if (storage.token.value === null && to.name !== "LoginPage") {
+  if (storage.token.value === undefined && to.name !== "LoginPage") {
     return {
       name: "LoginPage",
     }

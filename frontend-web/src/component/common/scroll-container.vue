@@ -8,13 +8,13 @@
     @scroll="scrollToBottom"
   >
     <slot></slot>
-    <div class="tip" v-if="isEnd">没有更多了^^</div>
-    <div class="tip" v-if="isLoading">加载中...</div>
+    <div :class="['tip', {'tip-show': isEnd}]">没有更多了^^</div>
+    <div :class="['tip', {'tip-show': isLoading}]">加载中...</div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
+  import { nextTick, onMounted, ref } from 'vue';
 
   const props = defineProps<{
     // 触发类型 bottom: 底部触发 reverse-top: 逆顶部触发
@@ -33,32 +33,38 @@
   const scrollToBottom = async (e: Event) => {
     const target = e.target as HTMLElement
     let diff = 0
+    const diffThreshold = 1
+    const prevScrollTop = target.scrollTop
+    const prevScrollHeight = target.scrollHeight
+    const prevClientHeight = target.clientHeight
 
     // 加载中或无更多数据时, 不触发
     if (isEnd.value || isLoading.value) return
+    isLoading.value = true
     switch (props.triggerType) {
       case 'bottom':
         diff = (target.scrollHeight - target.clientHeight) - target.scrollTop
-        if (diff <= 1 || diff >= -1) {
-          scrollMain()
+        if (diff <= diffThreshold && diff >= -diffThreshold) {
+          await scrollMain()
         }
         break
 
       // 该情况匹配flex-direction: column-reverse时滚动顶部触发,该情况scrollTop为负数
       case 'reverse-top':
-        diff = -target.scrollTop
-        if (diff <= 1 || diff >= -1) {
-          scrollMain()
+        diff = (prevScrollHeight - prevClientHeight) + prevScrollTop
+        if (diff <= diffThreshold && diff >= -diffThreshold) {
+          await scrollMain()
+          target.scrollTop = prevScrollTop
         }
         break
     }
+    isLoading.value = false
   }
 
   // 加载主逻辑
   const scrollMain = async () => {
-    isLoading.value = true
     isEnd.value = await props.loadMoreCallback()
-    isLoading.value = false
+    await nextTick()
   }
 
   // 挂载时自动执行一次回调
@@ -92,12 +98,15 @@
   .scroll-container {
     overflow: auto;
     display: flex;
-    align-items: stretch;
     .tip {
+      opacity: 0;
       font-size: 0.9rem;
       color: var(--root-gray);
       padding: 1rem 0;
       text-align: center;
+    }
+    .tip-show {
+      opacity: 1;
     }
   }
 </style>

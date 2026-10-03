@@ -83,7 +83,7 @@
       paths["/user/init-data"]["get"]["parameters"]["query"],
       paths["/user/init-data"]["get"]["responses"]["200"]["content"]["application/json"]
     >('/user/init-data', undefined)
-    storage.setInitData(initData)
+    storage.initData.value = initData
 
     ElMessage("保存成功")
     globalUpdateUserModal.isShow.value = false
@@ -94,7 +94,6 @@
     const formData = new FormData()
     formData.append('avatar', file)
     await axiosProxy.post('/upload/user/avatar', formData)
-    storage.updateUserAvatarUrl()
     ElMessage("头像保存成功")
   }
 

@@ -2,7 +2,19 @@ import type { Request } from "express";
 import type { EnhancedResponse } from "../model/dto/index.js";
 import { ClientChatSessionTable, ClientChatSessionMemberTable, ClientChatMessageTable } from "../model/db-schema/client-chat.js";
 import { ClientUserTable } from "../model/db-schema/client-user.js";
-import { createSessionOutput, getMessagesInput, getMessagesOutput, getSessionInput, getSessionOutput, getSessionsInput, getSessionsOutput, pinSessionInput, sendMessageInput, sendMessageOutput, type createSessionInput } from "../model/dto/client-chat.js";
+import { 
+    createSessionOutput, 
+    getMessagesInput, 
+    getMessagesOutput, 
+    getSessionInput, 
+    getSessionOutput, 
+    getSessionsInput, 
+    getSessionsOutput, 
+    pinSessionInput, 
+    sendMessageInput, 
+    sendMessageOutput, 
+    createSessionInput
+} from "../model/dto/client-chat.js";
 import { getCurrent } from "../../lib/local-stroage.js";
 import { v4 as uuidv4 } from "uuid";
 import { and, count, desc, eq, getTableColumns, gt, inArray, lt, max, not, SQL, sql } from "drizzle-orm";
@@ -157,6 +169,15 @@ export class ClientChatService extends BaseService {
             content: res.locals.body!.content,
         }, res.locals.body!.payload)
 
+        // 更新最后阅读时间
+        await this.baseUpdateMessageReadTime(
+            message.message.inc_seq,
+            and(
+                eq(ClientChatSessionMemberTable.session_id, res.locals.body!.sessionId),
+                eq(ClientChatSessionMemberTable.user_id, current.payload.userId),
+            )
+        )
+
         // 返回发送的消息
         res.json(sendMessageOutput.parse({
             message: message.message,
@@ -185,17 +206,31 @@ export class ClientChatService extends BaseService {
          * FIX: 仅更新小于当前消息序列号的记录
          */
         if (messages[0]) {
-            await current.tx.update(ClientChatSessionMemberTable).set({
-                last_read_seq: messages[0].message.inc_seq,
-            }).where(and(
-                eq(ClientChatSessionMemberTable.session_id, res.locals.query!.sessionId),
-                eq(ClientChatSessionMemberTable.user_id, current.payload.userId),
-                lt(ClientChatSessionMemberTable.last_read_seq, messages[0].message.inc_seq),
-            ));
+            await this.baseUpdateMessageReadTime(
+                messages[0].message.inc_seq,
+                and(
+                    eq(ClientChatSessionMemberTable.session_id, res.locals.query!.sessionId),
+                    eq(ClientChatSessionMemberTable.user_id, current.payload.userId),
+                    lt(ClientChatSessionMemberTable.last_read_seq, messages[0].message.inc_seq),
+                )
+            )
         }
+
+        // 更新活跃会话
+        this.clientManager.updateMetadata(current.payload.userId, {
+            activeSessionId: res.locals.query!.sessionId,
+        })
 
         res.json(getMessagesOutput.parse({
             messages: messages,
         }));
+    }
+
+    // 清理活跃会话
+    async clearActiveSession(req: Request, res: EnhancedResponse<null, null>) {
+        const current = getCurrent();
+        this.clientManager.updateMetadata(current.payload.userId, {
+            activeSessionId: "",
+        })
     }
 }

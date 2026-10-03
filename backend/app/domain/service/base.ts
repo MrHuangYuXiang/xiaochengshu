@@ -1,4 +1,4 @@
-import { and, eq, getTableColumns, sql } from "drizzle-orm"
+import { and, eq, getTableColumns, SQL, sql } from "drizzle-orm"
 import { ClientFollowTable, ClientUserTable } from "../model/db-schema/client-user.js"
 import { getCurrent } from "../../lib/local-stroage.js"
 import { alias } from "drizzle-orm/mysql-core"
@@ -186,7 +186,7 @@ export class BaseService {
         const msgId = uuidv4()
 
         // 创建消息
-        await current.tx.insert(ClientChatMessageTable).values({
+        const insertResult = await current.tx.insert(ClientChatMessageTable).values({
             id: msgId,
             session_id: message.session_id,
             user_id: message.user_id,
@@ -226,6 +226,18 @@ export class BaseService {
                         user: item.user,
                     })
                 );
+
+                // 如果目标用户的活跃会话是当前会话,则更新最新消息序列号
+                const metadata = this.clientManager.getMetadata(item.member.user_id)
+                if (metadata && metadata.activeSessionId === item.session.id) {
+                    await this.baseUpdateMessageReadTime(
+                        insertResult[0].insertId,
+                        and(
+                            eq(ClientChatSessionMemberTable.session_id, item.session.id),
+                            eq(ClientChatSessionMemberTable.user_id, item.member.user_id),
+                        )
+                    )
+                }
             }
         }
 
@@ -237,6 +249,21 @@ export class BaseService {
             message: members[0].message,
             user: members[0].user,
         }
+    }
+
+    // 更新消息最新阅读时间
+    async baseUpdateMessageReadTime(
+        inc_seq: number,
+        whereStmt: SQL | undefined,
+    ) {
+        const current = getCurrent()
+        
+        await current.tx.
+            update(ClientChatSessionMemberTable).
+            set({
+                last_read_seq: inc_seq,
+            }).
+            where(whereStmt);
     }
 
     // 查询举报详情

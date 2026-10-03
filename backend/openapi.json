@@ -3257,6 +3257,24 @@
         }
       }
     },
+    "/chat/clear/active/session": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/report": {
       "post": {
         "parameters": [],

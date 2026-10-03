@@ -31,15 +31,32 @@ import {
     getUserFollowsOutput,
     removeFollowerInput,
 } from "./domain/model/dto/client-user.js"
-import { reportWorkInput, getReportTypesOutput, getReportDetailInput, getReportDetailOutput } from "./domain/model/dto/client-report.js"
+import { 
+    reportWorkInput, 
+    getReportTypesOutput, 
+    getReportDetailInput, 
+    getReportDetailOutput
+} from "./domain/model/dto/client-report.js"
 import express from "express"
 import { routeMap } from "./lib/framework-ext.js"
 import { doc } from "./lib/framework-ext.js"
 import { z } from "zod"
-import { createSessionInput, createSessionOutput, getMessagesInput, getMessagesOutput, getSessionInput, getSessionOutput, getSessionsInput, getSessionsOutput, pinSessionInput, sendMessageInput, sendMessageOutput } from "./domain/model/dto/client-chat.js"
+import { 
+    createSessionInput, 
+    createSessionOutput, 
+    getMessagesInput, 
+    getMessagesOutput, 
+    getSessionInput, 
+    getSessionOutput, 
+    getSessionsInput, 
+    getSessionsOutput, 
+    pinSessionInput, 
+    sendMessageInput, 
+    sendMessageOutput, 
+} from "./domain/model/dto/client-chat.js"
 import { LocalMutexAdapter } from "./port/mutex-adapter.js"
 import { LocalFileStorageAdapter } from "./port/file-storage-adapter.js"
-import { LocalClientManagerAdapter } from "./port/client-manager-adapter.js"
+import { LocalClientManager } from "./port/client-manager-adapter.js"
 import type { ClientManagerPort } from "./port/client-manager-port.js"
 import { adminAddUserInput, adminLoginInput, adminLoginOutput } from "./domain/model/dto/admin-user.js"
 import { AdminUserService } from "./domain/service/admin-user.js"
@@ -59,7 +76,7 @@ export class Server implements ServerPort {
     private router: express.Router
 
     constructor() {
-        this.clientManager = new LocalClientManagerAdapter()
+        this.clientManager = new LocalClientManager()
         this.fileStorage = new LocalFileStorageAdapter()
         this.app = express()
         this.router = express.Router()
@@ -118,6 +135,7 @@ export class Server implements ServerPort {
         this.registerHandler("POST", '/chat/pin/session', pinSessionInput, null, clientChatService.pinSession.bind(clientChatService)) // 置顶会话
         this.registerHandler("POST", '/chat/send/message', sendMessageInput, sendMessageOutput, clientChatService.sendMessage.bind(clientChatService)) // 发送消息
         this.registerHandler("GET", '/chat/get/messages', getMessagesInput, getMessagesOutput, clientChatService.getMessages.bind(clientChatService)) // 查询消息
+        this.registerHandler("POST", '/chat/clear/active/session', null, null, clientChatService.clearActiveSession.bind(clientChatService)) // 清除活跃会话
 
         // 举报模块
         this.registerHandler("POST", '/report', reportWorkInput, null, clientReportService.report.bind(clientReportService)) // 举报

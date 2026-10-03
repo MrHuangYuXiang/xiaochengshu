@@ -58,7 +58,9 @@
 
   // 聊天消息推送
   const chatMessagePushCallback = async (data: unknown) => {
-    if (storage.initData.value) storage.initData.value.unreadMessageCount += 1
+    const event = data as components["schemas"]["pushChatMessageEvent"]
+
+    if (storage.initData.value && event.message.session_id !== storage.activeSessionId.value) storage.initData.value.unreadMessageCount += 1
   }
 
   onBeforeMount(async () => {
@@ -71,7 +73,7 @@
     clientEvent.registerCallback("global", "pushChatMessage", chatMessagePushCallback)
 
     // 获取初始化数据
-    storage.setInitData(
+    storage.initData.value = (
       await axiosProxy.get<
       paths["/user/init-data"]["get"]["parameters"]["query"],
       paths["/user/init-data"]['get']["responses"]["200"]["content"]["application/json"]
