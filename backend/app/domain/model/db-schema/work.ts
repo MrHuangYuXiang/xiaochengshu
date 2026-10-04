@@ -2,7 +2,7 @@ import { int, mysqlTable, varchar, date, datetime, tinyint, unique } from 'drizz
 import { baseTable } from './base.js';
 
 // 作品表
-export const ClientWorkTable = mysqlTable('client_work', {
+export const WorkTable = mysqlTable('work', {
     ...baseTable,
     title: varchar({ length: 20 }).notNull(),
     content: varchar({ length: 200 }).notNull(),
@@ -11,7 +11,7 @@ export const ClientWorkTable = mysqlTable('client_work', {
 });
 
 // 作品图片表
-export const ClientWorkImageTable = mysqlTable('client_work_image', {
+export const WorkImageTable = mysqlTable('work_image', {
     ...baseTable,
     work_id: varchar({ length: 255 }).notNull(),
     path: varchar({ length: 255 }).notNull(),
@@ -19,7 +19,7 @@ export const ClientWorkImageTable = mysqlTable('client_work_image', {
 });
 
 // 点赞表
-export const ClientWorkLikeTable = mysqlTable('client_work_like', {
+export const WorkLikeTable = mysqlTable('work_like', {
     ...baseTable,
     work_id: varchar({ length: 255 }).notNull(),
     user_id: varchar({ length: 255 }).notNull(),
@@ -28,7 +28,7 @@ export const ClientWorkLikeTable = mysqlTable('client_work_like', {
 ]);
 
 // 收藏表
-export const ClientWorkCollectTable = mysqlTable('client_work_collect', {
+export const WorkCollectTable = mysqlTable('work_collect', {
     ...baseTable,
     work_id: varchar({ length: 255 }).notNull(),
     user_id: varchar({ length: 255 }).notNull(),
@@ -39,7 +39,7 @@ export const ClientWorkCollectTable = mysqlTable('client_work_collect', {
 
 
 // 评论表
-export const ClientWorkCommentTable = mysqlTable('client_work_comment', {
+export const WorkCommentTable = mysqlTable('work_comment', {
     ...baseTable,
     content: varchar({ length: 200 }).notNull(),
     work_id: varchar({ length: 255 }).notNull(),
@@ -51,7 +51,7 @@ export const ClientWorkCommentTable = mysqlTable('client_work_comment', {
 });
 
 // 评论点赞表
-export const ClientWorkCommentLikeTable = mysqlTable('client_work_comment_like', {
+export const WorkCommentLikeTable = mysqlTable('work_comment_like', {
     ...baseTable,
     comment_id: varchar({ length: 255 }).notNull(),
     user_id: varchar({ length: 255 }).notNull(),

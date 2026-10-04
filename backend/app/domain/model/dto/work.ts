@@ -23,14 +23,15 @@ export const getWorkDetailInput = objectType({
 
 // 获取作品详情输出
 export const getWorkDetailOutput = objectType({
-    user: UserSchemaWithFollow,
-    work: workDetailSchema,
-    images: arrayType(workImageSchema),
-    likeCount: numberType,
-    collectCount: numberType,
-    isLiked: numberType,
-    isCollected: numberType,
-    isOwner: numberType,
+    work: objectType({
+        user: UserSchemaWithFollow,
+        work: workDetailSchema,
+        images: arrayType(workImageSchema),
+        likeCount: numberType,
+        collectCount: numberType,
+        isLiked: numberType,
+        isCollected: numberType,
+    }).optional(),
 })
 
 // 获取用户作品列表输入
@@ -57,7 +58,6 @@ export const getWorksOutput = objectType({
         cover_image: workImageSchema,
         likeCount: numberType,
         isLiked: numberType,
-        isOwner: numberType,
     })),
 })
 
@@ -95,12 +95,25 @@ export const getWorkCommentsOutput = objectType({
 export const createWorkCommentInput = objectType({
     content: stringType.min(1, "内容至少为1个字符").max(200, "内容最多为200个字符"),
     workId: stringType,
+})
+
+// 创建评论输出
+export const createWorkCommentOutput = objectType({
+    comment: objectType(workCommentAggregate).optional(),
+})
+
+// 回复评论输入
+export const replyWorkCommentInput = objectType({
+    content: stringType.min(1, "内容至少为1个字符").max(200, "内容最多为200个字符"),
+    workId: stringType,
     rootCommentId: stringType,
     parentId: stringType,
 })
 
-// 创建评论输出
-export const createWorkCommentOutput = objectType(workCommentAggregate)
+// 回复评论输出
+export const replyWorkCommentOutput = objectType({
+    comment: objectType(workCommentAggregate).optional(),
+})
 
 // 作品互动公共输入字段
 export const workInteractInputFields = {

@@ -3,7 +3,7 @@ import type { Request } from "express"
 import { sscanf } from "scanf"
 import { AppError } from "./app-error.js"
 import fs from "fs"
-import { clientEvents } from "../domain/model/dto/client-event.js"
+import { clientEvents } from "../domain/model/dto/event.js"
 import { FileExtEnum } from '../domain/model/enum/file.js';
 
 // 路由映射表
@@ -14,18 +14,15 @@ export class RouteMap {
         this.map = new Map();
     }
 
-    add(method: "GET" | "POST", url: string, schema: z.ZodObject | undefined) {
-        if (this.map.has(method + url)) {
-            throw new Error('url路径已存在');
+    add(url: string, schema: z.ZodObject | undefined) {
+        if (this.map.has(url)) {
+            throw new Error(`接口路径已存在 ${url}`);
         }
-        this.map.set(method + url, schema);
+        this.map.set(url, schema);
     }
 
-    get(method: "GET" | "POST", url: string) {
-        if (!this.map.has(method + url)) {
-            throw new Error('url路径不存在');
-        }
-        return this.map.get(method + url);
+    get(url: string) {
+        return this.map.get(url);
     }
 }
 
@@ -409,10 +406,10 @@ class DocGen {
         }
     }
 
-    registerPath(method: "GET" | "POST", path: string, inputSchema: z.ZodObject | null, outputSchema: z.ZodObject | null) {
+    registerPath(path: string, inputSchema: z.ZodObject | undefined, outputSchema: z.ZodObject | undefined) {
         // FIX: 重复路径的不同方法时防止覆盖
         this.doc.paths[path] ||= {}
-        this.doc.paths[path][method.toLowerCase()] = {
+        this.doc.paths[path]["post"] = {
             parameters: [],
             responses: {
                 "200": {
@@ -424,32 +421,9 @@ class DocGen {
             },
         }
 
-        // 设置请求查询参数
-        // 注意对于查询参数只允许基础类型,不允许object,array等复杂类型
-        const setRequestQuery = (key: string, obj: z.ZodObject) => {
-            for (const key in obj.shape) {
-                if (obj.shape[key] instanceof z.ZodObject || obj.shape[key] instanceof z.ZodArray) {
-                    throw new Error(`查询参数不允许复杂类型 ${key}`)
-                }
-                this.doc.paths[path][method.toLowerCase()].parameters.push({
-                    name: key,
-                    in: "query",
-                    required: true,
-                    schema: {
-                        type: this.getOriginalType(obj.shape[key]).obj.meta()?.openapiType,
-                    },
-                })
-            }
-        }
-
-        // 设置请求查询参数
-        if (inputSchema && method === "GET") {
-            setRequestQuery("", inputSchema)
-        }
-
-        // 设置请求体参数
-        if (inputSchema && method === "POST") {
-            this.doc.paths[path][method.toLowerCase()].requestBody = {
+        // 设置请求体
+        if (inputSchema) {
+            this.doc.paths[path]["post"].requestBody = {
                 description: "请求体参数",
                 required: true,
                 content: {
@@ -457,13 +431,13 @@ class DocGen {
                     },
                 },
             }
-            const begin = this.doc.paths[path][method.toLowerCase()].requestBody.content["application/json"]
+            const begin = this.doc.paths[path]["post"].requestBody.content["application/json"]
             if (inputSchema) { this.createOpenApiObject("schema", begin, inputSchema) }
             else { this.createOpenApiObject("schema", begin, z.object({})) }
         }
 
-        // 设置响应体参数
-        const begin = this.doc.paths[path][method.toLowerCase()].responses["200"].content["application/json"]
+        // 设置响应体
+        const begin = this.doc.paths[path]["post"].responses["200"].content["application/json"]
         if (outputSchema) {
             this.createOpenApiObject("schema", begin, outputSchema)
         }
@@ -481,7 +455,7 @@ class DocGen {
         }
 
         fs.writeFileSync("/opt/xiaochengshu/openapi.json", JSON.stringify(this.doc, null, 2))
-        console.log("openapi文档生成完成")
+        console.log("openapi文档生成完毕!")
     }
 }
 

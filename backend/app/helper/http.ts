@@ -1,6 +1,4 @@
 import type { Response } from "express";
-import type { FormFieldHeader } from "../lib/framework-ext.js";
-import { AppError } from "../lib/app-error.js";
 
 // 获取分页参数
 export function getPageParams(res: Response) {

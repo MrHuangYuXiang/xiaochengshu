@@ -13,8 +13,8 @@ import {
     objectType,
 } from "./index.js";
 import { page } from "./common.js";
-import { DbChatMessagePayload } from "../db-schema/client-chat.js";
-import { ClientChatMessageTypeEnum } from "../enum/client-chat.js";
+import { DbChatMessagePayload } from "../db-schema/chat.js";
+import { ClientChatMessageTypeEnum } from "../enum/chat.js";
 
 // 会话聚合模型
 export const sessionAggregate = {

@@ -12,7 +12,7 @@ import {
     arrayType,
     objectType,
 } from "./index.js";
-import { chatMessageAggregate, sessionAggregate } from "./client-chat.js";
+import { chatMessageAggregate, sessionAggregate } from "./chat.js";
 
 // 事件枚举定义
 export const ClientEventType = {

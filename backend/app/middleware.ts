@@ -3,7 +3,7 @@ import { routeMap } from "./lib/framework-ext.js";
 import { verifyJWT, type Payload } from "./helper/jwt.js";
 import { localStorage } from "./lib/local-stroage.js";
 import { getTx } from "./domain/db.js";
-import { errorClientEvent, ClientEventType } from "./domain/model/dto/client-event.js";
+import { errorClientEvent, ClientEventType } from "./domain/model/dto/event.js";
 import { AppError } from "./lib/app-error.js";
 import type { ClientManagerPort } from "./port/client-manager-port.js";
 import { AdminUserRole } from "./domain/model/enum/admin-user.js";
@@ -114,36 +114,18 @@ const validateMiddleware = (req: Request, res: Response) => {
         return
     }
 
-    if (req.method !== "POST" && req.method !== "GET") {
-        throw new AppError("请求方法仅支持POST和GET")
+    if (req.method !== "POST") {
+        throw new AppError("请求方法仅支持POST")
     }
-
-    const schema = routeMap.get(req.method, req.path)
-
-    // 如果节点没有schema,则直接跳过
-    if (schema == undefined) {
+    const zodObject = routeMap.get(req.path)
+    // 路径无校验对象则跳过
+    if (zodObject == undefined) {
         return
     }
 
     // POST请求解析请求体
     if (req.method === "POST") {
-        res.locals.body = schema.parse(req.body)
-    }
-
-    // GET请求解析查询参数
-    if (req.method === "GET") {
-        const queryParams: Record<string, any> = {}
-        // 转换查询参数中的boolean字符串为boolean类型,其他类型保持字符串
-        // 目的为解决zod转换"false"为true的问题
-        for (const key in req.query) {
-            if (req.query[key] === "true" || req.query[key] === "false") {
-                queryParams[key] = req.query[key] === "true"
-            } else {
-                queryParams[key] = req.query[key]
-            }
-        }
-        // 由于express的req.query只读,所有需要将查询参数解析到res.locals.query中
-        res.locals.query = schema.parse(queryParams)
+        res.locals.body = zodObject.parse(req.body)
     }
 }
 

@@ -1,6 +1,6 @@
 import { int, mysqlTable, varchar, date, datetime, tinyint, json } from 'drizzle-orm/mysql-core';
 import { baseTable, idType } from "./base.js";
-import { ClientChatMessageTypeEnum } from '../enum/client-chat.js';
+import { ClientChatMessageTypeEnum } from '../enum/chat.js';
 import { objectType, stringType } from '../dto/index.js';
 
 /**
@@ -8,13 +8,13 @@ import { objectType, stringType } from '../dto/index.js';
  */
 
 // 会话表
-export const ClientChatSessionTable = mysqlTable("client_chat_session", {
+export const ChatSessionTable = mysqlTable("chat_session", {
     ...baseTable,
     type: tinyint().notNull(),
 })
 
 // 会话成员表
-export const ClientChatSessionMemberTable = mysqlTable("client_chat_session_member", {
+export const ChatSessionMemberTable = mysqlTable("chat_session_member", {
     ...baseTable,
     session_id: idType(),
     user_id: idType(),
@@ -29,7 +29,7 @@ export const ClientChatSessionMemberTable = mysqlTable("client_chat_session_memb
  * 消息表
  * 采用快照形式存储不同类型的附带结构化数据
  */
-export const ClientChatMessageTable = mysqlTable("client_chat_message", {
+export const ChatMessageTable = mysqlTable("chat_message", {
     ...baseTable,
     type: tinyint().notNull(), // 消息类型
     payload: json().notNull().default({}), // 储存结构化数据

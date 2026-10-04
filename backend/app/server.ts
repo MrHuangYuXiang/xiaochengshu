@@ -1,8 +1,8 @@
 import { corsMiddleware, middlewareWrapper } from "./middleware.js"
-import { ClientUserService } from "./domain/service/client-user.js"
-import { ClientChatService } from "./domain/service/client-chat.js"
-import { ClientWorkService } from "./domain/service/client-work.js"
-import { ClientReportService } from "./domain/service/client-report.js"
+import { UserService } from "./domain/service/user.js"
+import { ChatService } from "./domain/service/chat.js"
+import { WorkService } from "./domain/service/work.js"
+import { ReportService } from "./domain/service/report.js"
 import {
     getWorksInput,
     createWorkCommentInput,
@@ -17,7 +17,9 @@ import {
     likeWorkCommentInput,
     deleteWorkInput,
     shareWorkInput,
-} from "./domain/model/dto/client-work.js"
+    replyWorkCommentInput,
+    replyWorkCommentOutput,
+} from "./domain/model/dto/work.js"
 import {
     smsSendInput,
     loginInput,
@@ -30,13 +32,13 @@ import {
     getUserFollowsInput,
     getUserFollowsOutput,
     removeFollowerInput,
-} from "./domain/model/dto/client-user.js"
+} from "./domain/model/dto/user.js"
 import { 
     reportWorkInput, 
     getReportTypesOutput, 
     getReportDetailInput, 
     getReportDetailOutput
-} from "./domain/model/dto/client-report.js"
+} from "./domain/model/dto/report.js"
 import express from "express"
 import { routeMap } from "./lib/framework-ext.js"
 import { doc } from "./lib/framework-ext.js"
@@ -53,45 +55,45 @@ import {
     pinSessionInput, 
     sendMessageInput, 
     sendMessageOutput, 
-} from "./domain/model/dto/client-chat.js"
-import { LocalMutexAdapter } from "./port/mutex-adapter.js"
+} from "./domain/model/dto/chat.js"
 import { LocalFileStorageAdapter } from "./port/file-storage-adapter.js"
 import { LocalClientManager } from "./port/client-manager-adapter.js"
 import type { ClientManagerPort } from "./port/client-manager-port.js"
-import { adminAddUserInput, adminLoginInput, adminLoginOutput } from "./domain/model/dto/admin-user.js"
-import { AdminUserService } from "./domain/service/admin-user.js"
-import { AdminReportService } from "./domain/service/admin-report.js"
-import type { FileStoragePort } from "./port/file-storage-port.js"
+import { WorkShareService } from "./domain/service/work-share.js"
+import { ReportShareService } from "./domain/service/report-share.js"
+import { UserShareService } from "./domain/service/user-share.js"
+import { ChatShareService } from "./domain/service/chat-share.js"
 
 export interface ServerPort {
     Run(): void
 }
 
 export class Server implements ServerPort {
-    // 端口实例
-    private clientManager: ClientManagerPort
-    private fileStorage: FileStoragePort
     // express相关变量
     private app: express.Express
     private router: express.Router
+    private clientManager: ClientManagerPort
 
     constructor() {
-        this.clientManager = new LocalClientManager()
-        this.fileStorage = new LocalFileStorageAdapter()
         this.app = express()
         this.router = express.Router()
+        this.clientManager = new LocalClientManager()
     }
 
     async Run() {
         // 端口实例
-        const mutex = new LocalMutexAdapter()
         const fileStorage = new LocalFileStorageAdapter()
+        const clientManager = this.clientManager
+        const reportShareService = new ReportShareService(fileStorage, clientManager)
+        const workShareService = new WorkShareService(fileStorage, clientManager)
+        const userShareService = new UserShareService(fileStorage, clientManager)
+        const chatShareService = new ChatShareService(fileStorage, clientManager)
 
         // 服务实例
-        const clientChatService = new ClientChatService(this.fileStorage, this.clientManager)
-        const clientReportService = new ClientReportService(this.fileStorage, this.clientManager)
-        const clientUserService = new ClientUserService(this.fileStorage, this.clientManager)
-        const clientWorkService = new ClientWorkService(this.fileStorage, this.clientManager)
+        const chatService = new ChatService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService) 
+        const reportService = new ReportService(fileStorage, clientManager,  chatShareService, workShareService, userShareService, reportShareService)
+        const userService = new UserService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
+        const workService = new WorkService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
 
         // express中间件注册
         this.app.use(express.json())
@@ -105,42 +107,43 @@ export class Server implements ServerPort {
         /** 以下为客户系统api,面向普通用户 */
 
         // 用户模块
-        this.registerHandler("POST", '/user/connect', null, null, clientUserService.connect.bind(clientUserService), true) // 建立长连接
-        this.registerHandler("GET", '/user/init-data', null, getInitDataOutput, clientUserService.getInitData.bind(clientUserService)) // 获取初始化数据
-        this.registerHandler("POST", '/sms/send', smsSendInput, null, clientUserService.smsSend.bind(clientUserService)) // 发送短信验证码
-        this.registerHandler("POST", '/login', loginInput, loginOutput, clientUserService.login.bind(clientUserService)) // 登录
-        this.registerHandler("GET", '/user', getUserDetailInput, getUserDetailOutput, clientUserService.getUserDetail.bind(clientUserService)) // 获取用户详情
-        this.registerHandler("POST", '/upload/user/avatar', null, null, clientUserService.uploadUserAvatar.bind(clientUserService)) // 上传头像
-        this.registerHandler("POST", '/update/user/info', updateUserInfoInput, null, clientUserService.updateUserInfo.bind(clientUserService)) // 更新用户信息
-        this.registerHandler("GET", '/user/follows', getUserFollowsInput, getUserFollowsOutput, clientUserService.getUserFollows.bind(clientUserService)) // 获取用户关注/粉丝
-        this.registerHandler("POST", '/follow/user', followUserInput, null, clientUserService.followUser.bind(clientUserService)) // 关注用户
-        this.registerHandler("POST", '/remove/follower', removeFollowerInput, null, clientUserService.removeFollower.bind(clientUserService)) // 移除粉丝
+        this.registerHandler('/user/connect', undefined, undefined, userService.connect.bind(userService), true)
+        this.registerHandler('/user/init-data', undefined, getInitDataOutput, userService.getInitData.bind(userService))
+        this.registerHandler('/sms/send', smsSendInput, undefined, userService.smsSend.bind(userService)) 
+        this.registerHandler('/login', loginInput, loginOutput, userService.login.bind(userService))
+        this.registerHandler('/user', getUserDetailInput, getUserDetailOutput, userService.getUserDetail.bind(userService))
+        this.registerHandler('/upload/user/avatar', undefined, undefined, userService.uploadUserAvatar.bind(userService))
+        this.registerHandler('/update/user/info', updateUserInfoInput, undefined, userService.updateUserInfo.bind(userService))
+        this.registerHandler('/user/follows', getUserFollowsInput, getUserFollowsOutput, userService.getUserFollows.bind(userService))
+        this.registerHandler('/follow/user', followUserInput, undefined, userService.followUser.bind(userService))
+        this.registerHandler('/remove/follower', removeFollowerInput, undefined, userService.removeFollower.bind(userService))
 
         // 作品模块
-        this.registerHandler("GET", '/work', getWorkDetailInput, getWorkDetailOutput, clientWorkService.getWorkDetail.bind(clientWorkService)) // 获取作品详情
-        this.registerHandler("GET", '/works', getWorksInput, getWorksOutput, clientWorkService.getWorks.bind(clientWorkService)) // 获取用户作品列表
-        this.registerHandler("POST", '/create/work', null, null, clientWorkService.createWork.bind(clientWorkService)) // 发表作品
-        this.registerHandler("POST", '/delete/work', deleteWorkInput, null, clientWorkService.deleteWork.bind(clientWorkService)) // 删除作品
-        this.registerHandler("POST", '/like/work', likeWorkInput, null, clientWorkService.likeWork.bind(clientWorkService)) // 点赞作品
-        this.registerHandler("POST", '/collect/work', collectWorkInput, null, clientWorkService.collectWork.bind(clientWorkService)) // 收藏作品
-        this.registerHandler("POST", '/share/work', shareWorkInput, null, clientWorkService.shareWork.bind(clientWorkService)) // 分享作品
-        this.registerHandler("GET", '/work/comments', getWorkCommentsInput, getWorkCommentsOutput, clientWorkService.getWorkComments.bind(clientWorkService)) // 获取作品评论/回复
-        this.registerHandler("POST", '/create/work/comment', createWorkCommentInput, createWorkCommentOutput, clientWorkService.createWorkComment.bind(clientWorkService)) // 评论作品
-        this.registerHandler("POST", '/like/work/comment', likeWorkCommentInput, null, clientWorkService.likeWorkComment.bind(clientWorkService)) // 点赞评论
+        this.registerHandler('/work', getWorkDetailInput, getWorkDetailOutput, workService.getWorkDetail.bind(workService))
+        this.registerHandler('/works', getWorksInput, getWorksOutput, workService.getWorks.bind(workService))
+        this.registerHandler('/create/work', undefined, undefined, workService.createWork.bind(workService))
+        this.registerHandler('/delete/work', deleteWorkInput, undefined, workService.deleteWork.bind(workService))
+        this.registerHandler('/like/work', likeWorkInput, undefined, workService.likeWork.bind(workService))
+        this.registerHandler('/collect/work', collectWorkInput, undefined, workService.collectWork.bind(workService))
+        this.registerHandler('/share/work', shareWorkInput, undefined, workService.shareWork.bind(workService))
+        this.registerHandler('/work/comments', getWorkCommentsInput, getWorkCommentsOutput, workService.getWorkComments.bind(workService))
+        this.registerHandler('/create/work/comment', createWorkCommentInput, createWorkCommentOutput, workService.createWorkComment.bind(workService))
+        this.registerHandler('/reply/work/comment', replyWorkCommentInput, replyWorkCommentOutput, workService.replyWorkComment.bind(workService))
+        this.registerHandler('/like/work/comment', likeWorkCommentInput, undefined, workService.likeWorkComment.bind(workService))
 
         // 聊天模块
-        this.registerHandler("POST", '/chat/create/session', createSessionInput, createSessionOutput, clientChatService.createSession.bind(clientChatService)) // 创建会话
-        this.registerHandler("GET", '/chat/get/sessions', getSessionsInput, getSessionsOutput, clientChatService.getSessions.bind(clientChatService)) // 查询会话
-        this.registerHandler("GET", '/chat/get/session', getSessionInput, getSessionOutput, clientChatService.getSession.bind(clientChatService)) // 查询会话
-        this.registerHandler("POST", '/chat/pin/session', pinSessionInput, null, clientChatService.pinSession.bind(clientChatService)) // 置顶会话
-        this.registerHandler("POST", '/chat/send/message', sendMessageInput, sendMessageOutput, clientChatService.sendMessage.bind(clientChatService)) // 发送消息
-        this.registerHandler("GET", '/chat/get/messages', getMessagesInput, getMessagesOutput, clientChatService.getMessages.bind(clientChatService)) // 查询消息
-        this.registerHandler("POST", '/chat/clear/active/session', null, null, clientChatService.clearActiveSession.bind(clientChatService)) // 清除活跃会话
+        this.registerHandler('/chat/create/session', createSessionInput, createSessionOutput, chatService.createSession.bind(chatService))
+        this.registerHandler('/chat/get/sessions', getSessionsInput, getSessionsOutput, chatService.getSessions.bind(chatService))
+        this.registerHandler('/chat/get/session', getSessionInput, getSessionOutput, chatService.getSession.bind(chatService))
+        this.registerHandler('/chat/pin/session', pinSessionInput, undefined, chatService.pinSession.bind(chatService))
+        this.registerHandler('/chat/send/message', sendMessageInput, sendMessageOutput, chatService.sendMessage.bind(chatService))
+        this.registerHandler('/chat/get/messages', getMessagesInput, getMessagesOutput, chatService.getMessages.bind(chatService))
+        this.registerHandler('/chat/clear/active/session', undefined, undefined, chatService.clearActiveSession.bind(chatService))
 
         // 举报模块
-        this.registerHandler("POST", '/report', reportWorkInput, null, clientReportService.report.bind(clientReportService)) // 举报
-        this.registerHandler("GET", '/report/types', null, getReportTypesOutput, clientReportService.getReportTypes.bind(clientReportService)) // 查询举报类型
-        this.registerHandler("GET", '/report', getReportDetailInput, getReportDetailOutput, clientReportService.getReportDetail.bind(clientReportService)) // 查询举报详情
+        this.registerHandler('/report', reportWorkInput, undefined, reportService.report.bind(reportService))
+        this.registerHandler('/report/types', undefined, getReportTypesOutput, reportService.getReportTypes.bind(reportService))
+        this.registerHandler('/report', getReportDetailInput, getReportDetailOutput, reportService.getReportDetail.bind(reportService))
 
         // 直播模块
 
@@ -158,19 +161,14 @@ export class Server implements ServerPort {
 
     // 注册处理函数
     registerHandler(
-        method: "GET" | "POST",
         path: string,
-        inputSchema: z.ZodObject | null,
-        outputSchema: z.ZodObject | null,
+        inputSchema: z.ZodObject | undefined,
+        outputSchema: z.ZodObject | undefined,
         cb: (req: express.Request, res: express.Response) => Promise<void>,
         isPersistent: boolean = false
     ) {
-        doc.registerPath(method, path, inputSchema, outputSchema)
-        routeMap.add(method, path, inputSchema || undefined)
-        if (method === "POST") {
-            return this.router.post(path, middlewareWrapper(cb, isPersistent, this.clientManager))
-        } else {
-            return this.router.get(path, middlewareWrapper(cb, isPersistent, this.clientManager))
-        }
+        doc.registerPath(path, inputSchema, outputSchema)
+        routeMap.add(path, inputSchema)
+        return this.router.post(path, middlewareWrapper(cb, isPersistent, this.clientManager))
     }
 }

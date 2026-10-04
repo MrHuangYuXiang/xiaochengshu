@@ -15,19 +15,21 @@ export const getUserDetailInput = objectType({
 
 // 获取用户详情输出
 export const getUserDetailOutput = objectType({
-    user: UserSchemaWithFollow,
-
-    // 关注数量
-    followingCount: numberType,
-    // 粉丝数量
-    followerCount: numberType,
-    // 作品数量
-    workCount: numberType,
-    // 点赞作品数量
-    likeCount: numberType,
-    // 收藏作品数量
-    collectCount: numberType,
-})
+    user: objectType({
+        user: UserSchemaWithFollow,
+        // 关注数量
+        followingCount: numberType,
+        // 粉丝数量
+        followerCount: numberType,
+        // 作品数量
+        workCount: numberType,
+        // 点赞作品数量
+        likeCount: numberType,
+        // 收藏作品数量
+        collectCount: numberType,
+    }).optional(),
+}
+)
 
 // 更新用户信息输入
 export const updateUserInfoInput = objectType({

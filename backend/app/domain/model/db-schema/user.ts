@@ -2,7 +2,7 @@ import { int, mysqlTable, varchar, date, datetime, tinyint } from 'drizzle-orm/m
 import { baseTable } from './base.js';
 
 // 用户表
-export const ClientUserTable = mysqlTable('client_user', {
+export const UserTable = mysqlTable('user', {
     ...baseTable,
     phone_number: varchar({ length: 11 }).notNull().unique(),
     name: varchar({ length: 20 }).notNull(),
@@ -18,7 +18,7 @@ export const ClientUserTable = mysqlTable('client_user', {
 });
 
 // 关注表
-export const ClientFollowTable = mysqlTable('client_follow', {
+export const FollowTable = mysqlTable('follow', {
     ...baseTable,
     follower_id: varchar({ length: 255 }).notNull(),
     following_id: varchar({ length: 255 }).notNull(),

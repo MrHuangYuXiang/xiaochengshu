@@ -1,30 +1,12 @@
 import { z } from "zod";
 import type { Request, Response } from "express";
 
-/** 规范:
- * 对于GET请求,只能够携带query参数,zod自动去校验req.query字段,并将校验结果添加到local.query字段
- * 对于POST请求,只能够携带body参数,zod自动去校验req.body字段,并将校验结果添加到local.body字段
- * 注意本项目只支持GET和POST请求,其他请求方法将被拒绝
+/**
+ * 增强express Response类型,添加locals.body字段
  */
-
-// // 增强express Response类型
-// export type EnhancedResponse<QuerySchema extends z.ZodObject | null, BodySchema extends z.ZodObject | null> =
-//     // 1. 先把 Response 里的 locals 删掉
-//     Omit<Response, 'locals'> &
-//     // 2. 再加上你自己的 locals 类型（这时候不会被 any 污染）
-//     (QuerySchema extends z.ZodObject ? {
-//         locals: {
-//             query: z.infer<QuerySchema>
-//             body: z.infer<BodySchema>
-//         }
-//     } : {
-//         locals: {}
-//     })
-
-export interface EnhancedResponse<QuerySchema extends z.ZodObject | null, BodySchema extends z.ZodObject | null> extends Response {
+export interface EnhancedResponse<BodyObject extends z.ZodObject | undefined> extends Response {
     locals: {
-        query?: z.infer<QuerySchema>
-        body?: z.infer<BodySchema>
+        body: z.infer<BodyObject>
     }
 }
 
