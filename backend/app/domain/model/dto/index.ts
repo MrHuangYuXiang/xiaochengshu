@@ -1,12 +1,18 @@
 import { z } from "zod";
-import type { Request, Response } from "express";
+import type { Response } from "express";
 
-/**
- * 增强express Response类型,添加locals.body字段
- */
-export interface EnhancedResponse<BodyObject extends z.ZodObject | undefined> extends Response {
-    locals: {
-        body: z.infer<BodyObject>
+// 获取请求体
+export const getRequestBody = <T extends z.ZodObject>(res: Response) => {
+    return res.locals.body as z.infer<T>;
+}
+
+// 获取分页参数
+export function getRequestPage(res: Response) {
+    const page = res.locals.body.page ? Number(res.locals.body.page) : 1
+    const pageSize = res.locals.body.pageSize ? Number(res.locals.body.pageSize) : 10
+    return {
+        limit: pageSize,
+        offset: (page - 1) * pageSize,
     }
 }
 

@@ -1,24 +1,23 @@
-import type { Request } from "express";
-import type { EnhancedResponse } from "../model/dto/index.js";
+import type { Request, Response } from "express";
+import { getRequestBody, getRequestPage } from "../model/dto/index.js";
 import { ChatSessionTable, ChatSessionMemberTable, ChatMessageTable } from "../model/db-schema/chat.js";
 import { UserTable } from "../model/db-schema/user.js";
-import { 
-    createSessionOutput, 
-    getMessagesInput, 
-    getMessagesOutput, 
-    getSessionInput, 
-    getSessionOutput, 
-    getSessionsInput, 
-    getSessionsOutput, 
-    pinSessionInput, 
-    sendMessageInput, 
-    sendMessageOutput, 
+import {
+    createSessionOutput,
+    getMessagesInput,
+    getMessagesOutput,
+    getSessionInput,
+    getSessionOutput,
+    getSessionsInput,
+    getSessionsOutput,
+    pinSessionInput,
+    sendMessageInput,
+    sendMessageOutput,
     createSessionInput
 } from "../model/dto/chat.js";
 import { getCurrent } from "../../lib/local-stroage.js";
 import { v4 as uuidv4 } from "uuid";
 import { and, count, desc, eq, getTableColumns, gt, inArray, lt, max, not, SQL, sql } from "drizzle-orm";
-import { getPageParams } from "../../helper/http.js";
 import { BaseService } from "./base.js";
 
 export class ChatService extends BaseService {
@@ -27,14 +26,15 @@ export class ChatService extends BaseService {
      * 该接口若会话已存在将查询该会话信息并返回,保证幂等性
      * TODO: 当前仅支持创建私聊会话
      */
-    async createSession(req: Request, res: EnhancedResponse<typeof createSessionInput>) {
+    async createSession(req: Request, res: Response) {
+        const body = getRequestBody<typeof createSessionInput>(res)
         const current = getCurrent();
 
         const exist = await current.tx.
             select().
             from(ChatSessionMemberTable).
             where(and(
-                eq(ChatSessionMemberTable.other_user_id, res.locals.body.userId),
+                eq(ChatSessionMemberTable.other_user_id, body.userId),
                 eq(ChatSessionMemberTable.user_id, current.payload.userId),
             ));
 
@@ -42,7 +42,7 @@ export class ChatService extends BaseService {
             // 创建会话
             const sessionIds = await this.chatShareService.createPrivateSession(
                 current.payload.userId,
-                res.locals.body.userId
+                body.userId
             );
 
             // 查询相关信息
@@ -73,17 +73,18 @@ export class ChatService extends BaseService {
     }
 
     // 查询单个会话
-    async getSession(req: Request, res: EnhancedResponse<typeof getSessionInput>) {
-        const sessions = await this.chatShareService.getSessions(eq(ChatSessionTable.id, res.locals.body.sessionId))
+    async getSession(req: Request, res: Response) {
+        const body = getRequestBody<typeof getSessionInput>(res)
+        const sessions = await this.chatShareService.getSessions(eq(ChatSessionTable.id, body.sessionId))
         res.json(getSessionOutput.parse({
             session: sessions[0],
         }))
     }
 
     // 查询会话列表
-    async getSessions(req: Request, res: EnhancedResponse<typeof getSessionsInput>) {
+    async getSessions(req: Request, res: Response) {
         const current = getCurrent();
-        const page = getPageParams(res);
+        const page = getRequestPage(res);
 
         const sessionIds = (await current.tx.select().
             from(ChatSessionMemberTable).
@@ -99,31 +100,33 @@ export class ChatService extends BaseService {
     }
 
     // 置顶会话
-    async pinSession(req: Request, res: EnhancedResponse<typeof pinSessionInput>) {
+    async pinSession(req: Request, res: Response) {
+        const body = getRequestBody<typeof pinSessionInput>(res)
         const current = getCurrent();
 
         await current.tx.
             update(ChatSessionMemberTable).
-            set({ is_pin: res.locals.body!.isPin }).
-            where(eq(ChatSessionMemberTable.id, res.locals.body!.sessionMemberId));
+            set({ is_pin: body.isPin }).
+            where(eq(ChatSessionMemberTable.id, body.sessionMemberId));
     }
 
     // 发送消息
-    async sendMessage(req: Request, res: EnhancedResponse<typeof sendMessageInput>) {
+    async sendMessage(req: Request, res: Response) {
+        const body = getRequestBody<typeof sendMessageInput>(res)
         const current = getCurrent();
 
         const message = await this.chatShareService.sendChatMessage({
-            type: res.locals.body.type,
+            type: body.type,
             user_id: current.payload.userId,
-            session_id: res.locals.body.sessionId,
-            content: res.locals.body.content,
-        }, res.locals.body.payload)
+            session_id: body.sessionId,
+            content: body.content,
+        }, body.payload)
 
         // 更新最后阅读时间
         await this.chatShareService.updateMessageReadTime(
             message.message.inc_seq,
             and(
-                eq(ChatSessionMemberTable.session_id, res.locals.body.sessionId),
+                eq(ChatSessionMemberTable.session_id, body.sessionId),
                 eq(ChatSessionMemberTable.user_id, current.payload.userId),
             )
         )
@@ -136,9 +139,10 @@ export class ChatService extends BaseService {
     }
 
     // 查询消息
-    async getMessages(req: Request, res: EnhancedResponse<typeof getMessagesInput>) {
+    async getMessages(req: Request, res: Response) {
+        const body = getRequestBody<typeof getMessagesInput>(res)
         const current = getCurrent();
-        const page = getPageParams(res);
+        const page = getRequestPage(res);
 
         const messages = await current.tx.select({
             user: getTableColumns(UserTable),
@@ -146,7 +150,7 @@ export class ChatService extends BaseService {
         }).
             from(ChatMessageTable).
             leftJoin(UserTable, eq(UserTable.id, ChatMessageTable.user_id)).
-            where(eq(ChatMessageTable.session_id, res.locals.body.sessionId)).
+            where(eq(ChatMessageTable.session_id, body.sessionId)).
             orderBy(desc(ChatMessageTable.inc_seq)).
             limit(page.limit).
             offset(page.offset);
@@ -159,7 +163,7 @@ export class ChatService extends BaseService {
             await this.chatShareService.updateMessageReadTime(
                 messages[0].message.inc_seq,
                 and(
-                    eq(ChatSessionMemberTable.session_id, res.locals.body.sessionId),
+                    eq(ChatSessionMemberTable.session_id, body.sessionId),
                     eq(ChatSessionMemberTable.user_id, current.payload.userId),
                     lt(ChatSessionMemberTable.last_read_seq, messages[0].message.inc_seq),
                 )
@@ -168,7 +172,7 @@ export class ChatService extends BaseService {
 
         // 更新活跃会话
         this.clientManager.updateMetadata(current.payload.userId, {
-            activeSessionId: res.locals.body.sessionId,
+            activeSessionId: body.sessionId,
         })
 
         res.json(getMessagesOutput.parse({
@@ -177,7 +181,7 @@ export class ChatService extends BaseService {
     }
 
     // 清理活跃会话
-    async clearActiveSession(req: Request, res: EnhancedResponse<undefined>) {
+    async clearActiveSession(req: Request, res: Response) {
         const current = getCurrent();
         this.clientManager.updateMetadata(current.payload.userId, {
             activeSessionId: "",

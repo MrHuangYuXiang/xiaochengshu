@@ -1,10 +1,10 @@
-import type { EnhancedResponse } from "../model/dto/index.js"
+import { getRequestBody, getRequestPage } from "../model/dto/index.js"
 import { getReportDetailInput, getReportDetailOutput, getReportTypesOutput, reportWorkInput } from "../model/dto/report.js"
 import { getCurrent } from "../../lib/local-stroage.js"
 import { ReportStatusEnum, ReportTypeEnum } from "../model/enum/admin-report.js"
 import { AppError } from "../../lib/app-error.js"
 import { AdminReportTable } from "../model/db-schema/admin-report.js"
-import type { Request } from "express"
+import type { Request, Response } from "express"
 import { BaseService } from "./base.js"
 import { ChatSessionMemberTable, ChatSessionTable } from "../model/db-schema/chat.js"
 import { and, eq } from "drizzle-orm"
@@ -13,16 +13,17 @@ import { v4 as uuidv4 } from "uuid";
 
 export class ReportService extends BaseService {
     // 举报
-    async report(req: Request, res: EnhancedResponse<typeof reportWorkInput>) {
+    async report(req: Request, res: Response) {
         const current = getCurrent()
+        const body = getRequestBody<typeof reportWorkInput>(res)
         const reportId = uuidv4()
 
         await current.tx.insert(AdminReportTable).values({
             id: reportId,
-            work_id: res.locals.body.workId,
+            work_id: body.workId,
             reporter_id: current.payload.userId,
-            report_type: res.locals.body.reportType,
-            reason: res.locals.body.reason,
+            report_type: body.reportType,
+            reason: body.reason,
             status: ReportStatusEnum.PENDING,
         })
 
@@ -50,15 +51,16 @@ export class ReportService extends BaseService {
     }
 
     // 查询举报详情
-    async getReportDetail(req: Request, res: EnhancedResponse<typeof getReportDetailInput>) {
-        const data = await this.reportShareService.getReportDetail(res.locals.body.reportId)
+    async getReportDetail(req: Request, res: Response) {
+        const body = getRequestBody<typeof getReportDetailInput>(res)
+        const data = await this.reportShareService.getReportDetail(body.reportId)
         res.json(getReportDetailOutput.parse({
             report: data,
         }))
     }
 
     // 查询举报类型
-    async getReportTypes(req: Request, res: EnhancedResponse<undefined>) {
+    async getReportTypes(req: Request, res: Response) {
         const data = Object.entries(ReportTypeEnum).map(([key, value]) => {
             return {
                 text: key,

@@ -16,15 +16,14 @@ import {
     getUserFollowsOutput,
     removeFollowerInput,
 } from "../model/dto/user.js";
-import type { EnhancedResponse } from "../model/dto/index.js";
-import type { Request } from "express";
+import { getRequestBody, getRequestPage } from "../model/dto/index.js";
+import type { Request, Response } from "express";
 import { getEnv } from "../../helper/env.js";
 import { genClientJWT } from "../../helper/jwt.js";
 import { FormParser } from "../../lib/framework-ext.js";
 import { v4 as uuidv4 } from "uuid";
 import { heartbeatClientEvent, ClientEventType } from "../model/dto/event.js";
 import { AppError } from "../../lib/app-error.js";
-import { getPageParams } from "../../helper/http.js";
 import { ClientChatMessageTypeEnum, ClientChatSessionTypeEnum } from "../model/enum/chat.js";
 import { FileExtEnum } from "../model/enum/file.js";
 import e from "express";
@@ -33,39 +32,39 @@ import { ChatMessageTable, ChatSessionMemberTable, ChatSessionTable } from "../m
 // FIXME: 该服务下的接口需要重写加锁逻辑,锁需要放在事务外面,避免mvcc快照导致锁失效
 export class UserService extends BaseService {
     // 获取手机验证码
-    async smsSend(req: Request, res: EnhancedResponse<typeof smsSendInput>) {
+    async smsSend(req: Request, res: Response) {
+        const body = getRequestBody<typeof smsSendInput>(res)
         const code = Math.floor(Math.random() * 1000000)
         console.log("生成验证码-->", code)
-
-        res.json()
     }
 
     /**
      * 登录
      * 该接口只负责返回jwt,关于jwt续约以及用户在线状态管理在/init接口中实现
      */
-    async login(req: Request, res: EnhancedResponse<typeof loginInput>) {
+    async login(req: Request, res: Response) {
         const current = getCurrent()
+        const body = getRequestBody<typeof loginInput>(res)
         let userId = ""
         let userName = ""
         let userAvatarPath = ""
 
         // TODO: 开发阶段默认验证码: 666666, 下同
-        if (res.locals.body.code != "666666") {
+        if (body.code != "666666") {
             throw new AppError("验证码错误")
         }
 
-        const user = await current.tx.select().from(UserTable).where(eq(UserTable.phone_number, res.locals.body.phoneNumber))
+        const user = await current.tx.select().from(UserTable).where(eq(UserTable.phone_number, body.phoneNumber))
 
         // 用户不存在自动注册,以下为初始化逻辑
         if (!user[0]) {
             // 创建用户
             userId = uuidv4()
-            userName = res.locals.body.phoneNumber
+            userName = body.phoneNumber
             userAvatarPath = ""
             await current.tx.insert(UserTable).values({
                 id: userId,
-                phone_number: res.locals.body.phoneNumber,
+                phone_number: body.phoneNumber,
                 name: userName,
                 desc: "",
                 birthday: new Date(),
@@ -73,7 +72,7 @@ export class UserService extends BaseService {
                 avatar_url: userAvatarPath,
                 is_complete_profile: 0,
             })
-            
+
             // 创建默认会话
             const ids = await this.chatShareService.createDefaultSession(userId)
 
@@ -84,7 +83,7 @@ export class UserService extends BaseService {
                 session_id: ids.sessionId,
                 content: "小橙书欢迎你的加入!",
             }, { [ClientChatMessageTypeEnum.TEXT]: {} })
-        } 
+        }
         else {
             userId = user[0].id
             userName = user[0].name
@@ -102,7 +101,7 @@ export class UserService extends BaseService {
      * - 多端在线状态管理
      * - 维护http长连接
      */
-    async connect(req: Request, res: EnhancedResponse<undefined>) {
+    async connect(req: Request, res: Response) {
         const current = getCurrent()
 
         // 设置相关响应头
@@ -127,7 +126,7 @@ export class UserService extends BaseService {
         })
     }
 
-    async getInitData(req: Request, res: EnhancedResponse<undefined>) {
+    async getInitData(req: Request, res: Response) {
         const current = getCurrent()
 
         // 查询用户信息
@@ -158,20 +157,21 @@ export class UserService extends BaseService {
     }
 
     // 获取用户详情
-    async getUserDetail(req: Request, res: EnhancedResponse<typeof getUserDetailInput>) {
+    async getUserDetail(req: Request, res: Response) {
         const current = getCurrent()
+        const body = getRequestBody<typeof getUserDetailInput>(res)
         const followRelationSubQuery = this.userShareService.getFollowRelationSubQuery()
 
         const user = await current.tx.select({
             user: followRelationSubQuery.user,
-            followingCount: current.tx.select({ "count": count(FollowTable.id).as("followingCount") }).from(FollowTable).where(eq(FollowTable.follower_id, res.locals.body.userId)).as("followingCount"),
-            followerCount: current.tx.select({ "count": count(FollowTable.id).as("followerCount") }).from(FollowTable).where(eq(FollowTable.following_id, res.locals.body.userId)).as("followerCount"),
-            workCount: current.tx.select({ "count": count(WorkTable.id).as("workCount") }).from(WorkTable).where(eq(WorkTable.user_id, res.locals.body.userId)).as("workCount"),
-            likeCount: current.tx.select({ "count": count(WorkLikeTable.id).as("likeCount") }).from(WorkLikeTable).where(eq(WorkLikeTable.user_id, res.locals.body.userId)).as("likeCount"),
-            collectCount: current.tx.select({ "count": count(WorkCollectTable.id).as("collectCount") }).from(WorkCollectTable).where(eq(WorkCollectTable.user_id, res.locals.body.userId)).as("collectCount"),
+            followingCount: current.tx.select({ "count": count(FollowTable.id).as("followingCount") }).from(FollowTable).where(eq(FollowTable.follower_id, body.userId)).as("followingCount"),
+            followerCount: current.tx.select({ "count": count(FollowTable.id).as("followerCount") }).from(FollowTable).where(eq(FollowTable.following_id, body.userId)).as("followerCount"),
+            workCount: current.tx.select({ "count": count(WorkTable.id).as("workCount") }).from(WorkTable).where(eq(WorkTable.user_id, body.userId)).as("workCount"),
+            likeCount: current.tx.select({ "count": count(WorkLikeTable.id).as("likeCount") }).from(WorkLikeTable).where(eq(WorkLikeTable.user_id, body.userId)).as("likeCount"),
+            collectCount: current.tx.select({ "count": count(WorkCollectTable.id).as("collectCount") }).from(WorkCollectTable).where(eq(WorkCollectTable.user_id, body.userId)).as("collectCount"),
         }).
             from(followRelationSubQuery).
-            where(eq(followRelationSubQuery.user.id, res.locals.body.userId))
+            where(eq(followRelationSubQuery.user.id, body.userId))
 
         res.json(getUserDetailOutput.parse({
             user: user[0],
@@ -179,7 +179,7 @@ export class UserService extends BaseService {
     }
 
     // 更新头像
-    async uploadUserAvatar(req: Request, res: EnhancedResponse<undefined>) {
+    async uploadUserAvatar(req: Request, res: Response) {
         const current = getCurrent()
         const formParser = new FormParser(req)
         let filePath = ""
@@ -196,39 +196,41 @@ export class UserService extends BaseService {
     }
 
     // 更新用户信息
-    async updateUserInfo(req: Request, res: EnhancedResponse<typeof updateUserInfoInput>) {
+    async updateUserInfo(req: Request, res: Response) {
         const current = getCurrent()
+        const body = getRequestBody<typeof updateUserInfoInput>(res)
 
         await current.tx.update(UserTable).set({
-            name: res.locals.body.name,
-            desc: res.locals.body.desc,
-            birthday: new Date(res.locals.body.birthday),
-            gender: res.locals.body.gender,
+            name: body.name,
+            desc: body.desc,
+            birthday: new Date(body.birthday),
+            gender: body.gender,
             is_complete_profile: 1,
         }).where(eq(UserTable.id, current.payload.userId))
     }
 
     // 获取用户的关注/粉丝接口
-    async getUserFollows(req: Request, res: EnhancedResponse<typeof getUserFollowsInput>) {
-        const page = getPageParams(res)
+    async getUserFollows(req: Request, res: Response) {
+        const page = getRequestPage(res)
         const current = getCurrent()
+        const body = getRequestBody<typeof getUserFollowsInput>(res)
         const followRelationSubQuery = this.userShareService.getFollowRelationSubQuery()
 
-        switch (res.locals.body.type) {
+        switch (body.type) {
             // 查询目标用户关注的人
             case "following": {
                 // 聚合数据查询
                 const followingCount = await current.tx.
                     select({ "followingCount": count(FollowTable.id).as("followingCount") }).
                     from(FollowTable).
-                    where(eq(FollowTable.follower_id, res.locals.body.userId))
+                    where(eq(FollowTable.follower_id, body.userId))
 
                 const users = await current.tx.
                     select({
                         ...followRelationSubQuery.user,
                     }).
                     from(FollowTable).
-                    where(eq(FollowTable.follower_id, res.locals.body.userId)).
+                    where(eq(FollowTable.follower_id, body.userId)).
                     innerJoin(followRelationSubQuery, eq(followRelationSubQuery.user.id, FollowTable.following_id)).
                     orderBy(desc(FollowTable.created_at)).
                     limit(page.limit).
@@ -247,14 +249,14 @@ export class UserService extends BaseService {
                 const followerCount = await current.tx.
                     select({ "followerCount": count(FollowTable.id).as("followerCount") }).
                     from(FollowTable).
-                    where(eq(FollowTable.following_id, res.locals.body.userId))
+                    where(eq(FollowTable.following_id, body.userId))
 
                 const users = await current.tx.
                     select({
                         ...followRelationSubQuery.user,
                     }).
                     from(FollowTable).
-                    where(eq(FollowTable.following_id, res.locals.body.userId)).
+                    where(eq(FollowTable.following_id, body.userId)).
                     innerJoin(followRelationSubQuery, eq(followRelationSubQuery.user.id, FollowTable.follower_id)).
                     orderBy(desc(FollowTable.created_at)).
                     limit(page.limit).
@@ -272,30 +274,32 @@ export class UserService extends BaseService {
     }
 
     // 关注用户
-    async followUser(req: Request, res: EnhancedResponse<typeof followUserInput>) {
+    async followUser(req: Request, res: Response) {
         const current = getCurrent()
+        const body = getRequestBody<typeof followUserInput>(res)
 
-        if (res.locals.body.isFollow === 1) {
+        if (body.isFollow === 1) {
             await current.tx.insert(FollowTable).values({
                 follower_id: current.payload.userId,
-                following_id: res.locals.body.userId,
+                following_id: body.userId,
             })
         } else {
             await current.tx.delete(FollowTable).
                 where(and(
                     eq(FollowTable.follower_id, current.payload.userId),
-                    eq(FollowTable.following_id, res.locals.body.userId),
+                    eq(FollowTable.following_id, body.userId),
                 ))
         }
     }
 
     // 移除粉丝
-    async removeFollower(req: Request, res: EnhancedResponse<typeof removeFollowerInput>) {
+    async removeFollower(req: Request, res: Response) {
         const current = getCurrent()
+        const body = getRequestBody<typeof removeFollowerInput>(res)
         await current.tx.
             delete(FollowTable).
             where(and(
-                eq(FollowTable.follower_id, res.locals.body.userId),
+                eq(FollowTable.follower_id, body.userId),
                 eq(FollowTable.following_id, current.payload.userId)
             ))
     }

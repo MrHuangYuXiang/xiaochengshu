@@ -4,8 +4,7 @@ import { getCurrent } from "../../lib/local-stroage.js";
 import { FollowTable, UserTable } from "../model/db-schema/user.js";
 import { WorkTable, WorkCollectTable, WorkCommentTable, WorkLikeTable, WorkCommentLikeTable, WorkImageTable } from "../model/db-schema/work.js";
 import { and, eq, getTableColumns, count, inArray, not, sql, desc, like, asc } from "drizzle-orm";
-import type { EnhancedResponse } from "../model/dto/index.js";
-import type { Request } from "express";
+import type { Request, Response } from "express";
 import {
   getWorkDetailInput,
   getWorkDetailOutput,
@@ -19,13 +18,11 @@ import {
   likeWorkCommentInput,
   createWorkCommentInput,
   deleteWorkInput,
-  workInteractInputFields,
   shareWorkInput,
   replyWorkCommentInput,
   replyWorkCommentOutput,
 } from "../model/dto/work.js";
 import { v4 as uuidv4 } from "uuid";
-import { getPageParams } from "../../helper/http.js";
 import { handleRawSqlRes } from "../../helper/sql.js";
 import { FormParser, MemoryWritableStream, type FormFieldHeader } from "../../lib/framework-ext.js";
 import { AppError, throwServerError, throwServerBusy } from "../../lib/app-error.js";
@@ -33,12 +30,15 @@ import { WorkImageTypeEnum } from "../model/enum/work.js";
 import { FileExtEnum } from "../model/enum/file.js";
 import { getTableConfig } from "drizzle-orm/mysql-core";
 import { ClientChatMessageTypeEnum } from "../model/enum/chat.js";
+import { getRequestBody, getRequestPage } from "../model/dto/index.js";
 
 export class WorkService extends BaseService {
   /** 获取作品详情 */
-  async getWorkDetail(req: Request, res: EnhancedResponse<typeof getWorkDetailInput>) {
+  async getWorkDetail(req: Request, res: Response) {
     const current = getCurrent()
-    const workId = res.locals.body.workId
+    const body = getRequestBody<typeof getWorkDetailInput>(res)
+
+    const workId = body.workId
     const followRelationSubQuery = this.userShareService.getFollowRelationSubQuery()
 
     const likeSubQuery = this.workShareService.getLikeSubQuery()
@@ -96,10 +96,11 @@ export class WorkService extends BaseService {
    * 所有获取多作品都统一请求该接口,避免sql,作品权限过滤等重复逻辑
    * 散落在多个接口函数中
    */
-  async getWorks(req: Request, res: EnhancedResponse<typeof getWorksInput>) {
+  async getWorks(req: Request, res: Response) {
     const current = getCurrent()
-    const targetUserId = res.locals.body.targetUserId
-    const { offset, limit } = getPageParams(res)
+    const body = getRequestBody<typeof getWorksInput>(res)
+    const targetUserId = body.targetUserId
+    const { offset, limit } = getRequestPage(res)
     let whereStmt: any[] = []
 
     // 当目标用户不是当前用户时,过滤私密作品
@@ -107,7 +108,7 @@ export class WorkService extends BaseService {
       whereStmt.push(eq(WorkTable.permission, 1))
     }
 
-    switch (res.locals.body.type) {
+    switch (body.type) {
       /**
        * 获取推荐作品
        * TODO: 推荐系统未实现,返回作品按时间降序模拟 
@@ -186,7 +187,7 @@ export class WorkService extends BaseService {
 
     res.json(getWorksOutput.parse({
       workList: works.map((item) => ({
-        ...item, 
+        ...item,
       }))
     }))
   }
@@ -195,7 +196,7 @@ export class WorkService extends BaseService {
    * 发表作品, 前端上传的第一张图片默认设置为封面图片
    * 字段顺序: title, content, permission, workImageCount, workImage1, workImage2, ...
    */
-  async createWork(req: Request, res: EnhancedResponse<undefined>) {
+  async createWork(req: Request, res: Response) {
     const current = getCurrent()
     const formParser = new FormParser(req)
     const workId = uuidv4()
@@ -247,24 +248,26 @@ export class WorkService extends BaseService {
   }
 
   /** 删除作品(级联删除相关资源) */
-  async deleteWork(req: Request, res: EnhancedResponse<typeof deleteWorkInput>) {
-    await this.workShareService.deleteWork(res.locals.body.workId)
+  async deleteWork(req: Request, res: Response) {
+    const body = getRequestBody<typeof deleteWorkInput>(res)
+    await this.workShareService.deleteWork(body.workId)
   }
 
   /**
    * 获取作品评论
    * 该接口将查询评论和回复合并为一个接口,通过type参数区分查询类型
    */
-  async getWorkComments(req: Request, res: EnhancedResponse<typeof getWorkCommentsInput>) {
-    const page = getPageParams(res)
+  async getWorkComments(req: Request, res: Response) {
+    const body = getRequestBody<typeof getWorkCommentsInput>(res)
+    const page = getRequestPage(res)
     let result: any
 
-    switch (res.locals.body.type) {
+    switch (body.type) {
       case "top":
-        result = await this.queryWorkComments(res.locals.body.workId, page)
+        result = await this.queryWorkComments(body.workId, page)
         break
       case "reply":
-        result = await this.queryWorkCommentReplies(res.locals.body.rootCommentId, page)
+        result = await this.queryWorkCommentReplies(body.rootCommentId, page)
         break
       default:
         throw new Error("type参数非法")
@@ -400,14 +403,15 @@ export class WorkService extends BaseService {
   }
 
   // 创建作品顶层评论
-  async createWorkComment(req: Request, res: EnhancedResponse<typeof createWorkCommentInput>) {
+  async createWorkComment(req: Request, res: Response) {
+    const body = getRequestBody<typeof createWorkCommentInput>(res)
     const current = getCurrent()
 
     const comment = await this.workShareService.createWorkComment({
-      work_id: res.locals.body.workId,
+      work_id: body.workId,
       root_comment_id: "",
       parent_id: "",
-      content: res.locals.body.content,
+      content: body.content,
       user_id: current.payload.userId,
     })
 
@@ -417,14 +421,15 @@ export class WorkService extends BaseService {
   }
 
   // 回复评论
-  async replyWorkComment(req: Request, res: EnhancedResponse<typeof replyWorkCommentInput>) {
+  async replyWorkComment(req: Request, res: Response) {
+    const body = getRequestBody<typeof replyWorkCommentInput>(res)
     const current = getCurrent()
 
     const comment = await this.workShareService.createWorkComment({
-      work_id: res.locals.body.workId,
-      root_comment_id: res.locals.body.rootCommentId,
-      parent_id: res.locals.body.parentId,
-      content: res.locals.body.content,
+      work_id: body.workId,
+      root_comment_id: body.rootCommentId,
+      parent_id: body.parentId,
+      content: body.content,
       user_id: current.payload.userId,
     })
 
@@ -433,90 +438,93 @@ export class WorkService extends BaseService {
     }))
   }
 
-
   // 点赞作品
-  async likeWork(req: Request, res: EnhancedResponse<typeof likeWorkInput>) {
+  async likeWork(req: Request, res: Response) {
+    const body = getRequestBody<typeof likeWorkInput>(res)
     const current = getCurrent()
-    
+
     // 点赞作品
-    if (res.locals.body.isLike) {
+    if (body.isLike) {
       await current.tx.insert(WorkLikeTable).values({
-        work_id: res.locals.body.workId,
+        work_id: body.workId,
         user_id: current.payload.userId,
       })
 
       // 发送互动消息
-      await this.chatShareService.sendInteractionMessage(res.locals.body, ClientChatMessageTypeEnum.WORK_LIKE_NOTICE)
+      await this.chatShareService.sendInteractionMessage(body, ClientChatMessageTypeEnum.WORK_LIKE_NOTICE)
     }
-    
+
     // 取消点赞作品
     else {
       await current.tx.delete(WorkLikeTable).where(and(
-        eq(WorkLikeTable.work_id, res.locals.body.workId), 
+        eq(WorkLikeTable.work_id, body.workId),
         eq(WorkLikeTable.user_id, current.payload.userId),
       ))
     }
   }
 
   // 收藏作品
-  async collectWork(req: Request, res: EnhancedResponse<typeof collectWorkInput>) {
+  async collectWork(req: Request, res: Response) {
+    const body = getRequestBody<typeof collectWorkInput>(res)
     const current = getCurrent()
-    if (res.locals.body.isCollect) {
+    if (body.isCollect) {
       await current.tx.insert(WorkCollectTable).values({
-        work_id: res.locals.body.workId,
+        work_id: body.workId,
         user_id: current.payload.userId,
       })
 
       // 发送互动消息
-      await this.chatShareService.sendInteractionMessage(res.locals.body, ClientChatMessageTypeEnum.WORK_COLLECT_NOTICE)
+      await this.chatShareService.sendInteractionMessage(body, ClientChatMessageTypeEnum.WORK_COLLECT_NOTICE)
     } else {
       await current.tx.delete(WorkCollectTable).where(and(
-        eq(WorkCollectTable.work_id, res.locals.body.workId),
+        eq(WorkCollectTable.work_id, body.workId),
         eq(WorkCollectTable.user_id, current.payload.userId),
       ))
     }
   }
 
   // 分享作品
-  async shareWork(req: Request, res: EnhancedResponse<typeof shareWorkInput>) {
+  async shareWork(req: Request, res: Response) {
+    const body = getRequestBody<typeof shareWorkInput>(res)
     const current = getCurrent()
 
     // 向目标会话发送分享消息
     await this.chatShareService.sendChatMessage({
-      session_id: res.locals.body.sessionId,
+      session_id: body.sessionId,
       user_id: current.payload.userId,
       type: ClientChatMessageTypeEnum.WORK_SHARE,
       content: "",
     }, {
       [ClientChatMessageTypeEnum.WORK_SHARE]: {
-        work_id: res.locals.body.workId,
-        work_title: res.locals.body.workTitle,
-        work_cover_image_path: res.locals.body.workCoverImagePath,
-        work_user_id: res.locals.body.workUserId,
-        work_user_name: res.locals.body.workUserName,
-        work_user_avatar_path: res.locals.body.workUserAvatarPath,
+        work_id: body.workId,
+        work_title: body.workTitle,
+        work_cover_image_path: body.workCoverImagePath,
+        work_user_id: body.workUserId,
+        work_user_name: body.workUserName,
+        work_user_avatar_path: body.workUserAvatarPath,
       }
     })
 
     // 向作品作者发送互动消息
     await this.chatShareService.sendInteractionMessage(
-      res.locals.body,
+      body,
       ClientChatMessageTypeEnum.WORK_FORWARD_NOTICE,
     )
   }
 
   // 点赞评论
-  async likeWorkComment(req: Request, res: EnhancedResponse<typeof likeWorkCommentInput>) {
+  async likeWorkComment(req: Request, res: Response) {
+    const body = getRequestBody<typeof likeWorkCommentInput>(res)
     const current = getCurrent()
-    if (res.locals.body.isLike) {
+    if (body.isLike) {
       await current.tx.insert(WorkCommentLikeTable).values({
-        comment_id: res.locals.body.commentId,
+        comment_id: body.commentId,
         user_id: current.payload.userId,
-        work_id: res.locals.body.workId,  
+        work_id: body.workId,
       })
     } else {
       await current.tx.delete(WorkCommentLikeTable).where(and(
-        eq(WorkCommentLikeTable.comment_id, res.locals.body.commentId),
+        eq(WorkCommentLikeTable.comment_id, body.commentId),
         eq(WorkCommentLikeTable.user_id, current.payload.userId),
       ))
     }
