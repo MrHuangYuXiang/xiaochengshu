@@ -119,10 +119,10 @@
   // 查询会话
   const getSessions = async () => {
     await sessions.value.pagePush(async (page: number, size: number) => {
-      const data = await axiosProxy.get<
-        paths["/chat/get/sessions"]["get"]["parameters"]["query"],
-        paths["/chat/get/sessions"]["get"]["responses"]["200"]["content"]["application/json"]
-      >("/chat/get/sessions", { page: page, pageSize: size })
+      const data = await axiosProxy.post<
+        paths["/get/chat/sessions"]["post"]["requestBody"]["content"]["application/json"],
+        paths["/get/chat/sessions"]["post"]["responses"]["200"]["content"]["application/json"]
+      >("/get/chat/sessions", { page: page, pageSize: size })
       return data.sessions
     })
     return sessions.value.isEnd
@@ -131,10 +131,10 @@
   // 查询消息
   const getMessages = async () => {
     await messages.value.pagePush(async (page: number, size: number) => {
-      const data = await axiosProxy.get<
-        paths["/chat/get/messages"]["get"]["parameters"]["query"],
-        paths["/chat/get/messages"]["get"]["responses"]["200"]["content"]["application/json"]
-      >("/chat/get/messages", { 
+      const data = await axiosProxy.post<
+        paths["/get/chat/messages"]["post"]["requestBody"]["content"]["application/json"],
+        paths["/get/chat/messages"]["post"]["responses"]["200"]["content"]["application/json"]
+      >("/get/chat/messages", { 
         page: page, 
         pageSize: size, 
         sessionId: storage.activeSessionId.value
@@ -165,9 +165,9 @@
   // 发送消息
   const sendMsg = async (content: string) => {
     const message = await axiosProxy.post<
-      paths["/chat/send/message"]["post"]["requestBody"]["content"]["application/json"],
-      paths["/chat/send/message"]["post"]["responses"]["200"]["content"]["application/json"]
-    >("/chat/send/message", {
+      paths["/send/chat/message"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/send/chat/message"]["post"]["responses"]["200"]["content"]["application/json"]
+    >("/send/chat/message", {
       sessionId: storage.activeSessionId.value,
       content: content,
       type: 1,
@@ -210,9 +210,9 @@
 
         session.sessionMember.is_pin = session.sessionMember.is_pin === 1 ? 0 : 1
         await axiosProxy.post<
-          paths["/chat/pin/session"]["post"]["requestBody"]["content"]["application/json"],
+          paths["/pin/chat/session"]["post"]["requestBody"]["content"]["application/json"],
           undefined
-        >("/chat/pin/session", {
+        >("/pin/chat/session", {
           sessionMemberId: session.sessionMember.id,
           isPin: session.sessionMember.is_pin
         })
@@ -230,10 +230,10 @@
     sessions.value.delete(event.message.session_id)
 
     // 获取新的会话信息并插入
-    const session = await axiosProxy.get<
-      paths["/chat/get/session"]["get"]["parameters"]["query"],
-      paths["/chat/get/session"]["get"]["responses"]["200"]["content"]["application/json"]
-    >(`/chat/get/session`, { sessionId: event.message.session_id })
+    const session = await axiosProxy.post<
+      paths["/get/chat/session"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/get/chat/session"]["post"]["responses"]["200"]["content"]["application/json"]
+    >(`/get/chat/session`, { sessionId: event.message.session_id })
     if (session.session) sessions.value.insert(session.session, (item) => item.sessionMember.is_pin === 0)
 
     // 如果当前正在和该会话聊天,则插入消息
@@ -258,9 +258,9 @@
     
     // 创建会话
     const sessionData = await axiosProxy.post<
-      paths["/chat/create/session"]["post"]["requestBody"]["content"]["application/json"],
-      paths["/chat/create/session"]["post"]["responses"]["200"]["content"]["application/json"]
-    >(`/chat/create/session`, {
+      paths["/create/chat/session"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/create/chat/session"]["post"]["responses"]["200"]["content"]["application/json"]
+    >(`/create/chat/session`, {
       userId,
     })
     sessions.value.unshift(sessionData)
@@ -273,7 +273,8 @@
     await axiosProxy.post<
       undefined,
       undefined
-    >("/chat/clear/active/session", undefined)
+    >("/clear/active/chat/session", undefined)
+    storage.activeSessionId.value = ""
   })
 </script>
 

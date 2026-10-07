@@ -4,9 +4,9 @@ import { getEnv } from './app/helper/env.js';
 
 export default defineConfig({
     schema: [
-        './app/domain/model/db-schema/client-chat.ts',
-        './app/domain/model/db-schema/client-work.ts',
-        './app/domain/model/db-schema/client-user.ts',
+        './app/domain/model/db-schema/chat.ts',
+        './app/domain/model/db-schema/work.ts',
+        './app/domain/model/db-schema/user.ts',
         './app/domain/model/db-schema/admin-user.ts',
         './app/domain/model/db-schema/admin-report.ts',
     ],

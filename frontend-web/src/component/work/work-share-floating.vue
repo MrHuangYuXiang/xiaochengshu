@@ -55,10 +55,10 @@
     // 获取当前用户会话
     const getSessions = async() => {
         await sessions.value.pagePush(async (currentPage, pageSize) => {
-            return (await axiosProxy.get<
-            paths["/chat/get/sessions"]["get"]["parameters"]["query"],
-            paths["/chat/get/sessions"]["get"]["responses"]["200"]["content"]["application/json"]
-            >("/chat/get/sessions", {
+            return (await axiosProxy.post<
+                paths["/get/chat/sessions"]["post"]["requestBody"]["content"]["application/json"],
+                paths["/get/chat/sessions"]["post"]["responses"]["200"]["content"]["application/json"]
+            >("/get/chat/sessions", {
                 page: currentPage,
                 pageSize: pageSize,
             })).sessions.filter((item) => item.session.type === 1)

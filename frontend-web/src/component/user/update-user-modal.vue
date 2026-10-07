@@ -79,10 +79,10 @@
       paths["/update/user/info"]["post"]["responses"]["200"]["content"]["application/json"]
     >('/update/user/info', form.value)
 
-    const initData = await axiosProxy.get<
-      paths["/user/init-data"]["get"]["parameters"]["query"],
-      paths["/user/init-data"]["get"]["responses"]["200"]["content"]["application/json"]
-    >('/user/init-data', undefined)
+    const initData = await axiosProxy.post<
+      undefined,
+      paths["/get/user/init-data"]["post"]["responses"]["200"]["content"]["application/json"]
+    >('/get/user/init-data', undefined)
     storage.initData.value = initData
 
     ElMessage("保存成功")

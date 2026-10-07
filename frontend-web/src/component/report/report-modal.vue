@@ -15,7 +15,7 @@
     import { axiosProxy } from '@/api/axios.ts';
     import { globalReportModal } from '../global.ts';
 
-    const report = ref<paths["/report"]["get"]["responses"]["200"]["content"]["application/json"]["report"]>()
+    const report = ref<paths["/get/report"]["post"]["responses"]["200"]["content"]["application/json"]["report"]>()
     // 流程图数据数组
     const flowItems = ref<{
         title: string
@@ -24,10 +24,10 @@
     }[]>([])
 
     onMounted(async () => {
-        report.value = (await axiosProxy.get<
-            paths["/report"]["get"]["parameters"]["query"],
-            paths["/report"]["get"]["responses"]["200"]["content"]["application/json"]
-        >(`/report`, {
+        report.value = (await axiosProxy.post<
+            paths["/get/report"]["post"]["requestBody"]["content"]["application/json"],
+            paths["/get/report"]["post"]["responses"]["200"]["content"]["application/json"]
+        >(`/get/report`, {
             reportId: globalReportModal.reportId.value
         })).report
 

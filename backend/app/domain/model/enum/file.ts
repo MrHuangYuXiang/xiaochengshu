@@ -1,5 +1,6 @@
 export enum FileExtEnum {
-    Unknown = 'unknown',
-    Jpg = '.jpg',
-    Png = '.png',
+    UNKNOWN = 'unknown',
+    JPG = '.jpg',
+    PNG = '.png',
+    MP4 = '.mp4',
 }

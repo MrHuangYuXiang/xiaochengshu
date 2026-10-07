@@ -80,7 +80,6 @@ export class FormParser {
     /**
      * 构造函数
      * @param req express请求对象
-     * @param writers web标准写入流数组,必须按照字段顺序传入
      */
     constructor(req: Request) {
         this.buf = Buffer.from("")
@@ -105,7 +104,7 @@ export class FormParser {
         this.status = 0
         this.isEnd = false
         this.isExecuting = false
-        this.accept = [FileExtEnum.Unknown]
+        this.accept = [FileExtEnum.UNKNOWN]
     }
 
     // 获取文件类型
@@ -113,9 +112,11 @@ export class FormParser {
         switch (contentType) {
             case "image/jpeg":
             case "image/jpg":
-                return FileExtEnum.Jpg
+                return FileExtEnum.JPG
             case "image/png":
-                return FileExtEnum.Png
+                return FileExtEnum.PNG
+            case "video/mp4":
+                return FileExtEnum.MP4
             default:
                 throw new AppError(`非法的文件类型: ${contentType}`)
         }
@@ -176,7 +177,7 @@ export class FormParser {
                     const fieldType: FormFieldHeader = {
                         name: "",
                         filename: "",
-                        contentType: FileExtEnum.Unknown,
+                        contentType: FileExtEnum.UNKNOWN,
                     }
                     const header = buffer.subarray(0, endIndex)
                     const headerLines = header.toString().split("\r\n")
@@ -262,11 +263,9 @@ export class FormParser {
     }
 }
 
-/**
- * 内存WritableStream实现,用于获取number,string等参数在内存中直接处理
- */
+// 内存WritableStream实现
 export class MemoryWritableStream extends WritableStream {
-    private buffer: Buffer
+    protected buffer: Buffer
 
     constructor() {
         super({
@@ -280,15 +279,17 @@ export class MemoryWritableStream extends WritableStream {
         })
         this.buffer = Buffer.from("")
     }
+}
 
-    getBuffer() {
-        return this.buffer
-    }
-
+// 字符串WritableStream实现
+export class StringWritableStream extends MemoryWritableStream {
     getString() {
         return this.buffer.toString()
     }
+}
 
+// 整型WritableStream实现
+export class NumberWritableStream extends MemoryWritableStream {
     getNumber() {
         const str = this.buffer.toString()
         const res = parseInt(str, 10)
@@ -298,6 +299,9 @@ export class MemoryWritableStream extends WritableStream {
         return res
     }
 }
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 

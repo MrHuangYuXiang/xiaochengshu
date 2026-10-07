@@ -4,18 +4,20 @@ import { baseTable } from './base.js';
 // 作品表
 export const WorkTable = mysqlTable('work', {
     ...baseTable,
+    type: tinyint().notNull(),
     title: varchar({ length: 20 }).notNull(),
     content: varchar({ length: 200 }).notNull(),
     permission: tinyint().notNull(),
     user_id: varchar({ length: 255 }).notNull(),
 });
 
-// 作品图片表
-export const WorkImageTable = mysqlTable('work_image', {
+// 作品附件表
+export const WorkAttachmentTable = mysqlTable('work_attachment', {
     ...baseTable,
     work_id: varchar({ length: 255 }).notNull(),
     path: varchar({ length: 255 }).notNull(),
-    type: tinyint().notNull(),
+    // 优先级,区分封面
+    priority: tinyint().notNull(),
 });
 
 // 点赞表

@@ -24,7 +24,6 @@ self.addEventListener("connect", (e: any) => {
         if (!isConnected) {
           isConnected = true
           try {
-            console.log(e.data.jwt, e.data.url)
             await connect(e.data.jwt, e.data.url)
           } catch (error: unknown) {
             if (error instanceof Error) {

@@ -1,17 +1,17 @@
 <template>
-  <div class="page-box">
+  <div class="page-box" v-if="user">
     <div class="top">
       <div class="avatar"><UserAvatar width="10rem" :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
       <div class="info">
         <div class="name">
-          <div class="text">{{ user?.user.name }}</div>
+          <div class="text">{{ user.user.name }}</div>
           <div class="btn-group" v-if="user?.user.id !== storage.initData.value?.user.id">
             <FormButton color="default" text="私信" @click="redirectToChatPage" />
           </div>
         </div>
         <div class="tag">
-          <div>{{ user?.user.gender === 1 ? "男" : "女" }}</div>
-          <div>{{ formatBirthday(user?.user.birthday || "") }}</div>
+          <div>{{ user.user.gender === 1 ? "男" : "女" }}</div>
+          <div>{{ formatBirthday(user.user.birthday || "") }}</div>
         </div>
         <div style="opacity: 0.5;font-size: 0.95rem;">{{ user?.user.desc }}</div>
         <div class="follow">
@@ -19,13 +19,13 @@
             v-if="user"
             @click="globalFollowModal.show('following', user.user.id)"
           >
-            关注 {{ user?.followingCount }}
+            关注 {{ user.followingCount }}
           </div>
           <div
             v-if="user"
             @click="globalFollowModal.show('follower', user.user.id)"
           >
-            粉丝 {{ user?.followerCount }}
+            粉丝 {{ user.followerCount }}
           </div>
         </div>
       </div>
@@ -43,29 +43,23 @@
   import { formatBirthday } from '@/helper/format'
   import type { paths } from '@/api/gen'
   import { storage } from '@/storage';
-  import { ElMessage } from 'element-plus';
   import router from '@/router';
   import { globalFollowModal } from '@/component/global'; 
 
   const route = useRoute();
-  const user = ref<paths["/user"]["get"]["responses"]["200"]["content"]["application/json"]>()
+  const user = ref<paths["/get/user"]["post"]["responses"]["200"]["content"]["application/json"]["user"]>()
 
   // 挂载钩子
   onMounted(async () => {
     // 获取用户数据
     const currentUserId = ref(route.params.userId as string);
-    user.value = await axiosProxy.get<
-    paths["/user"]["get"]["parameters"]["query"],
-    paths["/user"]["get"]["responses"]["200"]["content"]["application/json"]
-    >(`/user`, {
+    user.value = (await axiosProxy.post<
+      paths["/get/user"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/get/user"]["post"]["responses"]["200"]["content"]["application/json"]
+    >(`/get/user`, {
       userId: currentUserId.value,
-    })
+    })).user
   })
-
-  // 关注用户
-  const follow = async () => {
-    ElMessage("操作成功")
-  }
 
   /**
    * 私信用户,重定向到聊天页面

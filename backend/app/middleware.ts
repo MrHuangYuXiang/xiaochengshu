@@ -101,7 +101,7 @@ const authMiddleware = (req: Request, res: Response): Payload => {
     }
 
     if (!req.headers.authorization) {
-        throw new Error("请携带Authorization头")
+        throw new AppError("请携带Authorization头")
     }
 
     return verifyJWT(req.headers.authorization)

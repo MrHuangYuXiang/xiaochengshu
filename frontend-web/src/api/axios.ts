@@ -14,7 +14,6 @@ class AxiosProxy {
 
     this.axiosInstance.interceptors.request.use((config) => {
       config.headers['Authorization'] = storage.token.value
-
       return config
     }, (err) => {
       throw err
@@ -32,14 +31,6 @@ class AxiosProxy {
     }, (err) => {
       throw err
     })
-  }
-
-  async get<T, Q>(url: string, queryParam: T, config: AxiosRequestConfig = {}): Promise<Q> {
-    if (queryParam) {
-      config.params = queryParam
-    }
-
-    return (await this.axiosInstance.get(url, config)) as Q
   }
 
   async post<T, Q>(url: string, bodyData: T, config: AxiosRequestConfig = {}): Promise<Q> {

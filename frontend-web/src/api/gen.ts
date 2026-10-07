@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/user/connect": {
+    "/connect": {
         parameters: {
             query?: never;
             header?: never;
@@ -39,14 +39,16 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/user/init-data": {
+    "/get/user/init-data": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -79,15 +81,13 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/sms/send": {
+    "/send/login/sms": {
         parameters: {
             query?: never;
             header?: never;
@@ -174,23 +174,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/user": {
+    "/get/user": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
-                query: {
-                    userId: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        userId: string;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -199,31 +206,31 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            user: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                name: string;
-                                desc: string;
-                                birthday: string;
-                                gender: number;
-                                avatar_url: string;
-                                is_complete_profile: number;
-                                is_follow: number;
-                                is_followed: number;
+                            user?: {
+                                user: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    name: string;
+                                    desc: string;
+                                    birthday: string;
+                                    gender: number;
+                                    avatar_url: string;
+                                    is_complete_profile: number;
+                                    is_follow: number;
+                                    is_followed: number;
+                                };
+                                followingCount: number;
+                                followerCount: number;
+                                workCount: number;
+                                likeCount: number;
+                                collectCount: number;
                             };
-                            followingCount: number;
-                            followerCount: number;
-                            workCount: number;
-                            likeCount: number;
-                            collectCount: number;
                         };
                     };
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -310,26 +317,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/user/follows": {
+    "/get/user/follows": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
-                query: {
-                    page: number;
-                    pageSize: number;
-                    type: string;
-                    userId: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        page: number;
+                        pageSize: number;
+                        type: string;
+                        userId: string;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -357,8 +371,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -450,23 +462,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/work": {
+    "/get/work": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
-                query: {
-                    workId: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        workId: string;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -475,74 +494,80 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            user: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                name: string;
-                                desc: string;
-                                birthday: string;
-                                gender: number;
-                                avatar_url: string;
-                                is_complete_profile: number;
-                                is_follow: number;
-                                is_followed: number;
+                            work?: {
+                                user: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    name: string;
+                                    desc: string;
+                                    birthday: string;
+                                    gender: number;
+                                    avatar_url: string;
+                                    is_complete_profile: number;
+                                    is_follow: number;
+                                    is_followed: number;
+                                };
+                                work: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    title: string;
+                                    permission: number;
+                                    user_id: string;
+                                    content: string;
+                                };
+                                images: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    work_id: string;
+                                    path: string;
+                                    type: number;
+                                }[];
+                                likeCount: number;
+                                collectCount: number;
+                                isLiked: number;
+                                isCollected: number;
                             };
-                            work: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                title: string;
-                                permission: number;
-                                user_id: string;
-                                content: string;
-                            };
-                            images: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                work_id: string;
-                                path: string;
-                                type: number;
-                            }[];
-                            likeCount: number;
-                            collectCount: number;
-                            isLiked: number;
-                            isCollected: number;
-                            isOwner: number;
                         };
                     };
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/works": {
+    "/get/works": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
-                query: {
-                    page: number;
-                    pageSize: number;
-                    type: string;
-                    targetUserId: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        page: number;
+                        pageSize: number;
+                        type: string;
+                        targetUserId: string;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -581,15 +606,12 @@ export interface paths {
                                 };
                                 likeCount: number;
                                 isLiked: number;
-                                isOwner: number;
                             }[];
                         };
                     };
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -813,27 +835,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/work/comments": {
+    "/get/work/comments": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
-                query: {
-                    page: number;
-                    pageSize: number;
-                    type: string;
-                    workId: string;
-                    rootCommentId: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        page: number;
+                        pageSize: number;
+                        type: string;
+                        workId: string;
+                        rootCommentId: string;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -873,8 +902,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -882,6 +909,76 @@ export interface paths {
         trace?: never;
     };
     "/create/work/comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        content: string;
+                        workId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            comment?: {
+                                user: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    name: string;
+                                    desc: string;
+                                    birthday: string;
+                                    gender: number;
+                                    avatar_url: string;
+                                    is_complete_profile: number;
+                                };
+                                comment: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    content: string;
+                                    work_id: string;
+                                    user_id: string;
+                                    parent_id: string;
+                                    root_comment_id: string;
+                                };
+                                isLiked: number;
+                                likeCount: number;
+                                replyCount: number;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reply/work/comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -916,30 +1013,32 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            user: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                name: string;
-                                desc: string;
-                                birthday: string;
-                                gender: number;
-                                avatar_url: string;
-                                is_complete_profile: number;
+                            comment?: {
+                                user: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    name: string;
+                                    desc: string;
+                                    birthday: string;
+                                    gender: number;
+                                    avatar_url: string;
+                                    is_complete_profile: number;
+                                };
+                                comment: {
+                                    id: string;
+                                    created_at: string;
+                                    updated_at: string;
+                                    content: string;
+                                    work_id: string;
+                                    user_id: string;
+                                    parent_id: string;
+                                    root_comment_id: string;
+                                };
+                                isLiked: number;
+                                likeCount: number;
+                                replyCount: number;
                             };
-                            comment: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                content: string;
-                                work_id: string;
-                                user_id: string;
-                                parent_id: string;
-                                root_comment_id: string;
-                            };
-                            isLiked: number;
-                            likeCount: number;
-                            replyCount: number;
                         };
                     };
                 };
@@ -995,7 +1094,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/chat/create/session": {
+    "/create/chat/session": {
         parameters: {
             query?: never;
             header?: never;
@@ -1114,24 +1213,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/chat/get/sessions": {
+    "/get/chat/sessions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
-                query: {
-                    page: number;
-                    pageSize: number;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        page: number;
+                        pageSize: number;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -1223,31 +1329,36 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/chat/get/session": {
+    "/get/chat/session": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
-                query: {
-                    sessionId: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        sessionId: string;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -1339,15 +1450,13 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/chat/pin/session": {
+    "/pin/chat/session": {
         parameters: {
             query?: never;
             header?: never;
@@ -1390,7 +1499,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/chat/send/message": {
+    "/send/chat/message": {
         parameters: {
             query?: never;
             header?: never;
@@ -1532,25 +1641,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/chat/get/messages": {
+    "/get/chat/messages": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
-                query: {
-                    page: number;
-                    pageSize: number;
-                    sessionId: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        page: number;
+                        pageSize: number;
+                        sessionId: string;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -1625,15 +1741,13 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/chat/clear/active/session": {
+    "/clear/active/chat/session": {
         parameters: {
             query?: never;
             header?: never;
@@ -1675,39 +1789,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: {
-            parameters: {
-                query: {
-                    reportId: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description 响应模型 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            report: {
-                                id: string;
-                                created_at: string;
-                                updated_at: string;
-                                work_id: string;
-                                reporter_id: string;
-                                report_type: number;
-                                reason: string;
-                                status: number;
-                            };
-                        };
-                    };
-                };
-            };
-        };
+        get?: never;
         put?: never;
         post: {
             parameters: {
@@ -1744,14 +1826,16 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/report/types": {
+    "/get/report/types": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put?: never;
+        post: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -1776,8 +1860,59 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/get/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
         put?: never;
-        post?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reportId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            report: {
+                                id: string;
+                                created_at: string;
+                                updated_at: string;
+                                work_id: string;
+                                reporter_id: string;
+                                report_type: number;
+                                reason: string;
+                                status: number;
+                            };
+                        };
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;

@@ -94,7 +94,7 @@ import { computed } from 'vue';
         userAvatarUrl: string;
         messageContent: string;
         messageType: number;
-        messagePayload: paths["/chat/get/messages"]["get"]["responses"]["200"]["content"]["application/json"]["messages"][number]["message"]["payload"];
+        messagePayload: paths["/get/chat/messages"]["post"]["responses"]["200"]["content"]["application/json"]["messages"][number]["message"]["payload"];
         messageCreatedAt: string;
         sessionType?: number;
     }>()

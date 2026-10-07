@@ -51,7 +51,7 @@ import { ElMessage } from 'element-plus';
 import { storage } from '@/storage.ts';
 
   const users = ref<EnhancedList<
-    paths["/user/follows"]["get"]["responses"]["200"]["content"]["application/json"]["users"][number]
+      paths["/get/user/follows"]["post"]["responses"]["200"]["content"]["application/json"]["users"][number]
     >>(
     new EnhancedList(
       (data) => {
@@ -64,10 +64,10 @@ import { storage } from '@/storage.ts';
 
   const getUserFollows = async () => {
     await users.value.pagePush(async (currentPage, pageSize) => {
-      const res = await axiosProxy.get<
-        paths["/user/follows"]["get"]["parameters"]["query"],
-        paths["/user/follows"]["get"]["responses"]["200"]["content"]["application/json"]
-      >(`/user/follows`, {
+      const res = await axiosProxy.post<
+        paths["/get/user/follows"]["post"]["requestBody"]["content"]["application/json"],
+        paths["/get/user/follows"]["post"]["responses"]["200"]["content"]["application/json"]
+      >(`/get/user/follows`, {
         page: currentPage,
         pageSize: pageSize,
         type: globalFollowModal.type.value,
@@ -91,10 +91,10 @@ import { storage } from '@/storage.ts';
 
   // 移除粉丝
   const removeFollower = async (userId: string) => {
-    await axiosProxy.get<
+    await axiosProxy.post<
       paths["/remove/follower"]["post"]["requestBody"]["content"]["application/json"],
       undefined
-    >(`/user/follows`, {
+    >(`/remove/follower`, {
       userId: userId,
     })
     users.value.delete(userId)

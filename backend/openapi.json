@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/user/connect": {
+    "/connect": {
       "post": {
         "parameters": [],
         "responses": {
@@ -24,8 +24,8 @@
         }
       }
     },
-    "/user/init-data": {
-      "get": {
+    "/get/user/init-data": {
+      "post": {
         "parameters": [],
         "responses": {
           "200": {
@@ -93,7 +93,7 @@
         }
       }
     },
-    "/sms/send": {
+    "/send/login/sms": {
       "post": {
         "parameters": [],
         "responses": {
@@ -178,18 +178,9 @@
         }
       }
     },
-    "/user": {
-      "get": {
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/get/user": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -197,81 +188,106 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "user",
-                    "followingCount",
-                    "followerCount",
-                    "workCount",
-                    "likeCount",
-                    "collectCount"
-                  ],
+                  "required": [],
                   "properties": {
                     "user": {
                       "type": "object",
                       "required": [
-                        "id",
-                        "created_at",
-                        "updated_at",
-                        "name",
-                        "desc",
-                        "birthday",
-                        "gender",
-                        "avatar_url",
-                        "is_complete_profile",
-                        "is_follow",
-                        "is_followed"
+                        "user",
+                        "followingCount",
+                        "followerCount",
+                        "workCount",
+                        "likeCount",
+                        "collectCount"
                       ],
                       "properties": {
-                        "id": {
-                          "type": "string"
+                        "user": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "created_at",
+                            "updated_at",
+                            "name",
+                            "desc",
+                            "birthday",
+                            "gender",
+                            "avatar_url",
+                            "is_complete_profile",
+                            "is_follow",
+                            "is_followed"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "desc": {
+                              "type": "string"
+                            },
+                            "birthday": {
+                              "type": "string"
+                            },
+                            "gender": {
+                              "type": "integer"
+                            },
+                            "avatar_url": {
+                              "type": "string"
+                            },
+                            "is_complete_profile": {
+                              "type": "integer"
+                            },
+                            "is_follow": {
+                              "type": "integer"
+                            },
+                            "is_followed": {
+                              "type": "integer"
+                            }
+                          }
                         },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "desc": {
-                          "type": "string"
-                        },
-                        "birthday": {
-                          "type": "string"
-                        },
-                        "gender": {
+                        "followingCount": {
                           "type": "integer"
                         },
-                        "avatar_url": {
-                          "type": "string"
-                        },
-                        "is_complete_profile": {
+                        "followerCount": {
                           "type": "integer"
                         },
-                        "is_follow": {
+                        "workCount": {
                           "type": "integer"
                         },
-                        "is_followed": {
+                        "likeCount": {
+                          "type": "integer"
+                        },
+                        "collectCount": {
                           "type": "integer"
                         }
                       }
-                    },
-                    "followingCount": {
-                      "type": "integer"
-                    },
-                    "followerCount": {
-                      "type": "integer"
-                    },
-                    "workCount": {
-                      "type": "integer"
-                    },
-                    "likeCount": {
-                      "type": "integer"
-                    },
-                    "collectCount": {
-                      "type": "integer"
                     }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
                   }
                 }
               }
@@ -347,42 +363,9 @@
         }
       }
     },
-    "/user/follows": {
-      "get": {
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "type",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/get/user/follows": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -452,6 +435,37 @@
                     "count": {
                       "type": "integer"
                     }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page",
+                  "pageSize",
+                  "type",
+                  "userId"
+                ],
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
                   }
                 }
               }
@@ -538,18 +552,9 @@
         }
       }
     },
-    "/work": {
-      "get": {
-        "parameters": [
-          {
-            "name": "workId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/get/work": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -557,152 +562,173 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "user",
-                    "work",
-                    "images",
-                    "likeCount",
-                    "collectCount",
-                    "isLiked",
-                    "isCollected",
-                    "isOwner"
-                  ],
+                  "required": [],
                   "properties": {
-                    "user": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "created_at",
-                        "updated_at",
-                        "name",
-                        "desc",
-                        "birthday",
-                        "gender",
-                        "avatar_url",
-                        "is_complete_profile",
-                        "is_follow",
-                        "is_followed"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "desc": {
-                          "type": "string"
-                        },
-                        "birthday": {
-                          "type": "string"
-                        },
-                        "gender": {
-                          "type": "integer"
-                        },
-                        "avatar_url": {
-                          "type": "string"
-                        },
-                        "is_complete_profile": {
-                          "type": "integer"
-                        },
-                        "is_follow": {
-                          "type": "integer"
-                        },
-                        "is_followed": {
-                          "type": "integer"
-                        }
-                      }
-                    },
                     "work": {
                       "type": "object",
                       "required": [
-                        "id",
-                        "created_at",
-                        "updated_at",
-                        "title",
-                        "permission",
-                        "user_id",
-                        "content"
+                        "user",
+                        "work",
+                        "images",
+                        "likeCount",
+                        "collectCount",
+                        "isLiked",
+                        "isCollected"
                       ],
                       "properties": {
-                        "id": {
-                          "type": "string"
+                        "user": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "created_at",
+                            "updated_at",
+                            "name",
+                            "desc",
+                            "birthday",
+                            "gender",
+                            "avatar_url",
+                            "is_complete_profile",
+                            "is_follow",
+                            "is_followed"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "desc": {
+                              "type": "string"
+                            },
+                            "birthday": {
+                              "type": "string"
+                            },
+                            "gender": {
+                              "type": "integer"
+                            },
+                            "avatar_url": {
+                              "type": "string"
+                            },
+                            "is_complete_profile": {
+                              "type": "integer"
+                            },
+                            "is_follow": {
+                              "type": "integer"
+                            },
+                            "is_followed": {
+                              "type": "integer"
+                            }
+                          }
                         },
-                        "created_at": {
-                          "type": "string"
+                        "work": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "created_at",
+                            "updated_at",
+                            "title",
+                            "permission",
+                            "user_id",
+                            "content"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "permission": {
+                              "type": "integer"
+                            },
+                            "user_id": {
+                              "type": "string"
+                            },
+                            "content": {
+                              "type": "string"
+                            }
+                          }
                         },
-                        "updated_at": {
-                          "type": "string"
+                        "images": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "created_at",
+                              "updated_at",
+                              "work_id",
+                              "path",
+                              "type"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "type": "string"
+                              },
+                              "work_id": {
+                                "type": "string"
+                              },
+                              "path": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "integer"
+                              }
+                            }
+                          }
                         },
-                        "title": {
-                          "type": "string"
-                        },
-                        "permission": {
+                        "likeCount": {
                           "type": "integer"
                         },
-                        "user_id": {
-                          "type": "string"
+                        "collectCount": {
+                          "type": "integer"
                         },
-                        "content": {
-                          "type": "string"
+                        "isLiked": {
+                          "type": "integer"
+                        },
+                        "isCollected": {
+                          "type": "integer"
                         }
                       }
-                    },
-                    "images": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "id",
-                          "created_at",
-                          "updated_at",
-                          "work_id",
-                          "path",
-                          "type"
-                        ],
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "created_at": {
-                            "type": "string"
-                          },
-                          "updated_at": {
-                            "type": "string"
-                          },
-                          "work_id": {
-                            "type": "string"
-                          },
-                          "path": {
-                            "type": "string"
-                          },
-                          "type": {
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    },
-                    "likeCount": {
-                      "type": "integer"
-                    },
-                    "collectCount": {
-                      "type": "integer"
-                    },
-                    "isLiked": {
-                      "type": "integer"
-                    },
-                    "isCollected": {
-                      "type": "integer"
-                    },
-                    "isOwner": {
-                      "type": "integer"
                     }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workId"
+                ],
+                "properties": {
+                  "workId": {
+                    "type": "string"
                   }
                 }
               }
@@ -711,42 +737,9 @@
         }
       }
     },
-    "/works": {
-      "get": {
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "type",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "targetUserId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/get/works": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -767,8 +760,7 @@
                           "work",
                           "cover_image",
                           "likeCount",
-                          "isLiked",
-                          "isOwner"
+                          "isLiked"
                         ],
                         "properties": {
                           "user": {
@@ -881,13 +873,41 @@
                           },
                           "isLiked": {
                             "type": "integer"
-                          },
-                          "isOwner": {
-                            "type": "integer"
                           }
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page",
+                  "pageSize",
+                  "type",
+                  "targetUserId"
+                ],
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "targetUserId": {
+                    "type": "string"
                   }
                 }
               }
@@ -1118,50 +1138,9 @@
         }
       }
     },
-    "/work/comments": {
-      "get": {
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "type",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "workId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "rootCommentId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/get/work/comments": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -1284,6 +1263,41 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page",
+                  "pageSize",
+                  "type",
+                  "workId",
+                  "rootCommentId"
+                ],
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "workId": {
+                    "type": "string"
+                  },
+                  "rootCommentId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -1297,104 +1311,256 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "user",
-                    "comment",
-                    "isLiked",
-                    "likeCount",
-                    "replyCount"
-                  ],
+                  "required": [],
                   "properties": {
-                    "user": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "created_at",
-                        "updated_at",
-                        "name",
-                        "desc",
-                        "birthday",
-                        "gender",
-                        "avatar_url",
-                        "is_complete_profile"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "desc": {
-                          "type": "string"
-                        },
-                        "birthday": {
-                          "type": "string"
-                        },
-                        "gender": {
-                          "type": "integer"
-                        },
-                        "avatar_url": {
-                          "type": "string"
-                        },
-                        "is_complete_profile": {
-                          "type": "integer"
-                        }
-                      }
-                    },
                     "comment": {
                       "type": "object",
                       "required": [
-                        "id",
-                        "created_at",
-                        "updated_at",
-                        "content",
-                        "work_id",
-                        "user_id",
-                        "parent_id",
-                        "root_comment_id"
+                        "user",
+                        "comment",
+                        "isLiked",
+                        "likeCount",
+                        "replyCount"
                       ],
                       "properties": {
-                        "id": {
-                          "type": "string"
+                        "user": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "created_at",
+                            "updated_at",
+                            "name",
+                            "desc",
+                            "birthday",
+                            "gender",
+                            "avatar_url",
+                            "is_complete_profile"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "desc": {
+                              "type": "string"
+                            },
+                            "birthday": {
+                              "type": "string"
+                            },
+                            "gender": {
+                              "type": "integer"
+                            },
+                            "avatar_url": {
+                              "type": "string"
+                            },
+                            "is_complete_profile": {
+                              "type": "integer"
+                            }
+                          }
                         },
-                        "created_at": {
-                          "type": "string"
+                        "comment": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "created_at",
+                            "updated_at",
+                            "content",
+                            "work_id",
+                            "user_id",
+                            "parent_id",
+                            "root_comment_id"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "content": {
+                              "type": "string"
+                            },
+                            "work_id": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "type": "string"
+                            },
+                            "parent_id": {
+                              "type": "string"
+                            },
+                            "root_comment_id": {
+                              "type": "string"
+                            }
+                          }
                         },
-                        "updated_at": {
-                          "type": "string"
+                        "isLiked": {
+                          "type": "integer"
                         },
-                        "content": {
-                          "type": "string"
+                        "likeCount": {
+                          "type": "integer"
                         },
-                        "work_id": {
-                          "type": "string"
-                        },
-                        "user_id": {
-                          "type": "string"
-                        },
-                        "parent_id": {
-                          "type": "string"
-                        },
-                        "root_comment_id": {
-                          "type": "string"
+                        "replyCount": {
+                          "type": "integer"
                         }
                       }
-                    },
-                    "isLiked": {
-                      "type": "integer"
-                    },
-                    "likeCount": {
-                      "type": "integer"
-                    },
-                    "replyCount": {
-                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content",
+                  "workId"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  },
+                  "workId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reply/work/comment": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [],
+                  "properties": {
+                    "comment": {
+                      "type": "object",
+                      "required": [
+                        "user",
+                        "comment",
+                        "isLiked",
+                        "likeCount",
+                        "replyCount"
+                      ],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "created_at",
+                            "updated_at",
+                            "name",
+                            "desc",
+                            "birthday",
+                            "gender",
+                            "avatar_url",
+                            "is_complete_profile"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "desc": {
+                              "type": "string"
+                            },
+                            "birthday": {
+                              "type": "string"
+                            },
+                            "gender": {
+                              "type": "integer"
+                            },
+                            "avatar_url": {
+                              "type": "string"
+                            },
+                            "is_complete_profile": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "comment": {
+                          "type": "object",
+                          "required": [
+                            "id",
+                            "created_at",
+                            "updated_at",
+                            "content",
+                            "work_id",
+                            "user_id",
+                            "parent_id",
+                            "root_comment_id"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "content": {
+                              "type": "string"
+                            },
+                            "work_id": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "type": "string"
+                            },
+                            "parent_id": {
+                              "type": "string"
+                            },
+                            "root_comment_id": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "isLiked": {
+                          "type": "integer"
+                        },
+                        "likeCount": {
+                          "type": "integer"
+                        },
+                        "replyCount": {
+                          "type": "integer"
+                        }
+                      }
                     }
                   }
                 }
@@ -1480,7 +1646,7 @@
         }
       }
     },
-    "/chat/create/session": {
+    "/create/chat/session": {
       "post": {
         "parameters": [],
         "responses": {
@@ -1819,26 +1985,9 @@
         }
       }
     },
-    "/chat/get/sessions": {
-      "get": {
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
+    "/get/chat/sessions": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -2164,21 +2313,35 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page",
+                  "pageSize"
+                ],
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
-    "/chat/get/session": {
-      "get": {
-        "parameters": [
-          {
-            "name": "sessionId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/get/chat/session": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -2499,10 +2662,29 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
-    "/chat/pin/session": {
+    "/pin/chat/session": {
       "post": {
         "parameters": [],
         "responses": {
@@ -2543,7 +2725,7 @@
         }
       }
     },
-    "/chat/send/message": {
+    "/send/chat/message": {
       "post": {
         "parameters": [],
         "responses": {
@@ -2969,34 +3151,9 @@
         }
       }
     },
-    "/chat/get/messages": {
-      "get": {
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/get/chat/messages": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -3254,10 +3411,37 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "page",
+                  "pageSize",
+                  "sessionId"
+                ],
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "sessionId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
-    "/chat/clear/active/session": {
+    "/clear/active/chat/session": {
       "post": {
         "parameters": [],
         "responses": {
@@ -3318,18 +3502,51 @@
             }
           }
         }
-      },
-      "get": {
-        "parameters": [
-          {
-            "name": "reportId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
+      }
+    },
+    "/get/report/types": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "types"
+                  ],
+                  "properties": {
+                    "types": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "text",
+                          "id"
+                        ],
+                        "properties": {
+                          "text": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
-        ],
+        }
+      }
+    },
+    "/get/report": {
+      "post": {
+        "parameters": [],
         "responses": {
           "200": {
             "description": "响应模型",
@@ -3385,41 +3602,20 @@
               }
             }
           }
-        }
-      }
-    },
-    "/report/types": {
-      "get": {
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "响应模型",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "types"
-                  ],
-                  "properties": {
-                    "types": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "text",
-                          "id"
-                        ],
-                        "properties": {
-                          "text": {
-                            "type": "string"
-                          },
-                          "id": {
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reportId"
+                ],
+                "properties": {
+                  "reportId": {
+                    "type": "string"
                   }
                 }
               }

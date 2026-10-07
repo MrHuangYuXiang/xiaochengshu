@@ -187,7 +187,7 @@ export class UserService extends BaseService {
         await formParser.exec(async (header) => {
             filePath = `/user-avatars/${current.payload.userId}${header.contentType}`
             return await this.fileStorage.getWritableStream(filePath)
-        }, [FileExtEnum.Jpg, FileExtEnum.Png])
+        }, [FileExtEnum.JPG, FileExtEnum.PNG])
 
         // 数据库更新用户信息
         await current.tx.update(UserTable).set({

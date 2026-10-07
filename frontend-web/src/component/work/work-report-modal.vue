@@ -28,7 +28,7 @@
     import { ElMessage } from 'element-plus';
     import { globalWorkReportModal } from '../global.ts';
 
-    const reportTypes = ref<paths["/report/types"]["get"]["responses"]["200"]["content"]["application/json"]>()
+    const reportTypes = ref<paths["/get/report/types"]["post"]["responses"]["200"]["content"]["application/json"]>()
     const selectedType = ref<number>(1)
     const reportContent = ref<string>("")
     const reportContentRule = {
@@ -43,10 +43,10 @@
     const reportContentRef = useTemplateRef("reportContentRef")
 
     const getReportTypes = async () => {
-        reportTypes.value = await axiosProxy.get<
+        reportTypes.value = await axiosProxy.post<
             undefined,  
-            paths["/report/types"]["get"]["responses"]["200"]["content"]["application/json"]
-        >("/report/types", undefined)
+            paths["/get/report/types"]["post"]["responses"]["200"]["content"]["application/json"]
+        >("/get/report/types", undefined)
     }
 
     // 提交举报

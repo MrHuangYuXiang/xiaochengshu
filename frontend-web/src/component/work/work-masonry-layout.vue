@@ -47,10 +47,10 @@
   // 获取作品
   const getWorks = async () => {
     await works.value.pagePush(async (current: number, size: number) => {
-      const data = (await axiosProxy.get<
-        paths["/works"]["get"]["parameters"]["query"],
-        paths["/works"]["get"]["responses"]["200"]["content"]["application/json"]
-      >(`/works`,{
+      const data = (await axiosProxy.post<
+        paths["/get/works"]["post"]["requestBody"]["content"]["application/json"],
+        paths["/get/works"]["post"]["responses"]["200"]["content"]["application/json"]
+      >(`/get/works`,{
         page: current,
         pageSize: size,
         type: worksType.value,

@@ -2,7 +2,7 @@ import { db } from "../db.js";
 import { BaseService } from "./base.js";
 import { getCurrent } from "../../lib/local-stroage.js";
 import { FollowTable, UserTable } from "../model/db-schema/user.js";
-import { WorkTable, WorkCollectTable, WorkCommentTable, WorkLikeTable, WorkCommentLikeTable, WorkImageTable } from "../model/db-schema/work.js";
+import { WorkTable, WorkCollectTable, WorkCommentTable, WorkLikeTable, WorkCommentLikeTable, WorkAttachmentTable } from "../model/db-schema/work.js";
 import { and, eq, getTableColumns, count, inArray, not, sql, desc, like, asc } from "drizzle-orm";
 import type { Request, Response } from "express";
 import {
@@ -24,9 +24,9 @@ import {
 } from "../model/dto/work.js";
 import { v4 as uuidv4 } from "uuid";
 import { handleRawSqlRes } from "../../helper/sql.js";
-import { FormParser, MemoryWritableStream, type FormFieldHeader } from "../../lib/framework-ext.js";
+import { FormParser, MemoryWritableStream, NumberWritableStream, StringWritableStream, type FormFieldHeader } from "../../lib/framework-ext.js";
 import { AppError, throwServerError, throwServerBusy } from "../../lib/app-error.js";
-import { WorkImageTypeEnum } from "../model/enum/work.js";
+import { WorkAttachmentPriorityEnum, WorkTypeEnum } from "../model/enum/work.js";
 import { FileExtEnum } from "../model/enum/file.js";
 import { getTableConfig } from "drizzle-orm/mysql-core";
 import { ClientChatMessageTypeEnum } from "../model/enum/chat.js";
@@ -79,9 +79,9 @@ export class WorkService extends BaseService {
     // 查询作品图片
     const images = await db.
       select().
-      from(WorkImageTable).
-      where(eq(WorkImageTable.work_id, workId)).
-      orderBy(asc(WorkImageTable.type))
+      from(WorkAttachmentTable).
+      where(eq(WorkAttachmentTable.work_id, workId)).
+      orderBy(asc(WorkAttachmentTable.priority))
 
     res.json(getWorkDetailOutput.parse({
       work: {
@@ -169,15 +169,15 @@ export class WorkService extends BaseService {
     const works = await current.tx.select({
       user: UserTable,
       work: WorkTable,
-      cover_image: WorkImageTable,
+      cover_image: WorkAttachmentTable,
       likeCount: sql<number>`CASE WHEN likeSubQuery.likeCount IS NULL THEN 0 ELSE likeSubQuery.likeCount END`,
       isLiked: sql<number>`CASE WHEN likeSubQuery.isLiked IS NULL THEN 0 ELSE likeSubQuery.isLiked END`,
     }).
       from(WorkTable).
       where(and(...whereStmt)).
-      leftJoin(WorkImageTable, and(
-        eq(WorkTable.id, WorkImageTable.work_id),
-        eq(WorkImageTable.type, WorkImageTypeEnum.Cover),
+      leftJoin(WorkAttachmentTable, and(
+        eq(WorkTable.id, WorkAttachmentTable.work_id),
+        eq(WorkAttachmentTable.priority, WorkAttachmentPriorityEnum.COVER),
       )).
       leftJoin(UserTable, eq(WorkTable.user_id, UserTable.id)).
       leftJoin(likeSubQuery, eq(WorkTable.id, likeSubQuery.workId)).
@@ -193,23 +193,23 @@ export class WorkService extends BaseService {
   }
 
   /**
-   * 发表作品, 前端上传的第一张图片默认设置为封面图片
+   * 发布图片作品, 前端上传的第一张图片默认设置为封面图片
    * 字段顺序: title, content, permission, workImageCount, workImage1, workImage2, ...
    */
-  async createWork(req: Request, res: Response) {
+  async createImageWork(req: Request, res: Response) {
     const current = getCurrent()
     const formParser = new FormParser(req)
     const workId = uuidv4()
-    const titleStream = new MemoryWritableStream()
-    const contentStream = new MemoryWritableStream()
-    const permissionStream = new MemoryWritableStream()
-    const workImageCountStream = new MemoryWritableStream()
-    const images: Array<typeof WorkImageTable.$inferInsert> = []
+    const titleStream = new StringWritableStream()
+    const contentStream = new StringWritableStream()
+    const permissionStream = new NumberWritableStream()
+    const workImageCountStream = new NumberWritableStream()
+    const images: Array<typeof WorkAttachmentTable.$inferInsert> = []
 
-    await formParser.exec(async () => titleStream, [FileExtEnum.Unknown])
-    await formParser.exec(async () => contentStream, [FileExtEnum.Unknown])
-    await formParser.exec(async () => permissionStream, [FileExtEnum.Unknown])
-    await formParser.exec(async () => workImageCountStream, [FileExtEnum.Unknown])
+    await formParser.exec(async () => titleStream, [FileExtEnum.UNKNOWN])
+    await formParser.exec(async () => contentStream, [FileExtEnum.UNKNOWN])
+    await formParser.exec(async () => permissionStream, [FileExtEnum.UNKNOWN])
+    await formParser.exec(async () => workImageCountStream, [FileExtEnum.UNKNOWN])
     const workImageCount = workImageCountStream.getNumber()
 
     if (workImageCount === 0) {
@@ -220,20 +220,20 @@ export class WorkService extends BaseService {
     for (let i = 0; i < workImageCount; i++) {
       await formParser.exec(async (fieldHeader: FormFieldHeader) => {
         const imageId = uuidv4()
-        const filePath = `/work-images/${imageId}${fieldHeader.contentType}`
+        const filePath = `/work-attachments/${imageId}${fieldHeader.contentType}`
         images.push({
           id: imageId,
           work_id: workId,
           path: filePath,
           // 第一张图片默认为封面图片
-          type: i === 0 ? WorkImageTypeEnum.Cover : WorkImageTypeEnum.Normal,
+          priority: i === 0 ? WorkAttachmentPriorityEnum.COVER : WorkAttachmentPriorityEnum.NORMAL,
         })
         return await this.fileStorage.getWritableStream(filePath)
-      }, [FileExtEnum.Jpg, FileExtEnum.Png])
+      }, [FileExtEnum.JPG, FileExtEnum.PNG])
     }
 
     // 数据库插入图片信息
-    await current.tx.insert(WorkImageTable).values(images)
+    await current.tx.insert(WorkAttachmentTable).values(images)
 
     // 数据库插入作品信息
     await current.tx.insert(WorkTable).values({
@@ -241,10 +241,48 @@ export class WorkService extends BaseService {
       user_id: current.payload.userId,
       title: titleStream.getString(),
       content: contentStream.getString(),
+      type: WorkTypeEnum.IMAGE,
       permission: permissionStream.getNumber(),
     })
+  }
 
-    res.json()
+  // 发布视频作品
+  async createVideoWork(req: Request, res: Response) {
+    const current = getCurrent()
+    const formParser = new FormParser(req)
+    const workId = uuidv4()
+    const titleStream = new StringWritableStream()
+    const contentStream = new StringWritableStream()
+    const permissionStream = new NumberWritableStream()
+    let videos: typeof WorkAttachmentTable.$inferInsert[] = []
+
+    await formParser.exec(async () => titleStream, [FileExtEnum.UNKNOWN])
+    await formParser.exec(async () => contentStream, [FileExtEnum.UNKNOWN])
+    await formParser.exec(async () => permissionStream, [FileExtEnum.UNKNOWN])
+
+    await formParser.exec(async (fieldHeader: FormFieldHeader) => {
+      const videoId = uuidv4()
+      const video = {
+        id: videoId,
+        work_id: workId,
+        path: `/work-attachments/${videoId}${fieldHeader.contentType}`,
+        priority: WorkAttachmentPriorityEnum.NORMAL,
+      }
+      videos.push(video)
+      return await this.fileStorage.getWritableStream(video.path)
+    }, [FileExtEnum.MP4])
+
+    // 数据库插入视频信息
+    await current.tx.insert(WorkAttachmentTable).values(videos)
+    // 数据库插入作品信息
+    await current.tx.insert(WorkTable).values({
+      id: workId,
+      user_id: current.payload.userId,
+      title: titleStream.getString(),
+      content: contentStream.getString(),
+      type: WorkTypeEnum.VIDEO,
+      permission: permissionStream.getNumber(),
+    })
   }
 
   /** 删除作品(级联删除相关资源) */

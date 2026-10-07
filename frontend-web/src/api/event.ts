@@ -35,7 +35,7 @@ class ClientEvent {
     this.worker.port.postMessage({
       type: "connect",
       jwt: storage.token.value,
-      url: import.meta.env.VITE_API_URL + "/user/connect"
+      url: import.meta.env.VITE_API_URL + "/connect"
     })
   }
 
@@ -49,7 +49,7 @@ class ClientEvent {
   // 注册回调函数
   public async registerCallback(
     callbackType: "global" | "page",
-    eventType: string, 
+    eventType: string,
     callback: (data: unknown) => Promise<void>
   ) {
     if (callbackType === "global") {

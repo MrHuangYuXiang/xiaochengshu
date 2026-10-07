@@ -61,13 +61,6 @@ export const getWorksOutput = objectType({
     })),
 })
 
-// 发表作品输入
-export const createWorkInput = objectType({
-    title: stringType.min(1, "标题至少为1个字符").max(20, "标题最多为20个字符"),
-    content: stringType.min(1, "内容至少为1个字符").max(200, "内容最多为200个字符"),
-    permission: numberType.min(0, "permission字段非法").max(1, "permission字段非法"),
-})
-
 // 删除作品输入
 export const deleteWorkInput = objectType({
     workId: stringType,
@@ -149,3 +142,11 @@ export const likeWorkCommentInput = objectType({
     workId: stringType,
     isLike: numberType,
 })
+
+// 发布图片作品输入
+export const createImageWorkInput = {
+    title: stringType,
+    content: stringType,
+    permission: numberType,
+    workImageCount: numberType,
+}

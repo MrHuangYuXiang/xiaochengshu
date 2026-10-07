@@ -33,28 +33,28 @@ import {
     getUserFollowsOutput,
     removeFollowerInput,
 } from "./domain/model/dto/user.js"
-import { 
-    reportWorkInput, 
-    getReportTypesOutput, 
-    getReportDetailInput, 
+import {
+    reportWorkInput,
+    getReportTypesOutput,
+    getReportDetailInput,
     getReportDetailOutput
 } from "./domain/model/dto/report.js"
 import express from "express"
 import { routeMap } from "./lib/framework-ext.js"
 import { doc } from "./lib/framework-ext.js"
 import { z } from "zod"
-import { 
-    createSessionInput, 
-    createSessionOutput, 
-    getMessagesInput, 
-    getMessagesOutput, 
-    getSessionInput, 
-    getSessionOutput, 
-    getSessionsInput, 
-    getSessionsOutput, 
-    pinSessionInput, 
-    sendMessageInput, 
-    sendMessageOutput, 
+import {
+    createSessionInput,
+    createSessionOutput,
+    getMessagesInput,
+    getMessagesOutput,
+    getSessionInput,
+    getSessionOutput,
+    getSessionsInput,
+    getSessionsOutput,
+    pinSessionInput,
+    sendMessageInput,
+    sendMessageOutput,
 } from "./domain/model/dto/chat.js"
 import { LocalFileStorageAdapter } from "./port/file-storage-adapter.js"
 import { LocalClientManager } from "./port/client-manager-adapter.js"
@@ -90,8 +90,8 @@ export class Server implements ServerPort {
         const chatShareService = new ChatShareService(fileStorage, clientManager)
 
         // 服务实例
-        const chatService = new ChatService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService) 
-        const reportService = new ReportService(fileStorage, clientManager,  chatShareService, workShareService, userShareService, reportShareService)
+        const chatService = new ChatService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
+        const reportService = new ReportService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
         const userService = new UserService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
         const workService = new WorkService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
 
@@ -107,43 +107,43 @@ export class Server implements ServerPort {
         /** 以下为客户系统api,面向普通用户 */
 
         // 用户模块
-        this.registerHandler('/user/connect', undefined, undefined, userService.connect.bind(userService), true)
-        this.registerHandler('/user/init-data', undefined, getInitDataOutput, userService.getInitData.bind(userService))
-        this.registerHandler('/sms/send', smsSendInput, undefined, userService.smsSend.bind(userService)) 
+        this.registerHandler('/connect', undefined, undefined, userService.connect.bind(userService), true)
+        this.registerHandler('/get/user/init-data', undefined, getInitDataOutput, userService.getInitData.bind(userService))
+        this.registerHandler('/send/login/sms', smsSendInput, undefined, userService.smsSend.bind(userService))
         this.registerHandler('/login', loginInput, loginOutput, userService.login.bind(userService))
-        this.registerHandler('/user', getUserDetailInput, getUserDetailOutput, userService.getUserDetail.bind(userService))
+        this.registerHandler('/get/user', getUserDetailInput, getUserDetailOutput, userService.getUserDetail.bind(userService))
         this.registerHandler('/upload/user/avatar', undefined, undefined, userService.uploadUserAvatar.bind(userService))
         this.registerHandler('/update/user/info', updateUserInfoInput, undefined, userService.updateUserInfo.bind(userService))
-        this.registerHandler('/user/follows', getUserFollowsInput, getUserFollowsOutput, userService.getUserFollows.bind(userService))
+        this.registerHandler('/get/user/follows', getUserFollowsInput, getUserFollowsOutput, userService.getUserFollows.bind(userService))
         this.registerHandler('/follow/user', followUserInput, undefined, userService.followUser.bind(userService))
         this.registerHandler('/remove/follower', removeFollowerInput, undefined, userService.removeFollower.bind(userService))
 
         // 作品模块
-        this.registerHandler('/work', getWorkDetailInput, getWorkDetailOutput, workService.getWorkDetail.bind(workService))
-        this.registerHandler('/works', getWorksInput, getWorksOutput, workService.getWorks.bind(workService))
-        this.registerHandler('/create/work', undefined, undefined, workService.createWork.bind(workService))
+        this.registerHandler('/get/work', getWorkDetailInput, getWorkDetailOutput, workService.getWorkDetail.bind(workService))
+        this.registerHandler('/get/works', getWorksInput, getWorksOutput, workService.getWorks.bind(workService))
+        this.registerHandler('/create/work', undefined, undefined, workService.createImageWork.bind(workService))
         this.registerHandler('/delete/work', deleteWorkInput, undefined, workService.deleteWork.bind(workService))
         this.registerHandler('/like/work', likeWorkInput, undefined, workService.likeWork.bind(workService))
         this.registerHandler('/collect/work', collectWorkInput, undefined, workService.collectWork.bind(workService))
         this.registerHandler('/share/work', shareWorkInput, undefined, workService.shareWork.bind(workService))
-        this.registerHandler('/work/comments', getWorkCommentsInput, getWorkCommentsOutput, workService.getWorkComments.bind(workService))
+        this.registerHandler('/get/work/comments', getWorkCommentsInput, getWorkCommentsOutput, workService.getWorkComments.bind(workService))
         this.registerHandler('/create/work/comment', createWorkCommentInput, createWorkCommentOutput, workService.createWorkComment.bind(workService))
         this.registerHandler('/reply/work/comment', replyWorkCommentInput, replyWorkCommentOutput, workService.replyWorkComment.bind(workService))
         this.registerHandler('/like/work/comment', likeWorkCommentInput, undefined, workService.likeWorkComment.bind(workService))
 
         // 聊天模块
-        this.registerHandler('/chat/create/session', createSessionInput, createSessionOutput, chatService.createSession.bind(chatService))
-        this.registerHandler('/chat/get/sessions', getSessionsInput, getSessionsOutput, chatService.getSessions.bind(chatService))
-        this.registerHandler('/chat/get/session', getSessionInput, getSessionOutput, chatService.getSession.bind(chatService))
-        this.registerHandler('/chat/pin/session', pinSessionInput, undefined, chatService.pinSession.bind(chatService))
-        this.registerHandler('/chat/send/message', sendMessageInput, sendMessageOutput, chatService.sendMessage.bind(chatService))
-        this.registerHandler('/chat/get/messages', getMessagesInput, getMessagesOutput, chatService.getMessages.bind(chatService))
-        this.registerHandler('/chat/clear/active/session', undefined, undefined, chatService.clearActiveSession.bind(chatService))
+        this.registerHandler('/create/chat/session', createSessionInput, createSessionOutput, chatService.createSession.bind(chatService))
+        this.registerHandler('/get/chat/sessions', getSessionsInput, getSessionsOutput, chatService.getSessions.bind(chatService))
+        this.registerHandler('/get/chat/session', getSessionInput, getSessionOutput, chatService.getSession.bind(chatService))
+        this.registerHandler('/pin/chat/session', pinSessionInput, undefined, chatService.pinSession.bind(chatService))
+        this.registerHandler('/send/chat/message', sendMessageInput, sendMessageOutput, chatService.sendMessage.bind(chatService))
+        this.registerHandler('/get/chat/messages', getMessagesInput, getMessagesOutput, chatService.getMessages.bind(chatService))
+        this.registerHandler('/clear/active/chat/session', undefined, undefined, chatService.clearActiveSession.bind(chatService))
 
         // 举报模块
         this.registerHandler('/report', reportWorkInput, undefined, reportService.report.bind(reportService))
-        this.registerHandler('/report/types', undefined, getReportTypesOutput, reportService.getReportTypes.bind(reportService))
-        this.registerHandler('/report', getReportDetailInput, getReportDetailOutput, reportService.getReportDetail.bind(reportService))
+        this.registerHandler('/get/report/types', undefined, getReportTypesOutput, reportService.getReportTypes.bind(reportService))
+        this.registerHandler('/get/report', getReportDetailInput, getReportDetailOutput, reportService.getReportDetail.bind(reportService))
 
         // 直播模块
 

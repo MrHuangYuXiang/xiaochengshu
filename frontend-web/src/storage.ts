@@ -2,7 +2,7 @@ import { ref, type Ref } from "vue";
 import type { paths } from "./api/gen";
 
 class Storage {
-  public initData: Ref<paths["/user/init-data"]["get"]["responses"]["200"]["content"]["application/json"] | undefined>
+  public initData: Ref<paths["/get/user/init-data"]["post"]["responses"]["200"]["content"]["application/json"] | undefined>
   public token: Ref<string | undefined>
 
   // 当前活跃会话id

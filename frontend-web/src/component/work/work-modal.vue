@@ -10,9 +10,8 @@
     width="60vw"
     height="90vh"
   >
-    <div class="work-modal">
+    <div class="work-modal" v-if="work">
       <ImageSlider
-        v-if="work"
         class="image"
         :object-fit="'contain'"
         :src="work.images[currentImageIndex]?.path || ''"
@@ -26,7 +25,6 @@
         <!-- 用户信息 -->
         <UserFollowCard
           class="user"
-          v-if="work"
           :user-id="work.user.id"
           :user-name="work.user.name"
           :user-avatar-url="work.user.avatar_url"
@@ -159,6 +157,10 @@
         </div>
       </div>
     </div>
+
+    <div v-else>
+      作品不存在
+    </div>
   </BaseModal>
 </template>
 
@@ -204,7 +206,7 @@
     rootCommentId: string,
     replyContent: string,
     replyUserName: string,
-  } | undefined>(undefined)
+  }>()
 
   // 显示分享浮动框
   const isShowShareFloating = ref(false)
@@ -221,10 +223,10 @@
   // 封装获取顶层评论逻辑
   const getTopComments = async () => {
     await comments.value.pagePush(async (currentPage: number, pageSize: number) => {
-      const res = await axiosProxy.get<
-      paths["/work/comments"]["get"]["parameters"]["query"],
-      paths["/work/comments"]["get"]["responses"]["200"]["content"]["application/json"]
-      >(`/work/comments`, {
+      const res = await axiosProxy.post<
+      paths["/get/work/comments"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/get/work/comments"]["post"]["responses"]["200"]["content"]["application/json"]
+      >(`/get/work/comments`, {
         page: currentPage,
         pageSize: pageSize,
         workId: globalWorkModal.workId.value,
@@ -257,22 +259,31 @@
 
   // 发表作品评论/回复
   const publish = async () => {
-    let rootCommentId = ''
-    let parentId = ''
-    if (replyTarget.value !== undefined) {
-      rootCommentId = replyTarget.value.rootCommentId
-      parentId = replyTarget.value.parentId
+    let comment: workCommentSchema | undefined
+
+    if (!work.value) return
+
+    if (!replyTarget.value) {
+      comment = (await axiosProxy.post<
+        paths["/create/work/comment"]["post"]["requestBody"]["content"]["application/json"],
+        paths["/create/work/comment"]["post"]["responses"]["200"]["content"]["application/json"]
+      >("/create/work/comment", {
+        content: inputContent.value,
+        workId: work.value.work.id,
+      })).comment
+    } else {
+      comment = (await axiosProxy.post<
+        paths["/reply/work/comment"]["post"]["requestBody"]["content"]["application/json"],
+        paths["/reply/work/comment"]["post"]["responses"]["200"]["content"]["application/json"]
+      >("/reply/work/comment", {
+        content: inputContent.value,
+        workId: work.value.work.id,
+        parentId: replyTarget.value.parentId,
+        rootCommentId: replyTarget.value.rootCommentId,
+      })).comment
     }
 
-    const comment = await axiosProxy.post<
-      paths["/create/work/comment"]["post"]["requestBody"]["content"]["application/json"],
-      paths["/create/work/comment"]["post"]["responses"]["200"]["content"]["application/json"]
-    >("/create/work/comment", {
-      content: inputContent.value,
-      workId: work.value!.work.id,
-      rootCommentId: rootCommentId,
-      parentId: parentId,
-    })
+    if (!comment) return
 
     // 添加评论
     if (replyTarget.value !== undefined) {
@@ -292,10 +303,10 @@
   const getReplies = (commentId: string) => {
     const reply = repliesMap.value.get(commentId)
     reply?.pageAddChildren(async (currentPage: number, pageSize: number) => {
-      const res = await axiosProxy.get<
-        paths["/work/comments"]["get"]["parameters"]["query"],
-        paths["/work/comments"]["get"]["responses"]["200"]["content"]["application/json"]
-      >(`/work/comments`, {
+      const res = await axiosProxy.post<
+        paths["/get/work/comments"]["post"]["requestBody"]["content"]["application/json"],
+        paths["/get/work/comments"]["post"]["responses"]["200"]["content"]["application/json"]
+      >(`/get/work/comments`, {
         page: currentPage,
         pageSize: pageSize,
         type: "reply",
@@ -390,12 +401,12 @@
     if (!globalWorkModal.isShow.value) return
 
     // 获取作品详情
-    work.value = await axiosProxy.get<
-      paths["/work"]["get"]["parameters"]["query"],
-      paths["/work"]["get"]["responses"]["200"]["content"]["application/json"]
-    >(`/work`, {
+    work.value = (await axiosProxy.post<
+      paths["/get/work"]["post"]["requestBody"]["content"]["application/json"],
+      paths["/get/work"]["post"]["responses"]["200"]["content"]["application/json"]
+    >(`/get/work`, {
       workId: globalWorkModal.workId.value
-    })
+    })).work
   })
 </script>
 

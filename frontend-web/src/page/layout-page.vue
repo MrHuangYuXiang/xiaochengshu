@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
   import NavBar from '@/component/NavBar.vue'
-  import InitUserModal from '@/component/user/InitUserModal.vue';
+  import InitUserModal from '@/component/user/init-user-modal.vue';
   import UpdateUserModal from '@/component/user/update-user-modal.vue';
   import ErrorDialog from '@/component/common/ErrorDialog.vue';
   import ImagePreview from '@/component/image/image-preview.vue';
@@ -74,10 +74,10 @@
 
     // 获取初始化数据
     storage.initData.value = (
-      await axiosProxy.get<
-      paths["/user/init-data"]["get"]["parameters"]["query"],
-      paths["/user/init-data"]['get']["responses"]["200"]["content"]["application/json"]
-    >("/user/init-data", undefined))
+      await axiosProxy.post<
+      paths["/get/user/init-data"]["post"]["requestBody"],
+      paths["/get/user/init-data"]['post']["responses"]["200"]["content"]["application/json"]
+    >("/get/user/init-data", undefined))
 
     // 如果新用户个人信息未完善,显示弹窗
     if (storage.initData.value?.user.is_complete_profile === 0) {

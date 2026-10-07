@@ -113,7 +113,6 @@
     const formData = new FormData()
     formData.append('avatar', file)
     await axiosProxy.post('/upload/user/avatar', formData)
-    storage.updateUserAvatarUrl()
   }
 </script>
 
