@@ -21,12 +21,14 @@ import {
   shareWorkInput,
   replyWorkCommentInput,
   replyWorkCommentOutput,
+  createImageWorkInput,
+  createVideoWorkInput,
 } from "../model/dto/work.js";
 import { v4 as uuidv4 } from "uuid";
 import { handleRawSqlRes } from "../../helper/sql.js";
-import { FormParser, MemoryWritableStream, NumberWritableStream, StringWritableStream, type FormFieldHeader } from "../../lib/framework-ext.js";
+import { FormParser, getFormJsonData } from "../../lib/framework-ext.js";
 import { AppError, throwServerError, throwServerBusy } from "../../lib/app-error.js";
-import { WorkAttachmentPriorityEnum, WorkTypeEnum } from "../model/enum/work.js";
+import { WorkAttachmentPriorityEnum, WorkAttachmentTypeEnum, WorkTypeEnum } from "../model/enum/work.js";
 import { FileExtEnum } from "../model/enum/file.js";
 import { getTableConfig } from "drizzle-orm/mysql-core";
 import { ClientChatMessageTypeEnum } from "../model/enum/chat.js";
@@ -76,17 +78,24 @@ export class WorkService extends BaseService {
       return
     }
 
-    // 查询作品图片
-    const images = await db.
+    // 查询作品附件
+    const whereCond = [eq(WorkAttachmentTable.work_id, workId)]
+    // 如果是视频作品,只查询视频文件
+    if (work[0].work.type === WorkTypeEnum.VIDEO) {
+      whereCond.push(eq(WorkAttachmentTable.type, WorkAttachmentTypeEnum.VIDEO))
+    } else {
+      whereCond.push(eq(WorkAttachmentTable.type, WorkAttachmentTypeEnum.IMAGE))
+    }
+    const attachments = await db.
       select().
       from(WorkAttachmentTable).
-      where(eq(WorkAttachmentTable.work_id, workId)).
+      where(and(...whereCond)).
       orderBy(asc(WorkAttachmentTable.priority))
 
     res.json(getWorkDetailOutput.parse({
       work: {
         ...work[0],
-        images: images,
+        attachments: attachments,
       },
     }))
   }
@@ -103,10 +112,10 @@ export class WorkService extends BaseService {
     const { offset, limit } = getRequestPage(res)
     let whereStmt: any[] = []
 
-    // 当目标用户不是当前用户时,过滤私密作品
-    if (targetUserId !== current.payload.userId) {
-      whereStmt.push(eq(WorkTable.permission, 1))
-    }
+    // // 当目标用户不是当前用户时,过滤私密作品
+    // if (targetUserId !== current.payload.userId) {
+    //   whereStmt.push(eq(WorkTable.permission, 1))
+    // }
 
     switch (body.type) {
       /**
@@ -174,13 +183,14 @@ export class WorkService extends BaseService {
       isLiked: sql<number>`CASE WHEN likeSubQuery.isLiked IS NULL THEN 0 ELSE likeSubQuery.isLiked END`,
     }).
       from(WorkTable).
-      where(and(...whereStmt)).
       leftJoin(WorkAttachmentTable, and(
         eq(WorkTable.id, WorkAttachmentTable.work_id),
         eq(WorkAttachmentTable.priority, WorkAttachmentPriorityEnum.COVER),
+        eq(WorkAttachmentTable.type, WorkAttachmentTypeEnum.IMAGE),
       )).
       leftJoin(UserTable, eq(WorkTable.user_id, UserTable.id)).
       leftJoin(likeSubQuery, eq(WorkTable.id, likeSubQuery.workId)).
+      where(and(...whereStmt)).
       limit(limit).
       offset(offset).
       orderBy(desc(WorkTable.created_at))
@@ -194,42 +204,26 @@ export class WorkService extends BaseService {
 
   /**
    * 发布图片作品, 前端上传的第一张图片默认设置为封面图片
-   * 字段顺序: title, content, permission, workImageCount, workImage1, workImage2, ...
    */
   async createImageWork(req: Request, res: Response) {
     const current = getCurrent()
     const formParser = new FormParser(req)
     const workId = uuidv4()
-    const titleStream = new StringWritableStream()
-    const contentStream = new StringWritableStream()
-    const permissionStream = new NumberWritableStream()
-    const workImageCountStream = new NumberWritableStream()
     const images: Array<typeof WorkAttachmentTable.$inferInsert> = []
-
-    await formParser.exec(async () => titleStream, [FileExtEnum.UNKNOWN])
-    await formParser.exec(async () => contentStream, [FileExtEnum.UNKNOWN])
-    await formParser.exec(async () => permissionStream, [FileExtEnum.UNKNOWN])
-    await formParser.exec(async () => workImageCountStream, [FileExtEnum.UNKNOWN])
-    const workImageCount = workImageCountStream.getNumber()
-
-    if (workImageCount === 0) {
-      throw new AppError("请至少上传一张图片")
-    }
+    const jsonData = await getFormJsonData(formParser, createImageWorkInput)
 
     // 解析图片流并写入文件
-    for (let i = 0; i < workImageCount; i++) {
-      await formParser.exec(async (fieldHeader: FormFieldHeader) => {
-        const imageId = uuidv4()
-        const filePath = `/work-attachments/${imageId}${fieldHeader.contentType}`
-        images.push({
-          id: imageId,
-          work_id: workId,
-          path: filePath,
-          // 第一张图片默认为封面图片
-          priority: i === 0 ? WorkAttachmentPriorityEnum.COVER : WorkAttachmentPriorityEnum.NORMAL,
-        })
-        return await this.fileStorage.getWritableStream(filePath)
-      }, [FileExtEnum.JPG, FileExtEnum.PNG])
+    for (let i = 0; i < jsonData.workImageCount; i++) {
+      const imageId = uuidv4()
+      const filePath = await this.fileStorage.writeFileByParser(`/work-attachments/${imageId}`, formParser, [FileExtEnum.JPG, FileExtEnum.PNG])
+      images.push({
+        id: imageId,
+        work_id: workId,
+        path: filePath,
+        // 第一张图片默认为封面图片
+        type: WorkAttachmentTypeEnum.IMAGE,
+        priority: i === 0 ? WorkAttachmentPriorityEnum.COVER : WorkAttachmentPriorityEnum.NORMAL,
+      })
     }
 
     // 数据库插入图片信息
@@ -239,10 +233,10 @@ export class WorkService extends BaseService {
     await current.tx.insert(WorkTable).values({
       id: workId,
       user_id: current.payload.userId,
-      title: titleStream.getString(),
-      content: contentStream.getString(),
+      title: jsonData.title,
+      content: jsonData.content,
       type: WorkTypeEnum.IMAGE,
-      permission: permissionStream.getNumber(),
+      permission: jsonData.permission,
     })
   }
 
@@ -251,26 +245,30 @@ export class WorkService extends BaseService {
     const current = getCurrent()
     const formParser = new FormParser(req)
     const workId = uuidv4()
-    const titleStream = new StringWritableStream()
-    const contentStream = new StringWritableStream()
-    const permissionStream = new NumberWritableStream()
+    const coverImageId = uuidv4()
     let videos: typeof WorkAttachmentTable.$inferInsert[] = []
 
-    await formParser.exec(async () => titleStream, [FileExtEnum.UNKNOWN])
-    await formParser.exec(async () => contentStream, [FileExtEnum.UNKNOWN])
-    await formParser.exec(async () => permissionStream, [FileExtEnum.UNKNOWN])
+    const jsonData = await getFormJsonData(formParser, createVideoWorkInput)
+    const videoId = uuidv4()
+    const videoPath = await this.fileStorage.writeFileByParser(`/work-attachments/${videoId}`, formParser, [FileExtEnum.MP4])
+    videos.push({
+      id: videoId,
+      work_id: workId,
+      path: videoPath,
+      type: WorkAttachmentTypeEnum.VIDEO,
+      priority: WorkAttachmentPriorityEnum.NORMAL,
+    })
 
-    await formParser.exec(async (fieldHeader: FormFieldHeader) => {
-      const videoId = uuidv4()
-      const video = {
-        id: videoId,
-        work_id: workId,
-        path: `/work-attachments/${videoId}${fieldHeader.contentType}`,
-        priority: WorkAttachmentPriorityEnum.NORMAL,
-      }
-      videos.push(video)
-      return await this.fileStorage.getWritableStream(video.path)
-    }, [FileExtEnum.MP4])
+    // 提取首个关键帧作为封面图片
+    const coverFilePath = `/work-attachments/${coverImageId}${FileExtEnum.JPG}`
+    await this.fileStorage.mp4ExtractKeyFrame(videoPath, coverFilePath)
+    videos.push({
+      id: coverImageId,
+      work_id: workId,
+      path: coverFilePath,
+      type: WorkAttachmentTypeEnum.IMAGE,
+      priority: WorkAttachmentPriorityEnum.COVER,
+    })
 
     // 数据库插入视频信息
     await current.tx.insert(WorkAttachmentTable).values(videos)
@@ -278,10 +276,10 @@ export class WorkService extends BaseService {
     await current.tx.insert(WorkTable).values({
       id: workId,
       user_id: current.payload.userId,
-      title: titleStream.getString(),
-      content: contentStream.getString(),
+      title: jsonData.title,
+      content: jsonData.content,
       type: WorkTypeEnum.VIDEO,
-      permission: permissionStream.getNumber(),
+      permission: jsonData.permission,
     })
   }
 

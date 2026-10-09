@@ -14,6 +14,7 @@ export const WorkTable = mysqlTable('work', {
 // 作品附件表
 export const WorkAttachmentTable = mysqlTable('work_attachment', {
     ...baseTable,
+    type: tinyint().notNull(),
     work_id: varchar({ length: 255 }).notNull(),
     path: varchar({ length: 255 }).notNull(),
     // 优先级,区分封面

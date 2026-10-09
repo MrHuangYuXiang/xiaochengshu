@@ -1,4 +1,5 @@
-import { userSchema, workDetailSchema, workSimpleSchema, workCommentSchema, page, workImageSchema, UserSchemaWithFollow } from "./common.js";
+import { WorkPermissionEnum } from "../enum/work.js";
+import { userSchema, workDetailSchema, workSimpleSchema, workCommentSchema, page, workAttachmentSchema, UserSchemaWithFollow } from "./common.js";
 import {
     booleanType,
     numberType,
@@ -26,7 +27,7 @@ export const getWorkDetailOutput = objectType({
     work: objectType({
         user: UserSchemaWithFollow,
         work: workDetailSchema,
-        images: arrayType(workImageSchema),
+        attachments: arrayType(workAttachmentSchema),
         likeCount: numberType,
         collectCount: numberType,
         isLiked: numberType,
@@ -55,7 +56,7 @@ export const getWorksOutput = objectType({
     workList: arrayType(objectType({
         user: userSchema,
         work: workSimpleSchema,
-        cover_image: workImageSchema,
+        cover_image: workAttachmentSchema,
         likeCount: numberType,
         isLiked: numberType,
     })),
@@ -143,10 +144,23 @@ export const likeWorkCommentInput = objectType({
     isLike: numberType,
 })
 
-// 发布图片作品输入
-export const createImageWorkInput = {
+// 创建作品公共字段
+export const createWorkFields = {
     title: stringType,
     content: stringType,
-    permission: numberType,
-    workImageCount: numberType,
+    permission: numberType.refine((value) => {
+        if (WorkPermissionEnum[value]) return true
+        else return false
+    }, { message: "权限无效" }),
 }
+
+// 发布图片作品输入
+export const createImageWorkInput = objectType({
+    ...createWorkFields,
+    workImageCount: numberType.min(1, "至少需要一张图片").max(9, "最多上传9张图片"),
+})
+
+// 发布视频作品输入
+export const createVideoWorkInput = objectType({
+    ...createWorkFields,
+})

@@ -121,7 +121,8 @@ export class Server implements ServerPort {
         // 作品模块
         this.registerHandler('/get/work', getWorkDetailInput, getWorkDetailOutput, workService.getWorkDetail.bind(workService))
         this.registerHandler('/get/works', getWorksInput, getWorksOutput, workService.getWorks.bind(workService))
-        this.registerHandler('/create/work', undefined, undefined, workService.createImageWork.bind(workService))
+        this.registerHandler('/create/image/work', undefined, undefined, workService.createImageWork.bind(workService))
+        this.registerHandler('/create/video/work', undefined, undefined, workService.createVideoWork.bind(workService))
         this.registerHandler('/delete/work', deleteWorkInput, undefined, workService.deleteWork.bind(workService))
         this.registerHandler('/like/work', likeWorkInput, undefined, workService.likeWork.bind(workService))
         this.registerHandler('/collect/work', collectWorkInput, undefined, workService.collectWork.bind(workService))

@@ -33,13 +33,19 @@ export const routeMap = new RouteMap();
 /**
  * 字段元数据结构
  */
-export type FormFieldHeader = {
+export class FormFieldHeader {
     // 字段名
-    name: string,
+    name: string
 
     // 仅对文件字段有值,当字段为普通字段时以下为空字符串
-    filename: string,
-    contentType: FileExtEnum,
+    filename: string
+    contentType: FileExtEnum
+
+    constructor() {
+        this.name = ""
+        this.filename = ""
+        this.contentType = FileExtEnum.JSON
+    }
 }
 
 /**
@@ -47,7 +53,7 @@ export type FormFieldHeader = {
  * 注意: 对于每个字段必须顺序解读!
  */
 export class FormParser {
-    // 缓冲区,缓存二进制碎片
+    // 缓冲区
     private buf: Buffer
 
     // 分隔符字符串
@@ -61,7 +67,7 @@ export class FormParser {
 
     // 当前writer实例以及provider函数
     private currentWriter: WritableStreamDefaultWriter<Buffer> | undefined
-    private writerProvider: undefined | ((fieldType: FormFieldHeader) => Promise<WritableStream<Buffer>>)
+    private writerProvider: undefined | ((fieldType: FormFieldHeader) => Promise<WritableStreamDefaultWriter<Buffer>>)
 
     // 当前可接受的文件类型
     private accept: FileExtEnum[] = []
@@ -76,6 +82,9 @@ export class FormParser {
     // 标志位
     private isEnd: boolean
     private isExecuting: boolean
+
+    // 字段头部信息
+    private currentFieldHeader: FormFieldHeader
 
     /**
      * 构造函数
@@ -104,7 +113,8 @@ export class FormParser {
         this.status = 0
         this.isEnd = false
         this.isExecuting = false
-        this.accept = [FileExtEnum.UNKNOWN]
+        this.accept = [FileExtEnum.JSON]
+        this.currentFieldHeader = new FormFieldHeader()
     }
 
     // 获取文件类型
@@ -126,7 +136,7 @@ export class FormParser {
      * @param provider: 写入流对象提供者回调,在解析字段元数据时调用获取Writer实例
      */
     exec(
-        provider: (fieldType: FormFieldHeader) => Promise<WritableStream<Buffer>>,
+        provider: (fieldType: FormFieldHeader) => Promise<WritableStreamDefaultWriter<Buffer>>,
         accept: FileExtEnum[],
     ) {
         return new Promise(async (resolve, reject) => {
@@ -145,6 +155,7 @@ export class FormParser {
             this.currentResolve = resolve
             this.currentReject = reject
             this.isExecuting = true
+            this.currentFieldHeader = new FormFieldHeader()
 
             // 传入空Buffer,先解析缓冲区中剩余碎片,被动触发resume
             this.parse(Buffer.from(""))
@@ -173,32 +184,27 @@ export class FormParser {
                         break
                     }
 
-                    // 解析字段头部信息
-                    const fieldType: FormFieldHeader = {
-                        name: "",
-                        filename: "",
-                        contentType: FileExtEnum.UNKNOWN,
-                    }
                     const header = buffer.subarray(0, endIndex)
                     const headerLines = header.toString().split("\r\n")
                     const ContentDispositionLines = headerLines[1]!.split(";")!
                     if (ContentDispositionLines[1]) {
-                        fieldType.name = sscanf(ContentDispositionLines[1], " name=\"%s\"")
+                        this.currentFieldHeader.name = sscanf(ContentDispositionLines[1], " name=\"%s\"")
                     }
                     if (ContentDispositionLines[2]) {
-                        fieldType.filename = sscanf(ContentDispositionLines[2], " filename=\"%s\"")
+                        this.currentFieldHeader.filename = sscanf(ContentDispositionLines[2], " filename=\"%s\"")
                     }
                     if (headerLines[2]) {
-                        fieldType.contentType = this.getFileType(sscanf(headerLines[2], "Content-Type: %s"))
+                        this.currentFieldHeader.contentType = this.getFileType(sscanf(headerLines[2], "Content-Type: %s"))
                     }
 
                     // 验证文件类型是否合法
-                    if (!this.accept.includes(fieldType.contentType)) {
-                        throw new AppError(`不支持的文件类型: ${fieldType.contentType}`)
+                    if (!this.accept.includes(this.currentFieldHeader.contentType)) {
+                        throw new AppError(`不支持的文件类型: ${this.currentFieldHeader.contentType}`)
                     }
 
                     // 执行provider回调,获取当前writer实例
-                    this.currentWriter = (await this.writerProvider?.(fieldType))?.getWriter()
+                    if (!this.writerProvider) throw new AppError(`未定义writerProvider`)
+                    this.currentWriter = await this.writerProvider(this.currentFieldHeader)
                     buffer = buffer.subarray(endIndex + 4)
                     this.status = 1
                 }
@@ -210,32 +216,17 @@ export class FormParser {
                     let content: Buffer = Buffer.from("")
 
                     // 解析到边界
-                    if (boundaryIndex !== -1) {
+                    if (boundaryIndex !== -1 || endBoundaryIndex !== -1) {
                         // 写入内容并关闭当前writer
                         content = buffer.subarray(0, boundaryIndex - 1)
                         await this.currentWriter?.write(content)
-                        await this.currentWriter?.close()
 
                         // 缓存剩余内容并resolve
                         this.buf = buffer.subarray(boundaryIndex, buffer.length)
                         this.isExecuting = false
-                        this.status = 0
-                        this.currentResolve(null)
-                        break
-                    }
+                        if (endBoundaryIndex !== -1) this.isEnd = true
 
-                    // 解析到结束边界
-                    else if (endBoundaryIndex !== -1) {
-                        // 请求体解析到末尾,写入剩余内容并关闭writer,设置isEnd标志位
-                        content = buffer.subarray(0, endBoundaryIndex - 1)
-                        await this.currentWriter?.write(content)
-                        await this.currentWriter?.close()
-                        this.isEnd = true
-                        this.isExecuting = false
-
-                        // 唤醒promise,解析完成
                         this.currentResolve(null)
-                        break
                     }
 
                     else {
@@ -245,8 +236,9 @@ export class FormParser {
 
                         // 恢复请求流
                         this.req.resume()
-                        break
                     }
+
+                    break
                 }
 
                 // 未知状态
@@ -264,10 +256,11 @@ export class FormParser {
 }
 
 // 内存WritableStream实现
-export class MemoryWritableStream extends WritableStream {
+class MemoryWritableStream<T extends z.ZodObject> extends WritableStream {
     protected buffer: Buffer
+    private schema: T
 
-    constructor() {
+    constructor(schema: T) {
         super({
             write: (chunk) => {
                 // 防止内存泄漏
@@ -277,31 +270,25 @@ export class MemoryWritableStream extends WritableStream {
                 this.buffer = Buffer.concat([this.buffer, chunk])
             }
         })
+        this.schema = schema
         this.buffer = Buffer.from("")
     }
-}
 
-// 字符串WritableStream实现
-export class StringWritableStream extends MemoryWritableStream {
-    getString() {
-        return this.buffer.toString()
+    parse(): z.infer<T> {
+        return this.schema.parse(JSON.parse(this.buffer.toString()))
     }
 }
 
-// 整型WritableStream实现
-export class NumberWritableStream extends MemoryWritableStream {
-    getNumber() {
-        const str = this.buffer.toString()
-        const res = parseInt(str, 10)
-        if (isNaN(res)) {
-            throw new Error(`无法解析${str}为数字`)
-        }
-        return res
-    }
+// 仅暴露该方法,避免调用者忘记关闭writer,并自动解析表单json数据段
+export async function getFormJsonData<T extends z.ZodObject>(parser: FormParser, schema: T) {
+    const stream = new MemoryWritableStream<T>(schema)
+    const writer = stream.getWriter()
+    await parser.exec(async (fieldHeader: FormFieldHeader) => {
+        return writer
+    }, [FileExtEnum.JSON])
+    await writer.close()
+    return stream.parse()
 }
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 

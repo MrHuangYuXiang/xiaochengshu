@@ -569,7 +569,7 @@
                       "required": [
                         "user",
                         "work",
-                        "images",
+                        "attachments",
                         "likeCount",
                         "collectCount",
                         "isLiked",
@@ -662,7 +662,7 @@
                             }
                           }
                         },
-                        "images": {
+                        "attachments": {
                           "type": "array",
                           "items": {
                             "type": "object",
@@ -672,6 +672,7 @@
                               "updated_at",
                               "work_id",
                               "path",
+                              "priority",
                               "type"
                             ],
                             "properties": {
@@ -689,6 +690,9 @@
                               },
                               "path": {
                                 "type": "string"
+                              },
+                              "priority": {
+                                "type": "integer"
                               },
                               "type": {
                                 "type": "integer"
@@ -845,6 +849,7 @@
                               "updated_at",
                               "work_id",
                               "path",
+                              "priority",
                               "type"
                             ],
                             "properties": {
@@ -862,6 +867,9 @@
                               },
                               "path": {
                                 "type": "string"
+                              },
+                              "priority": {
+                                "type": "integer"
                               },
                               "type": {
                                 "type": "integer"
@@ -916,7 +924,25 @@
         }
       }
     },
-    "/create/work": {
+    "/create/image/work": {
+      "post": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "响应模型",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [],
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/create/video/work": {
       "post": {
         "parameters": [],
         "responses": {

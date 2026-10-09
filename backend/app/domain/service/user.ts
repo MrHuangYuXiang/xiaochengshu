@@ -180,19 +180,19 @@ export class UserService extends BaseService {
 
     // 更新头像
     async uploadUserAvatar(req: Request, res: Response) {
-        const current = getCurrent()
-        const formParser = new FormParser(req)
-        let filePath = ""
+        // const current = getCurrent()
+        // const formParser = new FormParser(req)
+        // let filePath = ""
 
-        await formParser.exec(async (header) => {
-            filePath = `/user-avatars/${current.payload.userId}${header.contentType}`
-            return await this.fileStorage.getWritableStream(filePath)
-        }, [FileExtEnum.JPG, FileExtEnum.PNG])
+        // await formParser.exec(async (header) => {
+        //     filePath = `/user-avatars/${current.payload.userId}${header.contentType}`
+        //     return await this.fileStorage.getWritableStream(filePath)
+        // }, [FileExtEnum.JPG, FileExtEnum.PNG])
 
-        // 数据库更新用户信息
-        await current.tx.update(UserTable).set({
-            avatar_url: filePath,
-        }).where(eq(UserTable.id, current.payload.userId))
+        // // 数据库更新用户信息
+        // await current.tx.update(UserTable).set({
+        //     avatar_url: filePath,
+        // }).where(eq(UserTable.id, current.payload.userId))
     }
 
     // 更新用户信息

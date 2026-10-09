@@ -66,10 +66,11 @@ export const workDetailSchema = objectType({
 })
 
 // 作品图片模型
-export const workImageSchema = objectType({
+export const workAttachmentSchema = objectType({
     ...baseSchema,
     work_id: stringType,
     path: stringType,
+    priority: numberType,
     type: numberType,
 })
 
