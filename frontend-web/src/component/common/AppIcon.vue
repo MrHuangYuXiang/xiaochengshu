@@ -1,18 +1,17 @@
 <template>
   <div
     class="icon"
-    :style="{ fill: props.fill }"
   >
-    <svg class="heart" viewBox="0 0 16 16" v-if="props.type === 'heart'" transform="translate(0, 1.2)">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'heart'" transform="translate(0, 1.2)">
       <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
     </svg>
-    <svg class="heart-fill" viewBox="0 0 16 16" v-if="props.type === 'heart-fill'" transform="translate(0, 1.2)">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'heart-fill'" transform="translate(0, 1.2)">
       <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
     </svg>
-    <svg class="star" viewBox="0 0 16 16" v-if="props.type === 'star'" transform="translate(0, 0.5)">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'star'" transform="translate(0, 0.5)">
       <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.56.56 0 0 0-.163-.505L1.71 6.745l4.052-.576a.53.53 0 0 0 .393-.288L8 2.223l1.847 3.658a.53.53 0 0 0 .393.288l4.052.575-2.906 2.77a.56.56 0 0 0-.163.506l.694 3.957-3.686-1.894a.5.5 0 0 0-.461 0z"/>
     </svg>
-    <svg class="star-fill" viewBox="0 0 16 16" v-if="props.type === 'star-fill'" transform="translate(0, 0.5)">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'star-fill'" transform="translate(0, 0.5)">
       <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
     </svg>
     <svg viewBox="0 0 24 24" class="arrow-down-outline" v-if="props.type === 'arrow-down-outline'">
@@ -36,25 +35,28 @@
     <svg class="chevron-right" viewBox="0 0 16 16" v-if="props.type === 'chevron-right'">
       <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
     </svg>
-    <svg class="chevron-left" viewBox="0 0 16 16" v-if="props.type === 'chevron-left'">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'chevron-left'">
       <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
     </svg>
-    <svg class="female" viewBox="0 0 16 16" v-if="props.type === 'female'">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'female'">
       <path fill-rule="evenodd" d="M8 1a4 4 0 1 0 0 8 4 4 0 0 0 0-8M3 5a5 5 0 1 1 5.5 4.975V12h2a.5.5 0 0 1 0 1h-2v2.5a.5.5 0 0 1-1 0V13h-2a.5.5 0 0 1 0-1h2V9.975A5 5 0 0 1 3 5"/>
     </svg>
-    <svg class="male" viewBox="0 0 16 16" v-if="props.type === 'male'">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'male'">
       <path fill-rule="evenodd" d="M9.5 2a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V2.707L9.871 6.836a5 5 0 1 1-.707-.707L13.293 2zM6 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8"/>
     </svg>
     <svg viewBox="0 0 16 16" v-if="props.type === 'close'">
       <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
     </svg>
-    <svg class="image" viewBox="0 0 16 16" v-if="props.type === 'image'">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'image'">
       <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
       <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z"/>
     </svg>
-    <svg class="share" viewBox="0 0 16 16" v-if="props.type === 'share'">
+    <svg viewBox="0 0 16 16" v-if="props.type === 'share'">
       <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
       <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+    </svg>
+    <svg  viewBox="0 0 16 16" v-if="props.type === 'play'" :fill="props.fill">
+      <path d="M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z" />
     </svg>
   </div>
 </template>
@@ -82,5 +84,6 @@
     gap: 2px;
     width: 1rem;
     height: 1rem;
+    transition: all 0.2s ease-in-out;
   }
 </style>

@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from "axios"
 import { storage } from '@/storage';
-import { AppError } from '@/error';
+import { BackendError } from '@/error';
 import { logger } from "@/logger";
 
 class AxiosProxy {
@@ -26,7 +26,7 @@ class AxiosProxy {
       if (success === "1") {
         return res.data
       } else {
-        throw new AppError(headers["app-error-msg"])
+        throw new BackendError(headers["app-error-msg"])
       }
     }, (err) => {
       throw err

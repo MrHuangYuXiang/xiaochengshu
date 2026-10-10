@@ -1,61 +1,57 @@
 <template>
   <div class="publish-page">
-    <AppSegment :fields="[{text: '发布图文', key: 'image'}, {text: '发布文章', key: 'article'}]" @change-field="(key) => currentCategory = key" />
-    <div v-if="currentCategory === 'image'" class="publish-form publish-image">
+    <AppSegment :fields="[{text: '发布图文', key: 'image'}, {text: '发布视频', key: 'video'}]" @change-field="changeField" />
+    <div class="publish-form">
       <div class="form-item">
-        <div class="item-label">文章标题</div>
+        <div class="item-label">作品标题</div>
         <FormInput ref="titleInputRef" type="textarea" placeholder="请输入文章标题" v-model="form.title" :rule="titleValidator"></FormInput>
       </div>
       <div class="form-item">
-        <div class="item-label">文章正文</div>
+        <div class="item-label">作品正文</div>
         <FormInput ref="contentInputRef" :rows="20" type="textarea" placeholder="请输入文章正文" v-model="form.content" :rule="contentValidator"></FormInput>
       </div>
-      <div class="form-item">
-        <div class="item-label">设置封面</div>
-        <div
-          :class="{'cover-image': true, 'none': coverImage === null}" 
-          :style="{ backgroundImage: `url(${coverImage?.url || ''})` }"
-        >
-          <span v-show="coverImage === null">请选择封面图片</span>
-      </div>
-      </div>
-      <div class="form-item">
-        <div class="item-label">文章图片</div>
-        <div class="image-uploader">
-          <input type="file" accept="image/jpeg"  style="display: none;" ref="inputRef" @change="changeFile" multiple />
+      <div class="form-item" v-if="currentField === 'image'">
+        <div class="item-label">上传图片</div>
+        <div class="images">
           <ImageSlider
-          class="item image"
-          v-for="(file, index) in files"
-          :key="file.url!"
-          :src="file.url"
-          :is-upload-image="false"
+            class="image"
+            v-for="(file, index) in files"
+            :key="index"
+            :src="file.url"
+            :is-upload-image="false"
+            :can-preview="true"
+            :can-hover="true"
           >
-            <div class="image-options" @click.self="globalImagePreview.show(file.url)">
-                <div class="image-option" @click="setCover(file.file, file.url, index)">设为封面</div>
-                <div class="image-option" @click="deleteImage(file.file, file.url, index)">删除</div>
+            <div class="image-options">
+              <div class="delete-btn" @click="deleteFile(index)">删除</div>
+              <div class="set-cover-btn" @click="setCover(index)">设置封面</div>
             </div>
           </ImageSlider>
-          <div
-            class="item upload-btn"
-            @mouseenter="uploadBtnFill = 'var(--root-orange)'"
-            @mouseleave="uploadBtnFill = 'var(--root-gray)'"
-            @click="inputRef?.click()"
-          >
-            <AppIcon type="plus" :fill="uploadBtnFill" />
-          </div>
+          <FileUploader 
+            :accept="['image/jpeg', 'image/png']" 
+            @upload="changeFile"
+          />
+        </div>
+      </div>
+      <div class="form-item" v-else>
+        <div class="item-label">上传视频</div>
+        <div class="video">
+          <FileUploader :accept="['video/mp4']" @upload="changeFile" v-if="!files[0]" />
+          <VideoPlayer 
+            :src="files[0].url"
+            :isUploadFile="false"
+            v-else 
+          />
         </div>
       </div>
       <div class="form-item">
         <div class="item-label">谁可以看</div>
         <div class="form-btn-group">
-          <FormRadio v-model="permissionSelected" text="公开" :value="1"></FormRadio>
-          <FormRadio v-model="permissionSelected" text="仅自己可见" :value="2"></FormRadio>
+          <FormRadio v-model="form.permission" text="公开" :value="1"></FormRadio>
+          <FormRadio v-model="form.permission" text="仅自己可见" :value="2"></FormRadio>
         </div>
       </div>
       <div class="publish-btn"><FormButton color="orange" text="发布" @click="publish"></FormButton></div>
-    </div>
-    <div v-else-if="currentCategory === 'article'" class="publish-form publish-article">
-      <div style="margin-top: 300px; color: #999;">功能正在开发中...</div>
     </div>
   </div>
 </template>
@@ -66,18 +62,18 @@
   import FormInput from '@/component/form/form-input.vue';
   import AppSegment from '@/component/common/app-segment.vue';
   import FormButton from '@/component/form/form-button.vue';
-  import AppIcon from '@/component/common/AppIcon.vue';
-  import ImageSlider from '@/component/image/image-slider.vue';
+  import FileUploader from '@/component/file/file-uploader.vue';
+  import ImageSlider from '@/component/file/image-slider.vue';
+  import VideoPlayer from '@/component/file/video-player.vue';
   import { ElMessage } from 'element-plus';
   import { axiosProxy } from '@/api/axios';
-  import { globalImagePreview } from '@/component/global';
-  import { validateForm } from '@/helper/form';
 
   const titleInputRef = useTemplateRef("titleInputRef");
   const contentInputRef = useTemplateRef("contentInputRef");
   const form = ref({
     title: '',
     content: '',
+    permission: 1,
   })
   const titleValidator = {
     required: {
@@ -106,94 +102,89 @@
     },
   }
 
-  const permissionSelected = ref(1)
-  // 分段器当前选中种类
-  const currentCategory = ref('image')
+  // 分段器当前选中项
+  const currentField = ref('image')
 
   // 文件图片相关变量
   const files = ref<{
     file: File,
     url: string,
   }[]>([])
-  const inputRef = useTemplateRef("inputRef");
-  const uploadBtnFill = ref('var(--root-gray)');
-  const coverImage = ref<{
-    file: File,
-    url: string,
-  } | null>(null);
 
-  /**
-   * 利用createObjectURL渲染用户本地图片
-   */
-  const changeFile = () => {
-    for (const file of inputRef.value?.files || []) {
-      if (!files.value.find((item) => item.file.name === file.name)) {
-        files.value.push({file, url: URL.createObjectURL(file)});
-      } else {
-        ElMessage.error('同名图片已存在')
-      }
-    }
+  // 分段器切换
+  const changeField = (key: string) => {
+    currentField.value = key;
+    clear();
   }
 
-  /**
-   * 注意url对象需要手动释放内存,否则导致内存泄漏
-   */
-  const deleteImage = (file: File, url: string, index: number) => {
-    if (coverImage.value !== null && file.name === coverImage.value.file.name) {
-      ElMessage.error("不能删除封面图片")
-      return
-    }
-    files.value.splice(index, 1);
-    URL.revokeObjectURL(url);
-  }
-
-  const setCover = (file: File, url: string, index: number) => {
-    coverImage.value = {
-      file,
-      url,
-    }
-
-    // 需要保证formData第一张图片是封面图片,因此
-    // 需要将封面图片移动到files数组第一位
-    files.value.splice(index, 1);
-    files.value.unshift({file, url});
-  }
-
-  const publish = async () => {
-    if (!validateForm(titleInputRef.value!, contentInputRef.value!)) {
-      return
-    }
-
-    if (files.value.length === 0) {
-      ElMessage.error('请上传文章图片')
-      return
-    }
-
-    if (coverImage.value === null) {
-      ElMessage.error('请选择封面图片')
-      return
-    }
-
-    const formData = new FormData();
-    formData.append("title", form.value.title);
-    formData.append("content", form.value.content);
-    formData.append("permission", permissionSelected.value.toString());
-    formData.append("workImageCount", files.value.length.toString());
-    for (const item of files.value) {
-      formData.append(`workImage`, item.file);
-    }
-    await axiosProxy.post("/create/work", formData)
-
-    // 后续清理工作
+  // 清理资源
+  const clear = () => {
     form.value.title = '';
     form.value.content = '';
-    permissionSelected.value = 1;
+    form.value.permission = 1;
     for (const file of files.value) {
       URL.revokeObjectURL(file.url);
     }
     files.value = [];
-    coverImage.value = null;
+  }
 
+  /**
+   * 利用createObjectURL渲染预览文件
+   */
+  const changeFile = (file: File) => {
+      if (!files.value.find((item) => item.file.name === file.name)) {
+        files.value.push({file, url: URL.createObjectURL(file)});
+      } else {
+        throw new Error('同名文件已存在')
+      }
+  }
+
+  // 注意url对象需要手动释放内存,否则导致内存泄漏
+  const deleteFile = (index: number) => {
+    const file = files.value[index];
+    if (!file) { return }
+    files.value.splice(index, 1);
+    URL.revokeObjectURL(file.url);
+  }
+  
+  // 后端约定formData第一张图片是封面图片
+  const setCover = (index: number) => {
+    const file = files.value[index];
+    if (!file) { return }
+    files.value.splice(index, 1);
+    files.value.unshift(file);
+  }
+
+  const publish = async () => {
+    if (
+      !titleInputRef.value?.validate() || 
+      !contentInputRef.value?.validate()
+    ) {
+      return
+    }
+
+    if (!files.value[0]) {
+      throw new Error('请上传文件')
+    }
+
+    if (currentField.value === 'image') {
+      const formData = new FormData();
+      formData.append("json", JSON.stringify({
+        ...form.value,
+        workImageCount: files.value.length,
+      }));
+      for (const item of files.value) {
+        formData.append(`workImage`, item.file);
+      }
+      await axiosProxy.post("/create/image/work", formData)
+    } else {
+      const formData = new FormData();
+      formData.append("json", JSON.stringify(form.value));
+      formData.append("video", files.value[0].file);
+      await axiosProxy.post("/create/video/work", formData)
+    }
+
+    clear();
     ElMessage('发布成功')
   }
 </script>
@@ -202,99 +193,67 @@
   .publish-page {
     padding: 2rem;
     display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: auto 1fr;
+    grid-template-columns: 75%;
+    justify-content: center;
+    align-items: start;
+    row-gap: 2rem;
   }
 
   .publish-form {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0px 15%;
     gap: 30px;
     .form-item {
+      flex: 0 0 auto;
       width: 100%;
       display: grid;
       align-items: start;
-      gap: 30px;
-      grid-template-columns: 1fr 9fr;
+      grid-template-columns: auto 1fr;
+      column-gap: 1.5rem;
       .item-label {
         font-weight: bold;
       }
-      .cover-image {
-        height: 175px;
-        width: 150px;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-      }
-      .cover-image.none {
-        color: var(--root-gray);
-        background-color: var(--root-bg-gray);
-      }
-      .image-uploader {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: start;
-        gap: 10px;
-        .item {
-          height: 175px;
-          min-width: 125px;
-          max-width: 150px;
-          flex: 1;
-          border-radius: 10px;
-          background-size: cover;
-        }
-        .upload-btn {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background-color: var(--root-bg-gray);
-          cursor: pointer;
-          transition: all 0.2s ease-in-out;
-        }
-        .upload-btn:hover {
-          transform: scale(1.05);
-          box-shadow: 0 0 3px var(--root-orange);
-        }
+      .images {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 8rem);
+        grid-auto-rows: 10rem;
+        gap: 1rem;
         .image {
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
           .image-options {
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            height: 100%;
+            height: auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            align-items: end;
-            transition: all 0.2s ease-in-out;
-            opacity: 0;
-            font-size: 11px;
-            .image-option {
-              padding: 7px;
+            div {
               text-align: center;
-              color: white;
-              background-color: rgba(0, 0, 0, 0.6);
-              transition: all 0.2s ease-in-out;
+              padding: 0.2rem;
               cursor: pointer;
+              font-size: 0.8rem;
+              color: white;
+              background-color: black;
             }
-            .image-option:hover {
-              background-color: rgba(0, 0, 0, 0.9);
-              font-weight: bold;
+            div:hover {
+              opacity: 0.8;
             }
-          }
-          .image-options:hover {
-            opacity: 1;
           }
         }
+      }
+      .image:hover {
+        .image-options {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+
+      .video {
+        width: 20rem;
+        height: 12rem;
       }
       .form-btn-group {
         height: 100%;
@@ -307,11 +266,5 @@
       width: 100px;
       align-self: end;
     }
-  }
-
-  .publish-article {
-  }
-
-  .publish-image {
   }
 </style>

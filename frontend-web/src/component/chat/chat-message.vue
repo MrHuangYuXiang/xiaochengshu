@@ -83,7 +83,7 @@
     import UserAvatar from '../user/UserAvatar.vue';
     import AppIcon from '../common/AppIcon.vue';
     import WorkCard from '../work/work-card.vue';
-    import imageSlider from '../image/image-slider.vue';
+    import imageSlider from '../file/image-slider.vue';
     import type { paths } from '@/api/gen.ts';
     import { useAttrs } from 'vue';
     import { formatTime } from '@/helper/format.ts';

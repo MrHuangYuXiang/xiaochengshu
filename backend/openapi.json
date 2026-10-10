@@ -636,6 +636,7 @@
                             "title",
                             "permission",
                             "user_id",
+                            "type",
                             "content"
                           ],
                           "properties": {
@@ -656,6 +657,9 @@
                             },
                             "user_id": {
                               "type": "string"
+                            },
+                            "type": {
+                              "type": "integer"
                             },
                             "content": {
                               "type": "string"
@@ -818,7 +822,8 @@
                               "updated_at",
                               "title",
                               "permission",
-                              "user_id"
+                              "user_id",
+                              "type"
                             ],
                             "properties": {
                               "id": {
@@ -838,6 +843,9 @@
                               },
                               "user_id": {
                                 "type": "string"
+                              },
+                              "type": {
+                                "type": "integer"
                               }
                             }
                           },

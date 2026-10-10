@@ -1,19 +1,16 @@
 <template>
-    <div
-        :class="{
-            'image': true
-        }"
-        >
+    <div class="image">
         <img 
             :src="getImageUrl()"
             :style="{ 
                 objectFit: props.objectFit
             }"
             :class="{
-                hoverable: props.enableHover,
+                hoverable: props.canHover,
             }"
             @click="clickImage"
         >
+        <slot></slot>
         <AppIcon
             type="chevron-left"
             :fill="'white'"
@@ -40,20 +37,17 @@
         src: string,
         objectFit?: 'contain' | 'cover',
         isUploadImage?: boolean,
-        enableHover?: boolean,
-        enablePreview?: boolean,
-        enableSwitch?: boolean,
+        canHover?: boolean,
+        canPreview?: boolean,
+        canSwitch?: boolean,
         currentIndex?: number,
         totalCount?: number,
     }>(), {
-        width: "auto",
-        height: "auto",
-        maxHeight: "auto",
         objectFit: "cover",
         isUploadImage: true,
-        enableHover: false,
-        enablePreview: false,
-        enableSwitch: false,
+        canHover: false,
+        canPreview: false,
+        canSwitch: false,
         currentIndex: 0,
         totalCount: 0,
     })
@@ -64,7 +58,7 @@
 
     // 点击图片
     const clickImage = () => {
-        if (props.enablePreview && props.src) {
+        if (props.canPreview && props.src) {
             globalImagePreview.show(getImageUrl())
         }
     }

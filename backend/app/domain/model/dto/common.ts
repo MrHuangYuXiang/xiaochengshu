@@ -50,6 +50,7 @@ const workCommonFields = {
     title: stringType,
     permission: numberType,
     user_id: stringType,
+    type: numberType,
 }
 
 // 作品简单模型
@@ -65,7 +66,7 @@ export const workDetailSchema = objectType({
     content: stringType,
 })
 
-// 作品图片模型
+// 作品附件模型
 export const workAttachmentSchema = objectType({
     ...baseSchema,
     work_id: stringType,

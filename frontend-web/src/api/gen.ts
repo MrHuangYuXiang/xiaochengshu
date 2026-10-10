@@ -515,14 +515,16 @@ export interface paths {
                                     title: string;
                                     permission: number;
                                     user_id: string;
+                                    type: number;
                                     content: string;
                                 };
-                                images: {
+                                attachments: {
                                     id: string;
                                     created_at: string;
                                     updated_at: string;
                                     work_id: string;
                                     path: string;
+                                    priority: number;
                                     type: number;
                                 }[];
                                 likeCount: number;
@@ -595,6 +597,7 @@ export interface paths {
                                     title: string;
                                     permission: number;
                                     user_id: string;
+                                    type: number;
                                 };
                                 cover_image: {
                                     id: string;
@@ -602,6 +605,7 @@ export interface paths {
                                     updated_at: string;
                                     work_id: string;
                                     path: string;
+                                    priority: number;
                                     type: number;
                                 };
                                 likeCount: number;
@@ -618,7 +622,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/create/work": {
+    "/create/image/work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 响应模型 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/create/video/work": {
         parameters: {
             query?: never;
             header?: never;

@@ -25,7 +25,7 @@
   import InitUserModal from '@/component/user/init-user-modal.vue';
   import UpdateUserModal from '@/component/user/update-user-modal.vue';
   import ErrorDialog from '@/component/common/ErrorDialog.vue';
-  import ImagePreview from '@/component/image/image-preview.vue';
+  import ImagePreview from '@/component/file/image-preview.vue';
   import WorkModal from '@/component/work/work-modal.vue';
   import ReportModal from '@/component/report/report-modal.vue';
   import WorkReportModal from '@/component/work/work-report-modal.vue';

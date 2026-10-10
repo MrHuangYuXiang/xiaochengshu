@@ -79,17 +79,10 @@ export class WorkService extends BaseService {
     }
 
     // 查询作品附件
-    const whereCond = [eq(WorkAttachmentTable.work_id, workId)]
-    // 如果是视频作品,只查询视频文件
-    if (work[0].work.type === WorkTypeEnum.VIDEO) {
-      whereCond.push(eq(WorkAttachmentTable.type, WorkAttachmentTypeEnum.VIDEO))
-    } else {
-      whereCond.push(eq(WorkAttachmentTable.type, WorkAttachmentTypeEnum.IMAGE))
-    }
     const attachments = await db.
       select().
       from(WorkAttachmentTable).
-      where(and(...whereCond)).
+      where(eq(WorkAttachmentTable.work_id, workId)).
       orderBy(asc(WorkAttachmentTable.priority))
 
     res.json(getWorkDetailOutput.parse({

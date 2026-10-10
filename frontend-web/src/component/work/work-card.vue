@@ -2,9 +2,17 @@
     <div class="card" ref="cardContainerRefs" :id="props.workId">
         <ImageSlider
             :src="`${props.workCoverUrl}`"
-            :enableHover="true"
+            :canHover="true"
             @click="globalWorkModal.show(props.workId)"
-        />
+            class="image"
+        >
+            <AppIcon
+                v-if="props.workType === 2"
+                class="play-icon"
+                type="play"
+                fill="white"
+            />
+        </ImageSlider>
         <div class="info" ref="textRefs">
             <div class="title">{{ props.workTitle }}</div>
             <div class="bottom">
@@ -28,7 +36,7 @@
 
 <script setup lang="ts">
     import UserAvatar from '../user/UserAvatar.vue';
-    import ImageSlider from '../image/image-slider.vue';
+    import ImageSlider from '../file/image-slider.vue';
     import AppIcon from '../common/AppIcon.vue';
     import SelectFloating from '../common/select-floating.vue';
     import { globalWorkModal, globalWorkReportModal } from '../global.ts';
@@ -37,6 +45,7 @@
     const props = defineProps<{
         workId: string
         workTitle: string
+        workType: number
         workCoverUrl: string
         userId: string
         userName: string
@@ -61,6 +70,17 @@
         background-color: var(--root-bg-gray);
         border-radius: 15px;
         row-gap: 0.25rem;
+        .image {
+            .play-icon {
+                position: absolute;
+                top: 0;
+                right: 0;
+                transform: translate(-50%, 50%);
+                backdrop-filter: blur(5px);
+                border-radius: 50%;
+                background-color: rgba(white, 0.3);
+            }
+        }
         .info {
           padding: 0.5rem;
           display: grid;

@@ -14,6 +14,7 @@
           v-for="work in works"
           :key="work.work.id"
           :workId="work.work.id"
+          :workType="work.work.type"
           :workTitle="work.work.title"
           :workCoverUrl="work.cover_image.path"
           :userId="work.user.id"

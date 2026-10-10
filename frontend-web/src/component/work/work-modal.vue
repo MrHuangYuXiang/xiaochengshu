@@ -12,14 +12,19 @@
   >
     <div class="work-modal" v-if="work">
       <ImageSlider
+        v-if="work.work.type === 1"
         class="image"
         :object-fit="'contain'"
-        :src="work.images[currentImageIndex]?.path || ''"
-        :enable-preview="true"
-        :enable-switch="true"
+        :src="work.attachments[currentImageIndex]?.path || ''"
+        :canPreview="true"
+        :canSwitch="true"
         :current-index="currentImageIndex"
-        :total-count="work?.images.length"
+        :total-count="work?.attachments.length"
         @switch="(index) => { currentImageIndex = index }"
+      />
+      <VideoPlayer
+        v-else-if="work.work.type === 2"
+        :src="getVideoAttachment()?.path || ''"
       />
       <div class="right">
         <!-- 用户信息 -->
@@ -111,11 +116,11 @@
         <!-- 评论表单 -->
         <div class="publish-form">
           <WorkShareFloating
-            v-if="work"
+            v-if="work && getCoverAttachment()"
             v-model:show="isShowShareFloating"
             :workId="work.work.id"
             :workTitle="work.work.title"
-            :workCoverUrl="work.images[0]!.path"
+            :workCoverUrl="getCoverAttachment().path"
             :userId="work.user.id"
             :userName="work.user.name"
             :userAvatarUrl="work.user.avatar_url"
@@ -172,7 +177,8 @@
   import CommentCard from './comment-card.vue';
   import FormInput from '../form/form-input.vue';
   import ScrollContainer from '../common/scroll-container.vue';
-  import ImageSlider from '../image/image-slider.vue';
+  import ImageSlider from '../file/image-slider.vue';
+  import VideoPlayer from '../file/video-player.vue';
   import WorkShareFloating from './work-share-floating.vue';
   import { formatTime } from '@/helper/format';
   import { onMounted, ref, useTemplateRef } from 'vue';
@@ -210,6 +216,28 @@
 
   // 显示分享浮动框
   const isShowShareFloating = ref(false)
+
+  // 获取作品封面附件
+  const getCoverAttachment = () => {
+    if (!work.value) return undefined
+    for (const attachment of work.value.attachments) {
+      if (attachment.type === 1 && attachment.priority === 1) {
+        return attachment
+      }
+    }
+    return undefined
+  }
+
+  // 获取作品视频附件
+  const getVideoAttachment = () => {
+    if (!work.value) return undefined
+    for (const attachment of work.value.attachments) {
+      if (attachment.type === 2) {
+        return attachment
+      }
+    }
+    return undefined
+  }
 
   // 初始化评论回复映射表
   const initRepliesMap = (commentId: string) => {
@@ -325,6 +353,8 @@
 
   // 点赞作品
   const likeWork = async () => {
+    const coverAttachment = getCoverAttachment()
+    if (!coverAttachment) return
     if (!work.value) return
 
     // 更新点赞状态
@@ -337,7 +367,7 @@
     >("/like/work", {
       workId: work.value.work.id,
       workTitle: work.value.work.title,
-      workCoverImagePath: work.value.images[0]?.path || '',
+      workCoverImagePath: coverAttachment.path,
       workUserId: work.value.work.user_id,
       isLike: work.value.isLiked,
     })
@@ -347,6 +377,8 @@
 
   // 收藏作品
   const collectWork = async () => {
+    const coverAttachment = getCoverAttachment()
+    if (!coverAttachment) return
     if (!work.value) return
 
     // 更新收藏状态
@@ -359,7 +391,7 @@
     >("/collect/work", {
       workId: work.value.work.id,
       workTitle: work.value.work.title,
-      workCoverImagePath: work.value.images[0]?.path || '',
+      workCoverImagePath: coverAttachment.path,
       workUserId: work.value.work.user_id,
       isCollect: work.value.isCollected,
     })
