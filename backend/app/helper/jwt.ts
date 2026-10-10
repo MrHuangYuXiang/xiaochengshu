@@ -1,40 +1,11 @@
 import jwt from "jsonwebtoken";
 import { getEnv } from "../helper/env.js";
+import type { Payload } from "../lib/local-stroage.js";
 
-type BasePayload = {
-    userId: string,
-}
-
-type ClientPayload = {
-    userName: string,
-    userAvatarPath: string,
-}
-
-type AdminPayload = {
-    adminEmployeeId: string,
-    adminRole: number
-}
-
-export type Payload = BasePayload & ClientPayload & AdminPayload
-
-export const genClientJWT = (
-    basePayload: BasePayload,
-    clientPayload?: ClientPayload,
-    adminPayload?: AdminPayload
+export const genJWT = (
+    payload: Payload,
 ) => {
-    if (!adminPayload) {
-        adminPayload = { adminEmployeeId: "", adminRole: 0 }
-    }
-
-    if (!clientPayload) {
-        clientPayload = { userName: "", userAvatarPath: "" }
-    }
-
-    return "Bearer " + jwt.sign({
-        ...basePayload,
-        ...adminPayload,
-        ...clientPayload
-    }, getEnv("JWT_SECRET"), { expiresIn: "24h" })
+    return "Bearer " + jwt.sign(payload, getEnv("JWT_SECRET"), { expiresIn: "24h" })
 }
 
 export const verifyJWT = (token: string): Payload => {

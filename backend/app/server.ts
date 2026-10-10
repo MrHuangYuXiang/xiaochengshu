@@ -63,6 +63,7 @@ import { WorkShareService } from "./domain/service/work-share.js"
 import { ReportShareService } from "./domain/service/report-share.js"
 import { UserShareService } from "./domain/service/user-share.js"
 import { ChatShareService } from "./domain/service/chat-share.js"
+import type { FileStoragePort } from "./port/file-storage-port.js"
 
 export interface ServerPort {
     Run(): void
@@ -73,27 +74,28 @@ export class Server implements ServerPort {
     private app: express.Express
     private router: express.Router
     private clientManager: ClientManagerPort
+    private fileStorage: FileStoragePort
 
     constructor() {
         this.app = express()
         this.router = express.Router()
         this.clientManager = new LocalClientManager()
+        this.fileStorage = new LocalFileStorageAdapter()
     }
 
     async Run() {
         // 端口实例
-        const fileStorage = new LocalFileStorageAdapter()
         const clientManager = this.clientManager
-        const reportShareService = new ReportShareService(fileStorage, clientManager)
-        const workShareService = new WorkShareService(fileStorage, clientManager)
-        const userShareService = new UserShareService(fileStorage, clientManager)
-        const chatShareService = new ChatShareService(fileStorage, clientManager)
+        const reportShareService = new ReportShareService(this.fileStorage, clientManager)
+        const workShareService = new WorkShareService(this.fileStorage, clientManager)
+        const userShareService = new UserShareService(this.fileStorage, clientManager)
+        const chatShareService = new ChatShareService(this.fileStorage, clientManager)
 
         // 服务实例
-        const chatService = new ChatService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
-        const reportService = new ReportService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
-        const userService = new UserService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
-        const workService = new WorkService(fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
+        const chatService = new ChatService(this.fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
+        const reportService = new ReportService(this.fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
+        const userService = new UserService(this.fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
+        const workService = new WorkService(this.fileStorage, clientManager, chatShareService, workShareService, userShareService, reportShareService)
 
         // express中间件注册
         this.app.use(express.json())
@@ -170,6 +172,6 @@ export class Server implements ServerPort {
     ) {
         doc.registerPath(path, inputSchema, outputSchema)
         routeMap.add(path, inputSchema)
-        return this.router.post(path, middlewareWrapper(cb, isPersistent, this.clientManager))
+        return this.router.post(path, middlewareWrapper(cb, isPersistent, this.clientManager, this.fileStorage))
     }
 }

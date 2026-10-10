@@ -2,12 +2,26 @@ import { AsyncLocalStorage } from "async_hooks"
 import type { MySqlTransaction } from "drizzle-orm/mysql-core"
 import type { MySql2QueryResultHKT, MySql2PreparedQueryHKT } from "drizzle-orm/mysql2"
 import type { ExtractTablesWithRelations } from "drizzle-orm"
-import type { Payload } from "../helper/jwt.js"
 
-export const localStorage = new AsyncLocalStorage<{
+// 载荷数据
+export type Payload = {
+    // 用户相关数据
+    userId: string,
+    userName: string,
+    userAvatarPath: string,
+}
+
+// 异步上下文结构
+type localStorageStruct = {
+    // 请求id
+    requestId: string,
+    // 载荷数据
     payload: Payload,
-    tx: MySqlTransaction<MySql2QueryResultHKT, MySql2PreparedQueryHKT, Record<string, never>, ExtractTablesWithRelations<Record<string, never>>>
-}>()
+    // drizzle事务对象
+    tx: MySqlTransaction<MySql2QueryResultHKT, MySql2PreparedQueryHKT, Record<string, never>, ExtractTablesWithRelations<Record<string, never>>>,
+}
+
+export const localStorage = new AsyncLocalStorage<localStorageStruct>()
 
 export const getCurrent = () => {
     const store = localStorage.getStore()

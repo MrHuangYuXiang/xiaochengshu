@@ -7,6 +7,7 @@ import { AppError } from "../lib/app-error.js";
 import { FileExtEnum } from "../domain/model/enum/file.js";
 import type { FormFieldHeader, FormParser } from "../lib/framework-ext.js";
 import { execCommandLineProgram } from "../lib/command-line.js";
+import { getCurrent } from "../lib/local-stroage.js";
 
 class baseFileStorageAdapter {
     protected getFilePath(fileName: string) {
@@ -20,11 +21,16 @@ class baseFileStorageAdapter {
 }
 
 export class LocalFileStorageAdapter extends baseFileStorageAdapter implements FileStoragePort {
+    // 已写入文件映射表
+    private writtenFiles: Map<string, string[]> = new Map()
+
     async writeFileByParser(filePathWithoutExt: string, parser: FormParser, accept: FileExtEnum[]) {
+        const current = getCurrent()
         let writer: WritableStreamDefaultWriter<Buffer> | undefined
         let fileExt: FileExtEnum | undefined
         let filePath = ""
         let realPath = ""
+
         await parser.exec(async (fieldHeader: FormFieldHeader) => {
             fileExt = fieldHeader.contentType
             filePath = `${filePathWithoutExt}${fileExt}`
@@ -49,12 +55,29 @@ export class LocalFileStorageAdapter extends baseFileStorageAdapter implements F
             await fs.promises.rm(realPath)
             await fs.promises.rename(`${realPath}.tmp.mp4`, realPath)
         }
+
+        // 保存本次写入的文件路径
+        this.writtenFiles.set(current.requestId, [...this.writtenFiles.get(current.requestId) || [], filePath])
+
         return filePath
     }
 
     async deleteFile(filePath: string) {
         filePath = this.getFilePath(filePath)
-        await fs.promises.rm(filePath, { recursive: true })
+        await fs.promises.rm(filePath)
+    }
+
+    async rollback() {
+        const current = getCurrent()
+        const files = this.writtenFiles.get(current.requestId) || []
+        for (const file of files) {
+            await this.deleteFile(file)
+        }
+    }
+
+    async commit() {
+        const current = getCurrent()
+        this.writtenFiles.delete(current.requestId)
     }
 
     async mp4ExtractKeyFrame(inputFilePath: string, outputFilePath: string) {

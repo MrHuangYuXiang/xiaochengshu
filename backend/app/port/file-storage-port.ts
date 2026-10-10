@@ -6,6 +6,10 @@ export interface FileStoragePort {
     writeFileByParser: (fileNameWithoutExt: string, parser: FormParser, accept: FileExtEnum[]) => Promise<string>
     // 删除
     deleteFile: (fileName: string) => Promise<void>
+    // 回滚
+    rollback: () => Promise<void>
+    // 提交
+    commit: () => Promise<void>
 
     // mp4文件提取关键帧
     mp4ExtractKeyFrame: (inputFilePath: string, outputFilePath: string) => Promise<void>

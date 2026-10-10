@@ -1,13 +1,15 @@
 import type { NextFunction, Request, Response } from "express";
 import { routeMap } from "./lib/framework-ext.js";
-import { verifyJWT, type Payload } from "./helper/jwt.js";
-import { localStorage } from "./lib/local-stroage.js";
+import { verifyJWT } from "./helper/jwt.js";
+import { localStorage, type Payload } from "./lib/local-stroage.js";
 import { getTx } from "./domain/db.js";
 import { errorClientEvent, ClientEventType } from "./domain/model/dto/event.js";
 import { AppError } from "./lib/app-error.js";
 import type { ClientManagerPort } from "./port/client-manager-port.js";
 import { AdminUserRole } from "./domain/model/enum/admin-user.js";
-import { ZodError } from "zod";
+import { file, ZodError } from "zod";
+import { v4 } from "uuid";
+import type { FileStoragePort } from "./port/file-storage-port.js";
 
 /**
  * 中间件包装器
@@ -20,7 +22,9 @@ export const middlewareWrapper = (
     // 是否为长连接,默认false
     isPersistent: boolean = false,
     // 注入客户端管理器实例
-    clientManager: ClientManagerPort
+    clientManager: ClientManagerPort,
+    // 注入文件存储实例
+    fileStorage: FileStoragePort
 ) => {
     return async function (req: Request, res: Response) {
         try {
@@ -34,13 +38,19 @@ export const middlewareWrapper = (
             validateMiddleware(req, res)
             permissionMiddleware(req, res, payload)
 
-            // drizzle事务回调会吞错误,所有需要手动捕获
             await getTx(async (tx) => {
                 await localStorage.run({
+                    requestId: v4(),
                     payload,
                     tx,
                 }, async () => {
-                    await handler(req, res)
+                    try {
+                        await handler(req, res)
+                        await fileStorage.commit()
+                    } catch (error) {
+                        await fileStorage.rollback()
+                        throw error
+                    }
                 })
             })
 
@@ -85,8 +95,6 @@ const authMiddleware = (req: Request, res: Response): Payload => {
         userId: "",
         userName: "",
         userAvatarPath: "",
-        adminEmployeeId: "",
-        adminRole: 0
     }
 
     // 允许不认证的访问路径
@@ -134,9 +142,6 @@ const AdminManagerPaths: string[] = []
 
 // 权限校验中间件()
 const permissionMiddleware = (req: Request, res: Response, payload: Payload) => {
-    if (payload.adminRole !== AdminUserRole.Manager && AdminManagerPaths.includes(req.path)) {
-        throw new AppError("您没有权限执行此操作")
-    }
 }
 
 

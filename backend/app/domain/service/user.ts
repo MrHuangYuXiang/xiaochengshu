@@ -19,7 +19,7 @@ import {
 import { getRequestBody, getRequestPage } from "../model/dto/index.js";
 import type { Request, Response } from "express";
 import { getEnv } from "../../helper/env.js";
-import { genClientJWT } from "../../helper/jwt.js";
+import { genJWT } from "../../helper/jwt.js";
 import { FormParser } from "../../lib/framework-ext.js";
 import { v4 as uuidv4 } from "uuid";
 import { heartbeatClientEvent, ClientEventType } from "../model/dto/event.js";
@@ -91,7 +91,7 @@ export class UserService extends BaseService {
         }
 
         res.json(loginOutput.parse({
-            token: genClientJWT({ userId }, { userName, userAvatarPath }),
+            token: genJWT({ userId, userName, userAvatarPath }),
         }))
     }
 
@@ -114,7 +114,7 @@ export class UserService extends BaseService {
         // 后端维持心跳,同时续约jwt
         const n = setInterval(() => {
             this.clientManager.push(current.payload.userId, ClientEventType.heartbeat, heartbeatClientEvent.parse({
-                jwt: genClientJWT({ userId: current.payload.userId }, { userName: current.payload.userName, userAvatarPath: current.payload.userAvatarPath }),
+                jwt: genJWT({ userId: current.payload.userId, userName: current.payload.userName, userAvatarPath: current.payload.userAvatarPath }),
             }))
         }, parseInt(getEnv("PERSISTENT_HEARTBEAT_INTERVAL")))
 
