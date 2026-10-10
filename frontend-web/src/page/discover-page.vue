@@ -1,5 +1,10 @@
 <template>
-  <WorkMasonryLayout class="page-box" />
+  <WorkMasonryLayout 
+  class="page-box" 
+  :fields="[
+    { text: '推荐', key: 'recommend' },
+    { text: '关注', key: 'following' },
+  ]" />
 </template>
 
 <script setup lang="ts">

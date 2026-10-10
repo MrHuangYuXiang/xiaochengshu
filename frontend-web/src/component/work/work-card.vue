@@ -19,15 +19,17 @@
                 <UserAvatar width="1.2rem" :userId="props.userId" :imgUrl="props.userAvatarUrl" />
                 <div>{{ props.userName }}</div>
                 <AppIcon
-                    class="more"
+                    class="more-icon"
                     type="more"
+                    :canAnimate="true"
                     size="1rem"
                     @click="isShowFloating = true"
                 />
             </div>
         </div>
         <SelectFloating
-            :options="[{ id: 1, text: '举报该作品' }]"
+            class="floating"
+            :options="getFloatingOptions"
             @clickOption="clickFloatingHandler"
             v-model:show="isShowFloating"
         />
@@ -39,8 +41,9 @@
     import ImageSlider from '../file/image-slider.vue';
     import AppIcon from '../common/AppIcon.vue';
     import SelectFloating from '../common/select-floating.vue';
+    import { storage } from '@/storage.ts';
     import { globalWorkModal, globalWorkReportModal } from '../global.ts';
-    import { ref } from 'vue';
+    import { computed, ref } from 'vue';
 
     const props = defineProps<{
         workId: string
@@ -52,12 +55,40 @@
         userAvatarUrl: string
     }>()
 
+    const emits = defineEmits<{
+        (e: 'deleteWork'): void;
+    }>()
+
     const isShowFloating = ref(false)
 
+    // 获取浮动框选项数组
+    const getFloatingOptions = computed(() => {
+        const options = [{ id: 3, text: '举报' }]
+        if (props.userId === storage.initData.value?.user.id) {
+            options.push({ id: 2, text: '删除' })
+        }
+        options.push({ id: 1, text: '关闭' })
+        return options
+    })
+
     // 点击浮动框处理函数
-    const clickFloatingHandler = (id: number) => {
-        if (id === 1) {
-            globalWorkReportModal.show(props.workId)
+    const clickFloatingHandler = async (id: number) => {
+        
+        switch (id) {
+            // 举报作品
+            case 3:
+                globalWorkReportModal.show(props.workId)
+                break;
+            
+            // 删除作品
+            case 2:
+                emits('deleteWork')
+                break;
+
+            // 关闭浮动框
+            case 1:
+                isShowFloating.value = false
+                break;
         }
     }
 </script>
@@ -95,11 +126,16 @@
             align-items: center;
             font-size: 0.8rem;
             column-gap: 0.5rem;
-            .more {
-                cursor: pointer;
+            .more-icon {
                 grid-column: 4;
             }
           }
         }
-      }
+        .floating {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            right: 0;
+        }
+    }
 </style>

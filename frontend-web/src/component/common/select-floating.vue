@@ -45,6 +45,7 @@
             padding: 0.8rem;
             cursor: pointer;
             border-radius: 15px;
+            text-align: center;
         }
         .inner-item:hover {
             background-color: var(--root-bg-gray);

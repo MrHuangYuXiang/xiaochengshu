@@ -1,43 +1,55 @@
 <template>
-  <div class="page-box" v-if="user">
-    <div class="top">
-      <div class="avatar"><UserAvatar width="10rem" :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
-      <div class="info">
-        <div class="name">
-          <div class="text">{{ user.user.name }}</div>
-          <div class="btn-group" v-if="user?.user.id !== storage.initData.value?.user.id">
-            <FormButton color="default" text="私信" @click="redirectToChatPage" />
+  <WorkMasonryLayout 
+    :fields="[
+      {text: '作品', key: 'self'}, 
+      {text: '点赞', key: 'like'},
+      {text: '收藏', key: 'collect'}
+    ]" 
+    v-if="user"
+    :targetUserId="user.user.id"
+    class="user-page"
+  >
+    <template #header>
+      <div class="user-info">
+        <div class="avatar"><UserAvatar width="10rem" :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
+        <div class="info">
+          <div class="name">
+            <div class="text">{{ user.user.name }}</div>
+            <div class="btn-group" v-if="user.user.id !== storage.initData.value?.user.id">
+              <FormButton color="default" text="私信" @click="redirectToChatPage" />
+            </div>
           </div>
-        </div>
-        <div class="tag">
-          <div>{{ user.user.gender === 1 ? "男" : "女" }}</div>
-          <div>{{ formatBirthday(user.user.birthday || "") }}</div>
-        </div>
-        <div style="opacity: 0.5;font-size: 0.95rem;">{{ user?.user.desc }}</div>
-        <div class="follow">
-          <div
-            v-if="user"
-            @click="globalFollowModal.show('following', user.user.id)"
-          >
-            关注 {{ user.followingCount }}
+          <div class="tag">
+            <div>{{ user.user.gender === 1 ? "男" : "女" }}</div>
+            <div>{{ formatBirthday(user.user.birthday || "") }}</div>
           </div>
-          <div
-            v-if="user"
-            @click="globalFollowModal.show('follower', user.user.id)"
-          >
-            粉丝 {{ user.followerCount }}
+          <div style="opacity: 0.5;font-size: 0.95rem;">{{ user?.user.desc }}</div>
+          <div class="follow">
+            <div
+              v-if="user"
+              @click="globalFollowModal.show('following', user.user.id)"
+            >
+              关注 {{ user.followingCount }}
+            </div>
+            <div
+              v-if="user"
+              @click="globalFollowModal.show('follower', user.user.id)"
+            >
+              粉丝 {{ user.followerCount }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </WorkMasonryLayout>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { useRoute } from 'vue-router';
   import UserAvatar from '@/component/user/UserAvatar.vue'
   import FormButton from '@/component/form/form-button.vue';
+  import WorkMasonryLayout from '@/component/work/work-masonry-layout.vue';
+  import { ref } from 'vue'
+  import { useRoute } from 'vue-router';
   import { onMounted } from 'vue';
   import { axiosProxy } from '@/api/axios';
   import { formatBirthday } from '@/helper/format'
@@ -81,18 +93,16 @@
  </script>
 
 <style scoped lang="scss">
-  .page-box {
-    margin-top: 5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: start;
-    padding: 25px 0px;
-    .top {
-      width: 45%;
+  .user-page {
+    height: 100%;
+    width: 100%;
+    padding: 3rem;
+    .user-info {
+      padding-bottom: 3rem;
+      justify-self: center;
       display: flex;
       align-items: center;
-      gap: 60px;
+      gap: 2rem;
       .avatar {
         width: 170px;
       }

@@ -1,12 +1,15 @@
 <template>
   <ScrollContainer
+    v-if="worksType"
+    :targetUserId="targetUserId"
     triggerType="bottom"
     :loadMoreCallback="getWorks"
     ref="scrollRef"
   >
     <div class="base-box">
+      <slot name="header"></slot>
       <AppSegment
-        :fields="worksTypeFields"
+        :fields="props.fields"
         @changeField="changeWorksType"
       />
       <div class="masonry-box">
@@ -20,6 +23,7 @@
           :userId="work.user.id"
           :userName="work.user.name"
           :userAvatarUrl="work.user.avatar_url"
+          @deleteWork="deleteWork(work.work.id)"
         />
       </div>
     </div>
@@ -32,18 +36,22 @@
   import AppSegment from '../common/app-segment.vue';
   import { EnhancedList } from '@/lib/structure.ts';
   import type { WorksSchema } from '@/api/type.ext';
-  import { ref, useTemplateRef } from 'vue';
+  import { onMounted, ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen.ts';
   import { axiosProxy } from '@/api/axios.ts';
+  import { ElMessage } from 'element-plus';
+
+  const props = withDefaults(defineProps<{
+    fields: {text: string, key: string}[]
+    targetUserId?: string
+  }>(), {
+    targetUserId: ""
+  })
 
   const works = ref(new EnhancedList<WorksSchema>((work) => work.work.id, 10))
-  const targetUserId = ref("")
-  const worksType = ref("recommend")
+  const targetUserId = ref(props.targetUserId)
+  const worksType = ref("")
   const scrollRef = useTemplateRef("scrollRef")
-  const worksTypeFields = ref([
-    {text: '推荐', key: 'recommend'},
-    {text: '关注', key: 'following'},
-  ])
   
   // 获取作品
   const getWorks = async () => {
@@ -62,12 +70,32 @@
     return works.value.isEnd
   }
 
+  // 删除作品
+  const deleteWork = async (workId: string) => {
+      await axiosProxy.post<
+          paths["/delete/work"]["post"]["requestBody"]["content"]["application/json"],
+          paths["/delete/work"]["post"]["responses"]["200"]["content"]["application/json"]
+      >("/delete/work", {
+          workId: workId
+      })
+      works.value.delete(workId)
+      ElMessage("删除成功")
+  }
+
   // 切换作品类型
   const changeWorksType = (type: string) => {
     worksType.value = type
     works.value.clear()
     scrollRef.value?.reset()
   }
+
+  onMounted(() => {
+    if (props.fields[0]) {
+      worksType.value = props.fields[0].key
+    } else {
+      throw new Error("props.fields为空")
+    }
+  })
 </script>
 
 <style scoped lang="scss">
