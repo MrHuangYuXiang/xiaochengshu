@@ -4,7 +4,7 @@ import { UserTable, FollowTable } from "../model/db-schema/user.js";
 import { WorkCollectTable, WorkTable, WorkLikeTable } from "../model/db-schema/work.js";
 import { eq, and, inArray, getTableColumns, gt, sql, count, desc, fillPlaceholders } from "drizzle-orm";
 import {
-    updateUserInfoInput,
+    updateUserInput,
     getUserDetailOutput,
     smsSendInput,
     loginInput,
@@ -20,7 +20,7 @@ import { getRequestBody, getRequestPage } from "../model/dto/index.js";
 import type { Request, Response } from "express";
 import { getEnv } from "../../helper/env.js";
 import { genJWT } from "../../helper/jwt.js";
-import { FormParser } from "../../lib/framework-ext.js";
+import { FormParser, getFormJsonData } from "../../lib/framework-ext.js";
 import { v4 as uuidv4 } from "uuid";
 import { heartbeatClientEvent, ClientEventType } from "../model/dto/event.js";
 import { AppError } from "../../lib/app-error.js";
@@ -178,38 +178,34 @@ export class UserService extends BaseService {
         }))
     }
 
-    // 更新头像
-    async uploadUserAvatar(req: Request, res: Response) {
-        // const current = getCurrent()
-        // const formParser = new FormParser(req)
-        // let filePath = ""
-
-        // await formParser.exec(async (header) => {
-        //     filePath = `/user-avatars/${current.payload.userId}${header.contentType}`
-        //     return await this.fileStorage.getWritableStream(filePath)
-        // }, [FileExtEnum.JPG, FileExtEnum.PNG])
-
-        // // 数据库更新用户信息
-        // await current.tx.update(UserTable).set({
-        //     avatar_url: filePath,
-        // }).where(eq(UserTable.id, current.payload.userId))
-    }
-
     // 更新用户信息
-    async updateUserInfo(req: Request, res: Response) {
+    async updateUser(req: Request, res: Response) {
         const current = getCurrent()
-        const body = getRequestBody<typeof updateUserInfoInput>(res)
+        const parser = new FormParser(req)
+        let avatarPath = ""
 
-        await current.tx.update(UserTable).set({
-            name: body.name,
-            desc: body.desc,
-            birthday: new Date(body.birthday),
-            gender: body.gender,
+        const jsonData = await getFormJsonData(parser, updateUserInput)
+        const user: Record<string, any> = {
+            name: jsonData.name,
+            desc: jsonData.desc,
+            birthday: jsonData.birthday,
+            gender: jsonData.gender,
             is_complete_profile: 1,
-        }).where(eq(UserTable.id, current.payload.userId))
+        }
+
+        if (jsonData.isUploadAvatar) {
+            avatarPath = await this.fileStorage.writeFileByParser(
+                `/user-avatars/${current.payload.userId}`,
+                parser,
+                [FileExtEnum.JPG, FileExtEnum.PNG]
+            )
+            user["avatar_url"] = avatarPath
+        }
+
+        await current.tx.update(UserTable).set(user).where(eq(UserTable.id, current.payload.userId))
     }
 
-    // 获取用户的关注/粉丝接口
+    // 获取用户的关注/粉丝
     async getUserFollows(req: Request, res: Response) {
         const page = getRequestPage(res)
         const current = getCurrent()

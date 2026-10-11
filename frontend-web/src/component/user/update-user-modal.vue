@@ -31,7 +31,6 @@
   import GenderRadio from './GenderRadio.vue';
   import { onMounted, ref, toRaw, useTemplateRef } from 'vue';
   import { storage } from '@/storage.ts';
-  import { validateForm } from '@/helper/form.ts';
   import { axiosProxy } from '@/api/axios.ts';
   import { ElMessage } from 'element-plus';
   import type { paths } from '@/api/gen.ts';
@@ -40,6 +39,7 @@
   const nameInput = useTemplateRef("nameInput")
   const birthdayInput = useTemplateRef("birthdayInput")
   const descInput = useTemplateRef("descInput")
+  const inputs = [nameInput.value, birthdayInput.value, descInput.value]
 
   const form = ref(storage.initData.value?.user || {
     name: '',
@@ -71,13 +71,9 @@
   })
 
   const clickSave = async () => {
-    if (!validateForm(nameInput.value!, birthdayInput.value!, descInput.value!)) {
+    if (!inputs.every(input => input?.validate())) {
       return
     }
-    await axiosProxy.post<
-      paths["/update/user/info"]["post"]["requestBody"]["content"]["application/json"],
-      paths["/update/user/info"]["post"]["responses"]["200"]["content"]["application/json"]
-    >('/update/user/info', form.value)
 
     const initData = await axiosProxy.post<
       undefined,
@@ -91,10 +87,6 @@
 
   // 更新头像
   const changeAvatar = async (file: File) => {
-    const formData = new FormData()
-    formData.append('avatar', file)
-    await axiosProxy.post('/upload/user/avatar', formData)
-    ElMessage("头像保存成功")
   }
 
   onMounted(() => {

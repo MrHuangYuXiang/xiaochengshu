@@ -32,11 +32,13 @@ export const getUserDetailOutput = objectType({
 )
 
 // 更新用户信息输入
-export const updateUserInfoInput = objectType({
+export const updateUserInput = objectType({
     name: stringType.min(1, "昵称至少为1个字符").max(20, "昵称最多为20个字符"),
     desc: stringType.max(200, "个人介绍最多为200个字符"),
     birthday: dateType,
     gender: numberType.gte(1, "性别必须为1或2").max(2, "性别必须为1或2"),
+    // 是否上传头像
+    isUploadAvatar: booleanType,
 })
 
 // 获取验证码输入

@@ -19,12 +19,14 @@ import {
     shareWorkInput,
     replyWorkCommentInput,
     replyWorkCommentOutput,
+    createImageWorkInput,
+    createVideoWorkInput,
 } from "./domain/model/dto/work.js"
 import {
     smsSendInput,
     loginInput,
     loginOutput,
-    updateUserInfoInput,
+    updateUserInput,
     getUserDetailInput,
     getUserDetailOutput,
     followUserInput,
@@ -114,8 +116,7 @@ export class Server implements ServerPort {
         this.registerHandler('/send/login/sms', smsSendInput, undefined, userService.smsSend.bind(userService))
         this.registerHandler('/login', loginInput, loginOutput, userService.login.bind(userService))
         this.registerHandler('/get/user', getUserDetailInput, getUserDetailOutput, userService.getUserDetail.bind(userService))
-        this.registerHandler('/upload/user/avatar', undefined, undefined, userService.uploadUserAvatar.bind(userService))
-        this.registerHandler('/update/user/info', updateUserInfoInput, undefined, userService.updateUserInfo.bind(userService))
+        this.registerHandler('/update/user', updateUserInput, undefined, userService.updateUser.bind(userService))
         this.registerHandler('/get/user/follows', getUserFollowsInput, getUserFollowsOutput, userService.getUserFollows.bind(userService))
         this.registerHandler('/follow/user', followUserInput, undefined, userService.followUser.bind(userService))
         this.registerHandler('/remove/follower', removeFollowerInput, undefined, userService.removeFollower.bind(userService))
@@ -123,8 +124,8 @@ export class Server implements ServerPort {
         // 作品模块
         this.registerHandler('/get/work', getWorkDetailInput, getWorkDetailOutput, workService.getWorkDetail.bind(workService))
         this.registerHandler('/get/works', getWorksInput, getWorksOutput, workService.getWorks.bind(workService))
-        this.registerHandler('/create/image/work', undefined, undefined, workService.createImageWork.bind(workService))
-        this.registerHandler('/create/video/work', undefined, undefined, workService.createVideoWork.bind(workService))
+        this.registerHandler('/create/image/work', createImageWorkInput, undefined, workService.createImageWork.bind(workService))
+        this.registerHandler('/create/video/work', createVideoWorkInput, undefined, workService.createVideoWork.bind(workService))
         this.registerHandler('/delete/work', deleteWorkInput, undefined, workService.deleteWork.bind(workService))
         this.registerHandler('/like/work', likeWorkInput, undefined, workService.likeWork.bind(workService))
         this.registerHandler('/collect/work', collectWorkInput, undefined, workService.collectWork.bind(workService))

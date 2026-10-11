@@ -296,25 +296,7 @@
         }
       }
     },
-    "/upload/user/avatar": {
-      "post": {
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "响应模型",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "required": [],
-                  "properties": {}
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/update/user/info": {
+    "/update/user": {
       "post": {
         "parameters": [],
         "responses": {
@@ -341,7 +323,8 @@
                   "name",
                   "desc",
                   "birthday",
-                  "gender"
+                  "gender",
+                  "isUploadAvatar"
                 ],
                 "properties": {
                   "name": {
@@ -355,6 +338,9 @@
                   },
                   "gender": {
                     "type": "integer"
+                  },
+                  "isUploadAvatar": {
+                    "type": "boolean"
                   }
                 }
               }

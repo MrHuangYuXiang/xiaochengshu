@@ -237,42 +237,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/upload/user/avatar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description 响应模型 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": unknown;
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/update/user/info": {
+    "/update/user": {
         parameters: {
             query?: never;
             header?: never;
@@ -296,6 +261,7 @@ export interface paths {
                         desc: string;
                         birthday: string;
                         gender: number;
+                        isUploadAvatar: boolean;
                     };
                 };
             };
