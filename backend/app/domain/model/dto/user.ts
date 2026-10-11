@@ -1,3 +1,4 @@
+import { UserGender } from "../enum/user.js";
 import { page, userSchema, UserSchemaWithFollow } from "./common.js";
 import {
     booleanType,
@@ -36,7 +37,7 @@ export const updateUserInput = objectType({
     name: stringType.min(1, "昵称至少为1个字符").max(20, "昵称最多为20个字符"),
     desc: stringType.max(200, "个人介绍最多为200个字符"),
     birthday: dateType,
-    gender: numberType.gte(1, "性别必须为1或2").max(2, "性别必须为1或2"),
+    gender: numberType.refine((val) => UserGender.MALE === val || val === UserGender.FEMALE, { message: "未知的性别类型" }),
     // 是否上传头像
     isUploadAvatar: booleanType,
 })
@@ -48,8 +49,8 @@ export const smsSendInput = objectType({
 
 // 登录输入
 export const loginInput = objectType({
-    phoneNumber: stringType.min(11, "手机号至少为11个字符").max(11, "手机号最多为11个字符"),
-    code: stringType.min(6, "验证码至少为6个字符").max(6, "验证码最多为6个字符"),
+    phoneNumber: stringType.length(11, "手机号必须为11位"),
+    code: stringType.length(6, "验证码必须为6位"),
 })
 
 // 登录输出

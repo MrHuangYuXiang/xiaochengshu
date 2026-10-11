@@ -75,6 +75,7 @@
       margin: 5vh auto;
       border-radius: 15px;
       max-height: 100vh;
+      max-width: 100vw;
       overflow: hidden;
       .step {
         position: absolute;

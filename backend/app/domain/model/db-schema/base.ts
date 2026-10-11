@@ -11,3 +11,8 @@ export const baseTable = {
 export const idType = () => {
     return varchar({ length: 255 }).notNull()
 }
+
+// 文件路径字段
+export const filePathType = () => {
+    return varchar({ length: 200 }).notNull()
+}

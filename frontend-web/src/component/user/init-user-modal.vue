@@ -43,7 +43,7 @@
   import UserAvatar from './UserAvatar.vue';
   import AppInput from '../form/form-input.vue';
   import AppButton from '../form/form-button.vue';
-  import GenderRadio from './GenderRadio.vue';
+  import GenderRadio from './gender-radio.vue/index.js';
   import { validateForm } from '@/helper/form.ts';
   import { storage } from '@/storage.ts';
   import { axiosProxy } from '@/api/axios.ts';

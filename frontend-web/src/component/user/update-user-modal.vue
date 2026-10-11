@@ -1,24 +1,25 @@
 <template>
-  <BaseModal width="50vw" v-model:show="globalUpdateUserModal.isShow.value">
+  <BaseModal v-model:show="globalUpdateUserModal.isShow.value" v-if="formValues">
     <div class="form-body">
-      <UserAvatar :is-uploadable="true" width="30%" :img-url="storage.initData.value?.user?.avatar_url" @change="changeAvatar"></UserAvatar>
+      <div class="title">更新用户信息</div>
+      <UserAvatar class="avatar"  :is-uploadable="true" width="30%" :img-url="storage.initData.value?.user?.avatar_url" @change="changeAvatar"></UserAvatar>
       <div class="form-item">
         <div class="label">昵称</div>
-        <AppInput placeholder="请输入昵称" v-model="form.name" ref="nameInput" :rule="nameValidator"></AppInput>
+        <AppInput placeholder="请输入昵称" type="text" v-model="formValues.name" ref="nameInput" :rule="rules.name"></AppInput>
       </div>
       <div class="form-item">
         <div class="label">生日</div>
-        <AppInput placeholder="请选择你的出生日期" v-model="form.birthday" type="date" ref="birthdayInput" :rule="birthdayValidator"></AppInput>
+        <AppInput placeholder="请选择你的出生日期" v-model="formValues.birthday" type="date" ref="birthdayInput" :rule="rules.birthday"></AppInput>
       </div>
       <div class="form-item">
         <div class="label">性别</div>
-        <GenderRadio v-model="form.gender"></GenderRadio>
+        <GenderRadio v-model="formValues.gender"></GenderRadio>
       </div>
       <div class="form-item">
         <div class="label">简介</div>
-        <AppInput type="textarea" placeholder="请输入简介" v-model="form.desc" :rows="4" ref="descInput" :rule="descValidator"></AppInput>
+        <AppInput type="textarea" placeholder="请输入简介" v-model="formValues.desc" :rows="4" ref="descInput" :rule="rules.desc"></AppInput>
       </div>
-      <AppButton text="保存" @click="clickSave" color="default" />
+      <AppButton text="保存" @click="save" color="default" />
     </div>
   </BaseModal>
 </template>
@@ -28,61 +29,37 @@
   import UserAvatar from './UserAvatar.vue';
   import AppInput from '../form/form-input.vue';
   import AppButton from '../form/form-button.vue';
-  import GenderRadio from './GenderRadio.vue';
+  import GenderRadio from './gender-radio.vue';
   import { onMounted, ref, toRaw, useTemplateRef } from 'vue';
   import { storage } from '@/storage.ts';
-  import { axiosProxy } from '@/api/axios.ts';
   import { ElMessage } from 'element-plus';
-  import type { paths } from '@/api/gen.ts';
   import { globalUpdateUserModal } from '../global.ts';
+  import z from 'zod';
 
   const nameInput = useTemplateRef("nameInput")
   const birthdayInput = useTemplateRef("birthdayInput")
   const descInput = useTemplateRef("descInput")
-  const inputs = [nameInput.value, birthdayInput.value, descInput.value]
+  const inputs = [nameInput, birthdayInput, descInput]
 
-  const form = ref(storage.initData.value?.user || {
-    name: '',
-    birthday: '',
-    gender: 1,
-    desc: '',
-  })
-  const nameValidator = ref({
-    required: {
-      errorString: "请输入昵称",
-      value: true
-    },
-    maxlength: {
-      errorString: "昵称最长不能超过20个字符",
-      value: 20
-    },
-  })
-  const birthdayValidator = ref({
-    required: {
-      errorString: "请选择你的出生日期",
-      value: true
-    }
-  })
-  const descValidator = ref({
-    maxlength: {
-      errorString: "简介最长不能超过200个字符",
-      value: 200
-    },
-  })
+  const formValues = ref<{
+    name: string,
+    birthday: string,
+    gender: number,
+    desc: string,
+  } | undefined>(undefined)
+  const rules = {
+    name: z.string().min(1, "请输入昵称").max(20, "昵称最长不能超过20个字符"),
+    birthday: z.string(),
+    gender: z.number().min(1, "请选择性别").max(2, "请选择性别"),
+    desc: z.string().max(200, "简介最长不能超过200个字符"),
+  }
 
-  const clickSave = async () => {
-    if (!inputs.every(input => input?.validate())) {
+  const save = async () => {
+    if (!inputs.every(input => input.value?.validate())) {
       return
     }
 
-    const initData = await axiosProxy.post<
-      undefined,
-      paths["/get/user/init-data"]["post"]["responses"]["200"]["content"]["application/json"]
-    >('/get/user/init-data', undefined)
-    storage.initData.value = initData
-
     ElMessage("保存成功")
-    globalUpdateUserModal.isShow.value = false
   }
 
   // 更新头像
@@ -90,26 +67,37 @@
   }
 
   onMounted(() => {
+    if (!storage.initData.value?.user) {
+      return
+    }
     // 深拷贝防止赋值引用,ref响应式对象需要用toRaw拿到原生对象
-    form.value = structuredClone(toRaw(storage.initData.value!.user))
-  })
+    formValues.value = structuredClone(toRaw(storage.initData.value.user))
+  }) 
 </script>
 
 <style scoped lang="scss">
   .form-body {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: start;
-    padding: 5% 25%;
-    gap: 5%;
+    padding: 2rem;
+    width: auto;
+    height: auto;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: auto;
+    row-gap: 1rem;
+    .title {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: bold;
+      padding-bottom: 1rem;
+    }
+    .avatar {
+      justify-self: center;
+    }
     .form-item {
-      width: 100%;
-      display: flex;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 1rem;
       align-items: center;
-      gap: 25px;
       .label {
         font-weight: bold;
         text-wrap: nowrap;

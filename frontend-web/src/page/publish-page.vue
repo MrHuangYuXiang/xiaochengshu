@@ -4,11 +4,11 @@
     <div class="publish-form">
       <div class="form-item">
         <div class="item-label">作品标题</div>
-        <FormInput ref="titleInputRef" type="textarea" placeholder="请输入文章标题" v-model="form.title" :rule="titleValidator"></FormInput>
+        <FormInput ref="titleInputRef" type="textarea" placeholder="请输入文章标题" v-model="form.title" :rule="rules.title"></FormInput>
       </div>
       <div class="form-item">
         <div class="item-label">作品正文</div>
-        <FormInput ref="contentInputRef" :rows="20" type="textarea" placeholder="请输入文章正文" v-model="form.content" :rule="contentValidator"></FormInput>
+        <FormInput ref="contentInputRef" :rows="20" type="textarea" placeholder="请输入文章正文" v-model="form.content" :rule="rules.content"></FormInput>
       </div>
       <div class="form-item" v-if="currentField === 'image'">
         <div class="item-label">上传图片</div>
@@ -67,6 +67,8 @@
   import VideoPlayer from '@/component/file/video-player.vue';
   import { ElMessage } from 'element-plus';
   import { axiosProxy } from '@/api/axios';
+  import z from 'zod';
+  import { AppError } from '@/error';
 
   const titleInputRef = useTemplateRef("titleInputRef");
   const contentInputRef = useTemplateRef("contentInputRef");
@@ -75,31 +77,9 @@
     content: '',
     permission: 1,
   })
-  const titleValidator = {
-    required: {
-      errorString: '请填写标题',
-    },
-    minLength: {
-      value: 1,
-      errorString: '标题长度不能小于1个字符',
-    },
-    maxLength: {
-      value: 20,
-      errorString: '标题长度不能大于20个字符',
-    },
-  }
-  const contentValidator = {
-    required: {
-      errorString: '请填写正文',
-    },
-    minLength: {
-      value: 1,
-      errorString: '正文长度不能小于1个字符',
-    },
-    maxLength: {
-      value: 200,
-      errorString: '正文长度不能大于200个字符',
-    },
+  const rules = {
+    title: z.string(),
+    content: z.string(),
   }
 
   // 分段器当前选中项
@@ -164,7 +144,7 @@
     }
 
     if (!files.value[0]) {
-      throw new Error('请上传文件')
+      throw new AppError('请上传文件')
     }
 
     if (currentField.value === 'image') {

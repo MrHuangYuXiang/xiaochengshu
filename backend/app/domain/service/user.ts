@@ -69,7 +69,7 @@ export class UserService extends BaseService {
                 desc: "",
                 birthday: new Date(),
                 gender: 1,
-                avatar_url: userAvatarPath,
+                avatar_path: userAvatarPath,
                 is_complete_profile: 0,
             })
 
@@ -87,7 +87,7 @@ export class UserService extends BaseService {
         else {
             userId = user[0].id
             userName = user[0].name
-            userAvatarPath = user[0].avatar_url
+            userAvatarPath = user[0].avatar_path
         }
 
         res.json(loginOutput.parse({

@@ -1,9 +1,8 @@
 <template>
-  <div class="input" :style="{ width: props.width }">
+  <div class="input-box">
     <input
       v-if="props.type === 'text'"
       ref="inputRef"
-      :style="{ backgroundColor: props.backgroundColor }"
       type="text"
       :placeholder="props.placeholder"
       v-model="inputValue"
@@ -16,10 +15,10 @@
       v-model="inputValue"
       size="default"
       value-format="YYYY-MM-DDTHH:mm:ss.sssZ"
+      :clearable="false"
     />
     <textarea
       v-if="props.type === 'textarea'"
-      :style="{ backgroundColor: props.backgroundColor }"
       ref="textareaRef"
       :placeholder="props.placeholder"
       :rows="props.rows"
@@ -33,34 +32,17 @@
 
 <script setup lang="ts">
   import { ref, useTemplateRef } from 'vue'
+  import { ZodString } from 'zod'
 
-  const props = defineProps({
-    placeholder: {
-      type: String,
-      default: ""
-    },
-    rule: {
-      type: Object,
-      default: () => ({
-      })
-    },
-    width: {
-      type: String,
-      default: '100%'
-    },
-    backgroundColor: {
-      type: String,
-      default: 'var(--root-bg-gray)'
-    },
-    type: {
-      type: String,
-      default: 'text'
-    },
+  const props = withDefaults(defineProps<{
+    placeholder?: string,
+    rule: ZodString,
+    type: string,
     // 只有当type为textarea时有效
-    rows: {
-      type: Number,
-      default: 4
-    },
+    rows?: number,
+  }>(), {
+    placeholder: '',
+    rows: 4,
   })
   const emits = defineEmits(['focus', 'blur'])
   const inputValue = defineModel<string>()
@@ -70,43 +52,14 @@
 
   /** 以下为组件暴露方法 */
   const validate = () => {
-    switch (props.type) {
-      // 文本输入框验证规则
-      case 'text':
-      case 'textarea':
-        if ("required" in props.rule && inputValue.value!.length === 0) {
-          errorString.value = props.rule.required.errorString
-          return false
-        }
-        if ("maxlength" in props.rule && inputValue.value!.length > props.rule.maxlength.value) {
-          errorString.value = props.rule.maxlength.errorString
-          return false
-        }
-        if ("minlength" in props.rule && inputValue.value!.length < props.rule.minlength.value) {
-          errorString.value = props.rule.minlength.errorString
-          return false
-        }
-        if ("mustLength" in props.rule && inputValue.value!.length !== props.rule.mustLength.value) {
-          errorString.value = props.rule.mustLength.errorString
-          return false
-        }
-        break
-
-      // 日期选择器验证规则
-      case 'date':
-        if ("required" in props.rule && (inputValue.value === null || inputValue.value === "")) {
-          errorString.value = props.rule.required.errorString
-          return false
-        }
-        break
-    }
-
-    // 延迟修改错误字符串保证动画渲染正常
-    errorString.value = ""
-    setTimeout(() => {
+    const result = props.rule.safeParse(inputValue.value)
+    if (!result.success) {
+      errorString.value = result.error.issues[0]?.message || ""
+      return false
+    } else {
       errorString.value = ""
-    }, 300)
-    return true
+      return true
+    }
   }
 
   const focus = () => {
@@ -127,8 +80,8 @@
 </script>
 
 <style scoped lang="scss">
-  .input {
-    width: 100%;
+  .input-box {
+    height: auto;
     display: flex;
     flex-direction: column;
     input,
@@ -139,6 +92,7 @@
       border: none;
       transition: all 0.2s ease-in-out;
       resize: none;
+      background-color: var(--root-bg-gray);
     }
     input:hover,
     textarea:hover,
@@ -151,15 +105,16 @@
     .error {
       height: 0;
       opacity: 0;
-      transition: all 0.3s ease-in-out;
+      transition: all 0.5s ease-in-out;
       color: red;
-      font-size: 12px;
       font-weight: bold;
+      overflow: hidden;
+      font-size: 0.8rem;
     }
     .error.show {
-      height: 12px;
+      padding-top: 0.2rem;
+      height: 1.3rem;
       opacity: 1;
-      margin-top: 5px;
     }
   }
 </style>

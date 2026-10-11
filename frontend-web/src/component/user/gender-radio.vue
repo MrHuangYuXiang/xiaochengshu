@@ -1,7 +1,7 @@
 <!-- 性别单选框 -->
 
 <template>
-  <div class="gender-radio" :style="{ width: props.width }">
+  <div class="gender-radio">
     <div class="gender-box male" :class="{'active': gender === 1}" @click="gender = 1">
       <AppIcon type="male" :fill="gender === 1 ? 'var(--root-male-color)' : 'var(--root-gray)' " />
       <div>男生</div>
@@ -15,23 +15,16 @@
 
 <script setup lang="ts">
   import AppIcon from '../common/AppIcon.vue';
-  const props = defineProps({
-    width: {
-      type: String,
-      default: '100%',
-    },
-  })
-
-  // 1:男 2:女
   const gender = defineModel<number>()
 </script>
 
 <style scoped lang="scss">
   .gender-radio {
-    width: 100%;
+    width: auto;
+    height: auto;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
     .gender-box {
       transition: all 0.3s ease-in-out;
       text-wrap: nowrap;

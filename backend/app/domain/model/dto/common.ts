@@ -30,7 +30,7 @@ const userFields = {
     desc: stringType,
     birthday: dateType,
     gender: numberType,
-    avatar_url: stringType,
+    avatar_path: stringType,
     is_complete_profile: numberType,
 }
 
