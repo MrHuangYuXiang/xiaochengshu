@@ -5,6 +5,7 @@ import { AppError } from "./app-error.js"
 import fs from "fs"
 import { clientEvents } from "../domain/model/dto/event.js"
 import { FileExtEnum } from '../domain/model/enum/file.js';
+import { getEnv } from '../helper/env.js';
 
 // 路由映射表
 export class RouteMap {
@@ -33,7 +34,7 @@ export const routeMap = new RouteMap();
 /**
  * 字段元数据结构
  */
-export class FormFieldHeader {
+export class FormHeader {
     // 字段名
     name: string
 
@@ -53,7 +54,7 @@ export class FormFieldHeader {
  * 注意: 对于每个字段必须顺序解读!
  */
 export class FormParser {
-    // 缓冲区
+    // 缓冲区(Buffer的单位是1byte = 8bit)
     private buf: Buffer
 
     // 分隔符字符串
@@ -67,13 +68,13 @@ export class FormParser {
 
     // 当前writer实例以及provider函数
     private currentWriter: WritableStreamDefaultWriter<Buffer> | undefined
-    private writerProvider: undefined | ((fieldType: FormFieldHeader) => Promise<WritableStreamDefaultWriter<Buffer>>)
+    private writerProvider: undefined | ((fieldType: FormHeader) => Promise<WritableStreamDefaultWriter<Buffer>>)
 
     // 当前可接受的文件类型
     private accept: FileExtEnum[] = []
 
     // reject和resolve对象
-    private currentReject: (err: Error) => void
+    private currentReject: (err: any) => void
     private currentResolve: (value: any) => void
 
     // 状态: 0: 读取字段头部信息 1: 读取字段内容
@@ -84,7 +85,10 @@ export class FormParser {
     private isExecuting: boolean
 
     // 字段头部信息
-    private currentFieldHeader: FormFieldHeader
+    private currentFieldHeader: FormHeader
+
+    // 当前字段已读大小
+    private currentReadSize: number
 
     /**
      * 构造函数
@@ -114,7 +118,8 @@ export class FormParser {
         this.isEnd = false
         this.isExecuting = false
         this.accept = [FileExtEnum.JSON]
-        this.currentFieldHeader = new FormFieldHeader()
+        this.currentFieldHeader = new FormHeader()
+        this.currentReadSize = 0
     }
 
     // 获取文件类型
@@ -132,11 +137,40 @@ export class FormParser {
         }
     }
 
+    // 文件大小校验
+    private checkFileSize(size: number) {
+        this.currentReadSize += size
+        const mb = this.currentReadSize / 1024 / 1024
+        switch (this.currentFieldHeader.contentType) {
+            case FileExtEnum.JSON:
+                const maxJsonFileSize = Number(getEnv("MAX_JSON_FILE_SIZE"))
+                if (mb > maxJsonFileSize) {
+                    throw new AppError(`json文件大小不能超过 ${maxJsonFileSize} mb`)
+                }
+                break
+            case FileExtEnum.JPG:
+            case FileExtEnum.PNG:
+                const maxImageFileSize = Number(getEnv("MAX_IMAGE_FILE_SIZE"))
+                if (mb > maxImageFileSize) {
+                    throw new AppError(`图片文件大小不能超过 ${maxImageFileSize} mb`)
+                }
+                break
+            case FileExtEnum.MP4:
+                const maxVideoFileSize = Number(getEnv("MAX_VIDEO_FILE_SIZE"))
+                if (mb > maxVideoFileSize) {
+                    throw new AppError(`视频文件大小不能超过 ${maxVideoFileSize} mb`)
+                }
+                break
+            default:
+                throw new AppError(`未知的文件类型: ${this.currentFieldHeader.contentType}`)
+        }
+    }
+
     /**
      * @param provider: 写入流对象提供者回调,在解析字段元数据时调用获取Writer实例
      */
     exec(
-        provider: (fieldType: FormFieldHeader) => Promise<WritableStreamDefaultWriter<Buffer>>,
+        provider: (fieldType: FormHeader) => Promise<WritableStreamDefaultWriter<Buffer>>,
         accept: FileExtEnum[],
     ) {
         return new Promise(async (resolve, reject) => {
@@ -155,7 +189,8 @@ export class FormParser {
             this.currentResolve = resolve
             this.currentReject = reject
             this.isExecuting = true
-            this.currentFieldHeader = new FormFieldHeader()
+            this.currentFieldHeader = new FormHeader()
+            this.currentReadSize = 0
 
             // 传入空Buffer,先解析缓冲区中剩余碎片,被动触发resume
             this.parse(Buffer.from(""))
@@ -215,21 +250,25 @@ export class FormParser {
                     const endBoundaryIndex = buffer.indexOf(this.endBoundary)
                     let content: Buffer = Buffer.from("")
 
-                    // 解析到边界
-                    if (boundaryIndex !== -1 || endBoundaryIndex !== -1) {
-                        // 写入内容并关闭当前writer
-                        content = buffer.subarray(0, boundaryIndex - 1)
-                        await this.currentWriter?.write(content)
+                    // 文件大小校验
+                    this.checkFileSize(boundaryIndex === -1 ? buffer.length : boundaryIndex)
 
+                    // 解析字段内容
+                    if (boundaryIndex !== -1) {
+
+                        // 解析到表单体结束边界
+                        if (boundaryIndex === endBoundaryIndex) {
+                            this.isEnd = true
+                        }
+
+                        // 写入内容并关闭当前writer
+                        content = buffer.subarray(0, boundaryIndex)
+                        await this.currentWriter?.write(content)
                         // 缓存剩余内容并resolve
                         this.buf = buffer.subarray(boundaryIndex, buffer.length)
                         this.isExecuting = false
-                        if (endBoundaryIndex !== -1) this.isEnd = true
-
                         this.currentResolve(null)
-                    }
-
-                    else {
+                    } else {
                         // 同上
                         await this.currentWriter?.write(buffer)
                         this.buf = Buffer.from("")
@@ -247,10 +286,8 @@ export class FormParser {
                 }
             }
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                this.req.pause()
-                this.currentReject(error)
-            }
+            this.req.pause()
+            this.currentReject(error)
         }
     }
 }
@@ -283,7 +320,7 @@ class MemoryWritableStream<T extends z.ZodObject> extends WritableStream {
 export async function getFormJsonData<T extends z.ZodObject>(parser: FormParser, schema: T) {
     const stream = new MemoryWritableStream<T>(schema)
     const writer = stream.getWriter()
-    await parser.exec(async (fieldHeader: FormFieldHeader) => {
+    await parser.exec(async (fieldHeader: FormHeader) => {
         return writer
     }, [FileExtEnum.JSON])
     await writer.close()

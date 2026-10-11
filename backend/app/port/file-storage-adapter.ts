@@ -5,7 +5,7 @@ import { Writable } from "stream"
 import { getEnv } from "../helper/env.js";
 import { AppError } from "../lib/app-error.js";
 import { FileExtEnum } from "../domain/model/enum/file.js";
-import type { FormFieldHeader, FormParser } from "../lib/framework-ext.js";
+import type { FormHeader, FormParser } from "../lib/framework-ext.js";
 import { execCommandLineProgram } from "../lib/command-line.js";
 import { getCurrent } from "../lib/local-stroage.js";
 
@@ -31,10 +31,13 @@ export class LocalFileStorageAdapter extends baseFileStorageAdapter implements F
         let filePath = ""
         let realPath = ""
 
-        await parser.exec(async (fieldHeader: FormFieldHeader) => {
+        await parser.exec(async (fieldHeader: FormHeader) => {
             fileExt = fieldHeader.contentType
             filePath = `${filePathWithoutExt}${fileExt}`
             realPath = this.getFilePath(filePath)
+
+            // 保存本次写入的文件路径
+            this.writtenFiles.set(current.requestId, [...this.writtenFiles.get(current.requestId) || [], filePath])
             // 确保目录存在
             await fs.promises.mkdir(path.dirname(realPath), { recursive: true })
             writer = Writable.toWeb(fs.createWriteStream(realPath)).getWriter()
@@ -55,9 +58,6 @@ export class LocalFileStorageAdapter extends baseFileStorageAdapter implements F
             await fs.promises.rm(realPath)
             await fs.promises.rename(`${realPath}.tmp.mp4`, realPath)
         }
-
-        // 保存本次写入的文件路径
-        this.writtenFiles.set(current.requestId, [...this.writtenFiles.get(current.requestId) || [], filePath])
 
         return filePath
     }
