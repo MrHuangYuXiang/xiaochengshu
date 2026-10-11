@@ -300,10 +300,6 @@ class MemoryWritableStream<T extends z.ZodObject> extends WritableStream {
     constructor(schema: T) {
         super({
             write: (chunk) => {
-                // 防止内存泄漏
-                if (this.buffer.length > 1024) {
-                    return
-                }
                 this.buffer = Buffer.concat([this.buffer, chunk])
             }
         })
@@ -320,11 +316,16 @@ class MemoryWritableStream<T extends z.ZodObject> extends WritableStream {
 export async function getFormJsonData<T extends z.ZodObject>(parser: FormParser, schema: T) {
     const stream = new MemoryWritableStream<T>(schema)
     const writer = stream.getWriter()
-    await parser.exec(async (fieldHeader: FormHeader) => {
-        return writer
-    }, [FileExtEnum.JSON])
-    await writer.close()
-    return stream.parse()
+
+    try {
+        await parser.exec(async (fieldHeader: FormHeader) => {
+            return writer
+        }, [FileExtEnum.JSON])
+        return stream.parse()
+    } catch (error) {
+        await writer.close()
+        throw error
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

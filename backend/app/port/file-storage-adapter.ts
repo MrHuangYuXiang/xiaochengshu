@@ -8,6 +8,7 @@ import { FileExtEnum } from "../domain/model/enum/file.js";
 import type { FormHeader, FormParser } from "../lib/framework-ext.js";
 import { execCommandLineProgram } from "../lib/command-line.js";
 import { getCurrent } from "../lib/local-stroage.js";
+import { writer } from "repl";
 
 class baseFileStorageAdapter {
     protected getFilePath(fileName: string) {
@@ -31,40 +32,43 @@ export class LocalFileStorageAdapter extends baseFileStorageAdapter implements F
         let filePath = ""
         let realPath = ""
 
-        await parser.exec(async (fieldHeader: FormHeader) => {
-            fileExt = fieldHeader.contentType
-            filePath = `${filePathWithoutExt}${fileExt}`
-            realPath = this.getFilePath(filePath)
+        try {
+            await parser.exec(async (fieldHeader: FormHeader) => {
+                fileExt = fieldHeader.contentType
+                filePath = `${filePathWithoutExt}${fileExt}`
+                realPath = this.getFilePath(filePath)
 
-            // 保存本次写入的文件路径
-            this.writtenFiles.set(current.requestId, [...this.writtenFiles.get(current.requestId) || [], filePath])
-            // 确保目录存在
-            await fs.promises.mkdir(path.dirname(realPath), { recursive: true })
-            writer = Writable.toWeb(fs.createWriteStream(realPath)).getWriter()
-            return writer
-        }, accept)
+                // 保存本次写入的文件路径
+                this.writtenFiles.set(current.requestId, [...this.writtenFiles.get(current.requestId) || [], filePath])
+                // 确保目录存在
+                await fs.promises.mkdir(path.dirname(realPath), { recursive: true })
+                writer = Writable.toWeb(fs.createWriteStream(realPath)).getWriter()
+                return writer
+            }, accept)
 
-        await writer?.close()
+            // 如果写入mp4文件,需要前置元数据(faststart)
+            if (fileExt === FileExtEnum.MP4) {
+                await execCommandLineProgram("ffmpeg", [
+                    "-y",
+                    "-i", realPath,
+                    "-c", "copy",
+                    "-movflags", "+faststart",
+                    `${realPath}.tmp.mp4`
+                ])
+                await fs.promises.rm(realPath)
+                await fs.promises.rename(`${realPath}.tmp.mp4`, realPath)
+            }
 
-        // 如果写入mp4文件,需要前置元数据(faststart)
-        if (fileExt === FileExtEnum.MP4) {
-            await execCommandLineProgram("ffmpeg", [
-                "-y",
-                "-i", realPath,
-                "-c", "copy",
-                "-movflags", "+faststart",
-                `${realPath}.tmp.mp4`
-            ])
-            await fs.promises.rm(realPath)
-            await fs.promises.rename(`${realPath}.tmp.mp4`, realPath)
+            return filePath
+        } catch (error) {
+            writer?.close()
+            throw error
         }
-
-        return filePath
     }
 
     async deleteFile(filePath: string) {
         filePath = this.getFilePath(filePath)
-        await fs.promises.rm(filePath)
+        await fs.promises.rm(filePath, { force: true })
     }
 
     async rollback() {
@@ -73,6 +77,7 @@ export class LocalFileStorageAdapter extends baseFileStorageAdapter implements F
         for (const file of files) {
             await this.deleteFile(file)
         }
+        this.writtenFiles.delete(current.requestId)
     }
 
     async commit() {
