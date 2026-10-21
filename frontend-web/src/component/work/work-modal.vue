@@ -14,6 +14,7 @@
       <ImageSlider
         v-if="work.work.type === 1"
         class="image"
+        type="upload"
         :object-fit="'contain'"
         :src="work.attachments[currentImageIndex]?.path || ''"
         :canPreview="true"

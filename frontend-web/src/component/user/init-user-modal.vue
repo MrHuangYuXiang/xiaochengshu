@@ -40,14 +40,13 @@
 <script setup lang="ts">
   import { ref, useTemplateRef } from 'vue';
   import BaseModal from '../common/BaseModal.vue';
-  import UserAvatar from './UserAvatar.vue';
+  import UserAvatar from './user-avatar.vue';
   import AppInput from '../form/form-input.vue';
   import AppButton from '../form/form-button.vue';
-  import GenderRadio from './gender-radio.vue/index.js';
+  import GenderRadio from './gender-radio.vue';
   import { validateForm } from '@/helper/form.ts';
   import { storage } from '@/storage.ts';
   import { axiosProxy } from '@/api/axios.ts';
-  import type { paths } from '@/api/gen.ts';
 
   const enableShow = defineModel<boolean>("show")
 
@@ -100,10 +99,6 @@
         activeIndex.value += 1
         break
       case 3:
-        await axiosProxy.post<
-          paths["/update/user/info"]["post"]["requestBody"]["content"]["application/json"],
-          paths["/update/user/info"]["post"]["responses"]["200"]["content"]["application/json"]
-        >('/update/user/info', form.value)
         enableShow.value = false
         break
     }

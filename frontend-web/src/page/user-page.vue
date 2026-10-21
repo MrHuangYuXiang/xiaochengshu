@@ -11,7 +11,13 @@
   >
     <template #header>
       <div class="user-info">
-        <div class="avatar"><UserAvatar width="10rem" :userId="user?.user.id" :imgUrl="user?.user.avatar_url"/></div>
+        <UserAvatar 
+          class="avatar"
+          type="upload"
+          width="10rem" 
+          :userId="user.user.id" 
+          :imgUrl="user.user.avatar_path"
+        />
         <div class="info">
           <div class="name">
             <div class="text">{{ user.user.name }}</div>
@@ -45,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-  import UserAvatar from '@/component/user/UserAvatar.vue'
+  import UserAvatar from '@/component/user/user-avatar.vue'
   import FormButton from '@/component/form/form-button.vue';
   import WorkMasonryLayout from '@/component/work/work-masonry-layout.vue';
   import { ref } from 'vue'
@@ -96,15 +102,17 @@
   .user-page {
     height: 100%;
     width: 100%;
-    padding: 3rem;
+    padding: 0 10rem;
+    padding-top: 5rem;
     .user-info {
-      padding-bottom: 3rem;
-      justify-self: center;
+      justify-self: start;
       display: flex;
       align-items: center;
-      gap: 2rem;
+      gap: 2.5rem;
+      padding-bottom: 3rem;
       .avatar {
-        width: 170px;
+        width: 10rem;
+        height: 10rem;
       }
       .info {
         flex: 1;

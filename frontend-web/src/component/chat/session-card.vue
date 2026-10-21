@@ -6,12 +6,10 @@
       'pin': props.sessionIsPin === 1
     }"
   >
-    <UserAvatar 
+    <ImageSlider
       class="session-image"
-      :user-id="props.userId"
-      :img-url="getSessionImageUrl(props.sessionType)"
-      :is-upload="props.sessionType === 3 || props.sessionType === 4 ? false : true"
-      width="60px"
+      :type="props.sessionType === 3 || props.sessionType === 4 ? 'noUpload' : 'upload'"
+      :src="getSessionImageUrl(props.sessionType)"
     />
     <div class="session-content">
       <div class="session-name">
@@ -28,7 +26,7 @@
 
 <script lang="ts" setup>
   import { formatTime } from '@/helper/format.ts';
-  import UserAvatar from '../user/UserAvatar.vue';
+  import ImageSlider from '../file/image-slider.vue';
 
   const props = defineProps<{
     userId: string;
@@ -54,6 +52,7 @@
       case 4:
         return '/images/interaction.png';
       default:
+        return '';
     }
   }
 
@@ -125,6 +124,12 @@
     border: 1.5px solid rgba(0,0,0,0.1);
     border-top: none;
     white-space: nowrap;
+    .session-image {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+    }
+
     .session-content {
       display: grid;
       grid-template-columns: 100%;

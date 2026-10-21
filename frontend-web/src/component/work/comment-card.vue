@@ -1,8 +1,6 @@
 <template>
   <div class="comment-card">
-    <div class="avatar">
-      <UserAvatar :img-url="props.userAvatarUrl" width="2.5rem"/>
-    </div>
+    <UserAvatar class="avatar" :img-url="props.userAvatarUrl"/>
     <div class="text">
       <div class="top">
         <div> {{ props.userName }} </div>
@@ -26,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-  import UserAvatar from '../user/UserAvatar.vue';
+  import UserAvatar from '../user/user-avatar.vue';
   import AppIcon from '../common/AppIcon.vue';
   import { formatTime } from '@/helper/format';
 

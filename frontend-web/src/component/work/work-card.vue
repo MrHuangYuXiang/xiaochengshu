@@ -1,6 +1,7 @@
 <template>
     <div class="card" ref="cardContainerRefs" :id="props.workId">
         <ImageSlider
+            type="upload"
             :src="`${props.workCoverUrl}`"
             :canHover="true"
             @click="globalWorkModal.show(props.workId)"
@@ -37,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-    import UserAvatar from '../user/UserAvatar.vue';
+    import UserAvatar from '../user/user-avatar.vue';
     import ImageSlider from '../file/image-slider.vue';
     import AppIcon from '../common/AppIcon.vue';
     import SelectFloating from '../common/select-floating.vue';

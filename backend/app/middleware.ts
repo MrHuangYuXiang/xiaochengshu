@@ -117,8 +117,8 @@ const authMiddleware = (req: Request, res: Response): Payload => {
 
 // 参数验证中间件
 const validateMiddleware = (req: Request, res: Response) => {
-    // 允许浏览器OPTIONS请求
-    if (req.method === "OPTIONS") {
+    // 跳过非POST请求和非json序列化请求参数
+    if (req.method === "OPTIONS" || req.headers["content-type"] !== "application/json") {
         return
     }
 
@@ -130,11 +130,8 @@ const validateMiddleware = (req: Request, res: Response) => {
     if (zodObject == undefined) {
         return
     }
-
     // POST请求解析请求体
-    if (req.method === "POST") {
-        res.locals.body = zodObject.parse(req.body)
-    }
+    res.locals.body = zodObject.parse(req.body)
 }
 
 // 后台系统需要管理员权限的路径

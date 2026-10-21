@@ -12,7 +12,11 @@
         ]"
         @click="clickMessage"
     >
-        <UserAvatar :user-id="props.userId" width="3rem" :img-url="props.userAvatarUrl" />
+        <UserAvatar
+            class="user-avatar"
+            :user-id="props.userId"
+            :img-url="props.userAvatarUrl" 
+        />
         
         <!-- 文本消息 -->
         <div
@@ -61,8 +65,8 @@
         @click="clickMessage"
     >
         <UserAvatar 
+            class="user-avatar"
             :user-id="interactionPayload.user_id" 
-            width="3rem" 
             :img-url="interactionPayload.user_avatar_path" 
         />
         <div class="interaction-content">
@@ -72,15 +76,15 @@
         </div>
         <imageSlider
             class="interaction-work"
+            type="noUpload"
             :src="interactionPayload.work_cover_image_path"
-            :height="'4rem'"
         />
     </div>
 </template>
 
 <script lang="ts" setup>
     import { storage } from '@/storage';
-    import UserAvatar from '../user/UserAvatar.vue';
+    import UserAvatar from '../user/user-avatar.vue';
     import AppIcon from '../common/AppIcon.vue';
     import WorkCard from '../work/work-card.vue';
     import imageSlider from '../file/image-slider.vue';
@@ -147,6 +151,10 @@ import { computed } from 'vue';
         display: flex;
         align-items: start;
         gap: 0.6rem;
+        .user-avatar {
+            width: 2rem;
+            height: 2rem;
+        }
         .text-content {
             white-space: nowrap;
             font-size: 0.9rem;
@@ -212,7 +220,11 @@ import { computed } from 'vue';
         padding: 2rem;
         border-radius: 15px;
         border-bottom: 1px solid rgba(0,0,0,0.1);
-               .interaction-content {
+        .user-avatar {
+            width: 3rem;
+            height: 3rem;
+        }
+        .interaction-content {
             display: grid;
             grid-template-columns: auto;
         }

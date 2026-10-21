@@ -1,7 +1,7 @@
 <template>
     <div class="image">
-        <img 
-            :src="getImageUrl()"
+        <img
+            :src="getImageUrl"
             :style="{ 
                 objectFit: props.objectFit
             }"
@@ -29,20 +29,32 @@
 </template>
 
 <script setup lang="ts">
+    import { computed, onUnmounted, watch } from 'vue';
     import AppIcon from '../common/AppIcon.vue';
     import { globalImagePreview } from "@/component/global.ts"
 
     const uploadUrl = import.meta.env.VITE_UPLOAD_URL
+    // 已使用过的url
+    const usedUrls: string[] = []
     const props = withDefaults(defineProps<{
+        // 图片类型: 上传图片 | 本地图片 | 非上传图片
+        type: 'upload' | 'local' | 'noUpload'
+        // 图片url
         src: string,
+        // 填充方式
         objectFit?: 'contain' | 'cover',
-        isUploadImage?: boolean,
+        // 是否有悬停效果
         canHover?: boolean,
+        // 是否可大图预览
         canPreview?: boolean,
+        // 是否可滑动切换
         canSwitch?: boolean,
+        // 当前图片索引
         currentIndex?: number,
+        // 总图片数量
         totalCount?: number,
     }>(), {
+        localFile: undefined,
         objectFit: "cover",
         isUploadImage: true,
         canHover: false,
@@ -59,16 +71,35 @@
     // 点击图片
     const clickImage = () => {
         if (props.canPreview && props.src) {
-            globalImagePreview.show(getImageUrl())
+            globalImagePreview.show(getImageUrl.value)
         }
     }
 
     // 图片url
-    const getImageUrl = () => {
-        if (props.isUploadImage) {
-            return `${uploadUrl}${props.src}`
-        } else {
-            return props.src
+    const getImageUrl = computed(() => {
+        switch (props.type) {
+            case 'upload':
+                return `${uploadUrl}${props.src}`
+            case 'local':
+            case 'noUpload':
+                return props.src
+            default:
+                return ''
+        }
+    })
+
+    onUnmounted(() => {
+        clearLocalUrl()
+    })
+
+    watch(() => props.src, (newVal) => {
+        usedUrls.push(newVal)
+    })
+
+    // 清理本地url资源
+    const clearLocalUrl = () => {
+        for (const url of usedUrls) {
+            URL.revokeObjectURL(url)
         }
     }
 </script>
@@ -79,11 +110,11 @@
         width: auto;
         position: relative;
         background-color: var(--root-bg-gray);
-        border-radius: 15px;
+        border-radius: 1rem;
+        overflow: hidden;
         img {
             width: 100%;
             height: 100%;
-            border-radius: 15px;
             transition: all 0.3s ease-in-out;
             display: block;
             border-radius: 15px;

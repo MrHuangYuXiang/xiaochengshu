@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-  import UserAvatar from './UserAvatar.vue';
+  import UserAvatar from './user-avatar.vue';
   import AppButton from '../form/form-button.vue';
 
   const props = withDefaults(defineProps<{

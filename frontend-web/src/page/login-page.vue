@@ -5,7 +5,6 @@
           <div style="font-size: 18px; font-weight: bold;">打开小橙书app</div>
           <div style="font-size: 13px; color: var(--root-gray);">扫描下方二维码登录</div>
           <img src="/images/login-qr-code.png"/>
-          <div class="download-app">点击下载小橙书app</div>
         </div>
         <div class="border"></div>
         <div class="right">
@@ -27,7 +26,6 @@
           <FormButton text="登录" @click="clickLogin" type="glass" color="orange" />
           <AppDivider text="用其他方式登录" color="black" />
           <FormButton color="default" text="微信登录" type="glass" />
-          <div class="bottom">如果你是新用户,将会自动注册</div>
         </div>
       </div>
     </div>
@@ -106,17 +104,6 @@
             width: 125px;
             aspect-ratio: 1 / 1;
           }
-          .download-app {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 13px;
-            cursor: pointer;
-          }
-          .download-app:hover {
-            color: var(--root-orange);
-          }
         }
         .border {
           height: 100%;
@@ -131,13 +118,9 @@
           row-gap: 0.5rem;
           .title {
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: bold;
-          }
-          .bottom {
-            text-align: center;
-            color: var(--root-gray);
-            font-size: 0.8rem;
+            margin-bottom: 1rem;
           }
         }
       }

@@ -199,7 +199,7 @@ export class UserService extends BaseService {
                 parser,
                 [FileExtEnum.JPG, FileExtEnum.PNG]
             )
-            user["avatar_url"] = avatarPath
+            user["avatar_path"] = avatarPath
         }
 
         await current.tx.update(UserTable).set(user).where(eq(UserTable.id, current.payload.userId))

@@ -22,7 +22,7 @@
           :workCoverUrl="work.cover_image.path"
           :userId="work.user.id"
           :userName="work.user.name"
-          :userAvatarUrl="work.user.avatar_url"
+          :userAvatarUrl="work.user.avatar_path"
           @deleteWork="deleteWork(work.work.id)"
         />
       </div>

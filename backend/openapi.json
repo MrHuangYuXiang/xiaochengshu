@@ -49,7 +49,7 @@
                         "desc",
                         "birthday",
                         "gender",
-                        "avatar_url",
+                        "avatar_path",
                         "is_complete_profile"
                       ],
                       "properties": {
@@ -74,7 +74,7 @@
                         "gender": {
                           "type": "integer"
                         },
-                        "avatar_url": {
+                        "avatar_path": {
                           "type": "string"
                         },
                         "is_complete_profile": {
@@ -211,7 +211,7 @@
                             "desc",
                             "birthday",
                             "gender",
-                            "avatar_url",
+                            "avatar_path",
                             "is_complete_profile",
                             "is_follow",
                             "is_followed"
@@ -238,7 +238,7 @@
                             "gender": {
                               "type": "integer"
                             },
-                            "avatar_url": {
+                            "avatar_path": {
                               "type": "string"
                             },
                             "is_complete_profile": {
@@ -376,7 +376,7 @@
                           "desc",
                           "birthday",
                           "gender",
-                          "avatar_url",
+                          "avatar_path",
                           "is_complete_profile",
                           "is_follow",
                           "is_followed"
@@ -403,7 +403,7 @@
                           "gender": {
                             "type": "integer"
                           },
-                          "avatar_url": {
+                          "avatar_path": {
                             "type": "string"
                           },
                           "is_complete_profile": {
@@ -572,7 +572,7 @@
                             "desc",
                             "birthday",
                             "gender",
-                            "avatar_url",
+                            "avatar_path",
                             "is_complete_profile",
                             "is_follow",
                             "is_followed"
@@ -599,7 +599,7 @@
                             "gender": {
                               "type": "integer"
                             },
-                            "avatar_url": {
+                            "avatar_path": {
                               "type": "string"
                             },
                             "is_complete_profile": {
@@ -767,7 +767,7 @@
                               "desc",
                               "birthday",
                               "gender",
-                              "avatar_url",
+                              "avatar_path",
                               "is_complete_profile"
                             ],
                             "properties": {
@@ -792,7 +792,7 @@
                               "gender": {
                                 "type": "integer"
                               },
-                              "avatar_url": {
+                              "avatar_path": {
                                 "type": "string"
                               },
                               "is_complete_profile": {
@@ -933,6 +933,37 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "content",
+                  "permission",
+                  "workImageCount"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "permission": {
+                    "type": "integer"
+                  },
+                  "workImageCount": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -947,6 +978,33 @@
                 "schema": {
                   "required": [],
                   "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "请求体参数",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "content",
+                  "permission"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "permission": {
+                    "type": "integer"
+                  }
                 }
               }
             }
@@ -1194,7 +1252,7 @@
                               "desc",
                               "birthday",
                               "gender",
-                              "avatar_url",
+                              "avatar_path",
                               "is_complete_profile"
                             ],
                             "properties": {
@@ -1219,7 +1277,7 @@
                               "gender": {
                                 "type": "integer"
                               },
-                              "avatar_url": {
+                              "avatar_path": {
                                 "type": "string"
                               },
                               "is_complete_profile": {
@@ -1353,7 +1411,7 @@
                             "desc",
                             "birthday",
                             "gender",
-                            "avatar_url",
+                            "avatar_path",
                             "is_complete_profile"
                           ],
                           "properties": {
@@ -1378,7 +1436,7 @@
                             "gender": {
                               "type": "integer"
                             },
-                            "avatar_url": {
+                            "avatar_path": {
                               "type": "string"
                             },
                             "is_complete_profile": {
@@ -1499,7 +1557,7 @@
                             "desc",
                             "birthday",
                             "gender",
-                            "avatar_url",
+                            "avatar_path",
                             "is_complete_profile"
                           ],
                           "properties": {
@@ -1524,7 +1582,7 @@
                             "gender": {
                               "type": "integer"
                             },
-                            "avatar_url": {
+                            "avatar_path": {
                               "type": "string"
                             },
                             "is_complete_profile": {
@@ -1756,7 +1814,7 @@
                         "desc",
                         "birthday",
                         "gender",
-                        "avatar_url",
+                        "avatar_path",
                         "is_complete_profile"
                       ],
                       "properties": {
@@ -1781,7 +1839,7 @@
                         "gender": {
                           "type": "integer"
                         },
-                        "avatar_url": {
+                        "avatar_path": {
                           "type": "string"
                         },
                         "is_complete_profile": {
@@ -2103,7 +2161,7 @@
                               "desc",
                               "birthday",
                               "gender",
-                              "avatar_url",
+                              "avatar_path",
                               "is_complete_profile"
                             ],
                             "properties": {
@@ -2128,7 +2186,7 @@
                               "gender": {
                                 "type": "integer"
                               },
-                              "avatar_url": {
+                              "avatar_path": {
                                 "type": "string"
                               },
                               "is_complete_profile": {
@@ -2453,7 +2511,7 @@
                             "desc",
                             "birthday",
                             "gender",
-                            "avatar_url",
+                            "avatar_path",
                             "is_complete_profile"
                           ],
                           "properties": {
@@ -2478,7 +2536,7 @@
                             "gender": {
                               "type": "integer"
                             },
-                            "avatar_url": {
+                            "avatar_path": {
                               "type": "string"
                             },
                             "is_complete_profile": {
@@ -2956,7 +3014,7 @@
                         "desc",
                         "birthday",
                         "gender",
-                        "avatar_url",
+                        "avatar_path",
                         "is_complete_profile"
                       ],
                       "properties": {
@@ -2981,7 +3039,7 @@
                         "gender": {
                           "type": "integer"
                         },
-                        "avatar_url": {
+                        "avatar_path": {
                           "type": "string"
                         },
                         "is_complete_profile": {
@@ -3390,7 +3448,7 @@
                               "desc",
                               "birthday",
                               "gender",
-                              "avatar_url",
+                              "avatar_path",
                               "is_complete_profile"
                             ],
                             "properties": {
@@ -3415,7 +3473,7 @@
                               "gender": {
                                 "type": "integer"
                               },
-                              "avatar_url": {
+                              "avatar_path": {
                                 "type": "string"
                               },
                               "is_complete_profile": {
@@ -3872,7 +3930,7 @@
               "desc",
               "birthday",
               "gender",
-              "avatar_url",
+              "avatar_path",
               "is_complete_profile"
             ],
             "properties": {
@@ -3897,7 +3955,7 @@
               "gender": {
                 "type": "integer"
               },
-              "avatar_url": {
+              "avatar_path": {
                 "type": "string"
               },
               "is_complete_profile": {

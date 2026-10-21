@@ -72,7 +72,7 @@ export interface paths {
                                 desc: string;
                                 birthday: string;
                                 gender: number;
-                                avatar_url: string;
+                                avatar_path: string;
                                 is_complete_profile: number;
                             };
                             unreadMessageCount: number;
@@ -215,7 +215,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                     is_follow: number;
                                     is_followed: number;
@@ -326,7 +326,7 @@ export interface paths {
                                 desc: string;
                                 birthday: string;
                                 gender: number;
-                                avatar_url: string;
+                                avatar_path: string;
                                 is_complete_profile: number;
                                 is_follow: number;
                                 is_followed: number;
@@ -469,7 +469,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                     is_follow: number;
                                     is_followed: number;
@@ -553,7 +553,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                 };
                                 work: {
@@ -604,7 +604,17 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        title: string;
+                        content: string;
+                        permission: number;
+                        workImageCount: number;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -639,7 +649,16 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            /** @description 请求体参数 */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        title: string;
+                        content: string;
+                        permission: number;
+                    };
+                };
+            };
             responses: {
                 /** @description 响应模型 */
                 200: {
@@ -885,7 +904,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                 };
                                 comment: {
@@ -955,7 +974,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                 };
                                 comment: {
@@ -1027,7 +1046,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                 };
                                 comment: {
@@ -1155,7 +1174,7 @@ export interface paths {
                                 desc: string;
                                 birthday: string;
                                 gender: number;
-                                avatar_url: string;
+                                avatar_path: string;
                                 is_complete_profile: number;
                             };
                             latestMessage: {
@@ -1276,7 +1295,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                 };
                                 latestMessage: {
@@ -1397,7 +1416,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                 };
                                 latestMessage: {
@@ -1632,7 +1651,7 @@ export interface paths {
                                 desc: string;
                                 birthday: string;
                                 gender: number;
-                                avatar_url: string;
+                                avatar_path: string;
                                 is_complete_profile: number;
                             };
                         };
@@ -1737,7 +1756,7 @@ export interface paths {
                                     desc: string;
                                     birthday: string;
                                     gender: number;
-                                    avatar_url: string;
+                                    avatar_path: string;
                                     is_complete_profile: number;
                                 };
                             }[];
@@ -1991,7 +2010,7 @@ export interface components {
                 desc: string;
                 birthday: string;
                 gender: number;
-                avatar_url: string;
+                avatar_path: string;
                 is_complete_profile: number;
             };
         };
