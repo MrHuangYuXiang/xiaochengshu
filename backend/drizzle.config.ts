@@ -6,9 +6,9 @@ export default defineConfig({
     schema: [
         './app/domain/model/db-schema/chat.ts',
         './app/domain/model/db-schema/work.ts',
+        './app/domain/model/db-schema/report.ts',
         './app/domain/model/db-schema/user.ts',
         './app/domain/model/db-schema/admin-user.ts',
-        './app/domain/model/db-schema/admin-report.ts',
     ],
     dialect: 'mysql',
     dbCredentials: {

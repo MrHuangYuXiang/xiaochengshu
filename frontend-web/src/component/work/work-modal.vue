@@ -33,8 +33,7 @@
           class="user"
           :user-id="work.user.id"
           :user-name="work.user.name"
-          :user-avatar-url="work.user.avatar_url"
-          avatarSize="3rem"
+          :user-avatar-url="work.user.avatar_path"
           :is-follow="work.user.is_follow"
           :is-followed="work.user.is_followed"
           :follow-callback="followCallback"
@@ -55,8 +54,9 @@
             <div class="comment-list">
               <CommentCard
                 v-for="comment in comments" :key="comment.comment.id"
+                :userId="comment.user.id"
                 :userName="comment.user.name"
-                :userAvatarUrl="comment.user.avatar_url"
+                :userAvatarUrl="comment.user.avatar_path"
                 :commentId="comment.comment.id"
                 :commentContent="comment.comment.content"
                 :commentCreatedAt="comment.comment.created_at"
@@ -81,7 +81,7 @@
                     class="reply-item"
                     :parentUserName="reply.data.comment.parent_id === comment.comment.id ? '' : reply.parent!.data.user.name"
                     :userName="reply.data.user.name"
-                    :userAvatarUrl="reply.data.user.avatar_url"
+                    :userAvatarUrl="reply.data.user.avatar_path"
                     :commentId="reply.data.comment.id"
                     :commentContent="reply.data.comment.content"
                     :commentCreatedAt="reply.data.comment.created_at"
@@ -124,7 +124,7 @@
             :workCoverUrl="getCoverAttachment().path"
             :userId="work.user.id"
             :userName="work.user.name"
-            :userAvatarUrl="work.user.avatar_url"
+            :userAvatarUrl="work.user.avatar_path"
           />
           <div :class="{'reply-content': true, 'focus': isInputFocus && replyTarget !== undefined}">
             回复{{ replyTarget?.replyUserName }} {{ replyTarget?.replyContent }} : 
@@ -139,6 +139,7 @@
               ref="textareaRef"
               @click="triggerFocus()"
               v-model="inputContent"
+              :rule="rule"
             />
             <div :class="{'focus': isInputFocus, 'interaction': true}">
               <div class="item" @click="likeWork">
@@ -190,6 +191,7 @@
   import { EnhancedList } from '@/lib/structure.ts';
   import { ElMessage } from 'element-plus';
   import { globalWorkModal } from '../global.ts';
+  import z from 'zod';
 
   const textareaRef = useTemplateRef('textareaRef')
   const work = ref<WorkSchema>()
@@ -203,9 +205,10 @@
   // 当前图片索引
   const currentImageIndex = ref(0)
 
-  // 输入框聚焦标志位及输入内容
+  // 表单相关
   const isInputFocus = ref(false)
   const inputContent = ref('')
+  const rule = z.string().min(1, "请输入评论内容").max(200, "评论内容长度不能超过200")
 
   // 回复的目标评论,仅当回复时有值,评论作品时为undefined
   const replyTarget = ref<{
@@ -291,6 +294,9 @@
     let comment: workCommentSchema | undefined
 
     if (!work.value) return
+
+    // 表单校验
+    if (!textareaRef.value?.validate()) return
 
     if (!replyTarget.value) {
       comment = (await axiosProxy.post<

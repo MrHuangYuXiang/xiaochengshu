@@ -3,7 +3,6 @@
         :userId="props.userId"
         :userName="props.userName"
         :userAvatarUrl="props.userAvatarUrl"
-        :avatarSize="props.avatarSize"
         :btnText="getBtnText()"
         :btnColor="getBtnColor()"
         :isShowBtn="storage.initData.value?.user.id !== props.userId"
@@ -23,7 +22,6 @@
         userId: string,
         userName: string,
         userAvatarUrl: string,
-        avatarSize: string,
         isFollow: number,
         isFollowed: number,
         // 父组件需要传入回调函数去修改关注状态并返回新值

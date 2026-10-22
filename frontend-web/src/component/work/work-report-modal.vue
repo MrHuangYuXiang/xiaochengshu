@@ -4,12 +4,12 @@
             <div class="title">举报作品</div>
             <FormRadio v-for="type in reportTypes?.types" :key="type.id" :value="type.id" :text="type.text" v-model="selectedType" />
             <FormInput 
-                ref="reportContentRef"
+                ref="inputRef"
                 placeholder="请输入举报内容" 
                 type="textarea"
                 v-model="reportContent"
                 class="textarea"
-                :rule="reportContentRule"
+                :rule="rule"
              />
              <FormButton text="提交" @click="submitReport" color="default" />
         </div>
@@ -24,23 +24,15 @@
     import { onMounted, ref, useTemplateRef } from 'vue';
     import type { paths } from '@/api/gen.ts';
     import { axiosProxy } from '@/api/axios.ts';
-    import { validateForm } from '@/helper/form.ts';
     import { ElMessage } from 'element-plus';
     import { globalWorkReportModal } from '../global.ts';
+    import z from 'zod';
 
     const reportTypes = ref<paths["/get/report/types"]["post"]["responses"]["200"]["content"]["application/json"]>()
     const selectedType = ref<number>(1)
     const reportContent = ref<string>("")
-    const reportContentRule = {
-        required: {
-            errorString: "请输入举报内容"
-        },
-        maxLength: {
-            value: 100,
-            errorString: "举报内容最多100个字符"
-        },
-    }
-    const reportContentRef = useTemplateRef("reportContentRef")
+    const rule = z.string().min(1, "请输入举报内容").max(200, "举报内容长度不能超过200")
+    const inputRef = useTemplateRef("inputRef")
 
     const getReportTypes = async () => {
         reportTypes.value = await axiosProxy.post<
@@ -51,7 +43,8 @@
 
     // 提交举报
     const submitReport = async () => {
-        if (!validateForm(reportContentRef.value!)) return
+        // 表单校验
+        if (!inputRef.value?.validate()) return
 
         await axiosProxy.post<
             paths["/report"]["post"]["requestBody"]["content"]["application/json"],

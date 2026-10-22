@@ -6,7 +6,7 @@ import { reportSchema } from "./common.js"
 export const reportWorkInput = objectType({
     workId: stringType,
     reportType: numberType,
-    reason: stringType.min(1, "举报原因至少为1个字符").max(200, "举报原因最多为200个字符"),
+    reason: stringType.min(1, "请输入举报原因").max(200, "举报原因最多为200个字符"),
 })
 
 // 查询举报类型输出

@@ -1,9 +1,9 @@
 <template>
   <div class="user-card">
     <UserAvatar 
+      class="avatar"
       :userId="props.userId" 
       :imgUrl="props.userAvatarUrl" 
-      :width="props.avatarSize"
     />
     <div class="name">{{ props.userName }}</div>
     <AppButton
@@ -24,7 +24,6 @@
     userId: string,
     userName: string,
     userAvatarUrl: string,
-    avatarSize?: string,
     isShowBtn?: boolean,
     btnText: string,
     btnColor?: "default" | "orange",
@@ -46,6 +45,10 @@
     grid-template-rows: auto;
     column-gap: 0.5rem;
     align-items: center;
+    .avatar {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
     .btn {
       grid-column: 4;
     }

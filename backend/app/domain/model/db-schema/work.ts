@@ -1,5 +1,5 @@
 import { int, mysqlTable, varchar, date, datetime, tinyint, unique } from 'drizzle-orm/mysql-core';
-import { baseTable } from './base.js';
+import { baseTable, idType } from './base.js';
 
 // 作品表
 export const WorkTable = mysqlTable('work', {
@@ -8,14 +8,14 @@ export const WorkTable = mysqlTable('work', {
     title: varchar({ length: 20 }).notNull(),
     content: varchar({ length: 200 }).notNull(),
     permission: tinyint().notNull(),
-    user_id: varchar({ length: 255 }).notNull(),
+    user_id: idType(),
 });
 
 // 作品附件表
 export const WorkAttachmentTable = mysqlTable('work_attachment', {
     ...baseTable,
     type: tinyint().notNull(),
-    work_id: varchar({ length: 255 }).notNull(),
+    work_id: idType(),
     path: varchar({ length: 255 }).notNull(),
     // 优先级,区分封面
     priority: tinyint().notNull(),
@@ -24,8 +24,8 @@ export const WorkAttachmentTable = mysqlTable('work_attachment', {
 // 点赞表
 export const WorkLikeTable = mysqlTable('work_like', {
     ...baseTable,
-    work_id: varchar({ length: 255 }).notNull(),
-    user_id: varchar({ length: 255 }).notNull(),
+    work_id: idType(),
+    user_id: idType(),
 }, (t) => [
     unique().on(t.work_id, t.user_id),
 ]);
@@ -33,8 +33,8 @@ export const WorkLikeTable = mysqlTable('work_like', {
 // 收藏表
 export const WorkCollectTable = mysqlTable('work_collect', {
     ...baseTable,
-    work_id: varchar({ length: 255 }).notNull(),
-    user_id: varchar({ length: 255 }).notNull(),
+    work_id: idType(),
+    user_id: idType(),
 }, (t) => [
     unique().on(t.work_id, t.user_id),
 ]);
@@ -45,20 +45,20 @@ export const WorkCollectTable = mysqlTable('work_collect', {
 export const WorkCommentTable = mysqlTable('work_comment', {
     ...baseTable,
     content: varchar({ length: 200 }).notNull(),
-    work_id: varchar({ length: 255 }).notNull(),
+    work_id: idType(),
     // 父评论id
-    parent_id: varchar({ length: 255 }).notNull(),
+    parent_id: idType(),
     // 根评论id
-    root_comment_id: varchar({ length: 255 }).notNull(),
-    user_id: varchar({ length: 255 }).notNull(),
+    root_comment_id: idType(),
+    user_id: idType(),
 });
 
 // 评论点赞表
 export const WorkCommentLikeTable = mysqlTable('work_comment_like', {
     ...baseTable,
-    comment_id: varchar({ length: 255 }).notNull(),
-    user_id: varchar({ length: 255 }).notNull(),
-    work_id: varchar({ length: 255 }).notNull(),
+    comment_id: idType(),
+    user_id: idType(),
+    work_id: idType(),
 }, (t) => [
     unique().on(t.comment_id, t.user_id),
 ]);

@@ -17,7 +17,7 @@
         <div class="info" ref="textRefs">
             <div class="title">{{ props.workTitle }}</div>
             <div class="bottom">
-                <UserAvatar width="1.2rem" :userId="props.userId" :imgUrl="props.userAvatarUrl" />
+                <UserAvatar class="user-avatar" :userId="props.userId" :imgUrl="props.userAvatarUrl" />
                 <div>{{ props.userName }}</div>
                 <AppIcon
                     class="more-icon"
@@ -103,6 +103,8 @@
         border-radius: 15px;
         row-gap: 0.25rem;
         .image {
+            width: 100%;
+            max-height: 14rem;
             .play-icon {
                 position: absolute;
                 top: 0;
@@ -127,6 +129,10 @@
             align-items: center;
             font-size: 0.8rem;
             column-gap: 0.5rem;
+            .user-avatar {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
             .more-icon {
                 grid-column: 4;
             }

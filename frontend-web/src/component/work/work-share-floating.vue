@@ -15,7 +15,7 @@
                 :key="session.session.id"
                 :userId="session.user.id"
                 :userName="session.user.name"
-                :userAvatarUrl="session.user.avatar_url"
+                :userAvatarUrl="session.user.avatar_path"
                 avatarSize="2rem"
                 btnText="分享"
                 @clickBtn="shareWork(session.session.id)"

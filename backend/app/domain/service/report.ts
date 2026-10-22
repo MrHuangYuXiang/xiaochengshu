@@ -3,7 +3,7 @@ import { getReportDetailInput, getReportDetailOutput, getReportTypesOutput, repo
 import { getCurrent } from "../../lib/local-stroage.js"
 import { ReportStatusEnum, ReportTypeEnum } from "../model/enum/admin-report.js"
 import { AppError } from "../../lib/app-error.js"
-import { AdminReportTable } from "../model/db-schema/admin-report.js"
+import { ReportTable } from "../model/db-schema/report.js"
 import type { Request, Response } from "express"
 import { BaseService } from "./base.js"
 import { ChatSessionMemberTable, ChatSessionTable } from "../model/db-schema/chat.js"
@@ -18,7 +18,7 @@ export class ReportService extends BaseService {
         const body = getRequestBody<typeof reportWorkInput>(res)
         const reportId = uuidv4()
 
-        await current.tx.insert(AdminReportTable).values({
+        await current.tx.insert(ReportTable).values({
             id: reportId,
             work_id: body.workId,
             reporter_id: current.payload.userId,

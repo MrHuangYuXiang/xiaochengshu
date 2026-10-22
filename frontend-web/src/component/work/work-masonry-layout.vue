@@ -14,6 +14,7 @@
       />
       <div class="masonry-box">
         <WorkCard
+          class="work-card"
           v-for="work in works"
           :key="work.work.id"
           :workId="work.work.id"
@@ -104,8 +105,14 @@
     grid-template-columns: 100%;
     .masonry-box {
       display: grid;
-      grid-template-columns: repeat(auto-fill, 270px);
+      grid-template-columns: repeat(auto-fill, 13rem);
+      grid-auto-rows: auto;
+      align-items: start;
+      align-content: start;
       gap: 0.5rem;
+    }
+    .work-card {
+      width: 100%;
     }
   }
 </style>

@@ -17,8 +17,7 @@
             v-if="globalFollowModal.type.value === 'following' || globalFollowModal.userId.value !== storage.initData.value?.user.id"
             :userId="user.id"
             :userName="user.name"
-            :userAvatarUrl="user.avatar_url"
-            avatarSize="2rem"
+            :userAvatarUrl="user.avatar_path"
             :isFollow="user.is_follow"
             :isFollowed="user.is_followed"
             :followCallback="followUser"
@@ -27,7 +26,7 @@
             v-else
             :userId="user.id"
             :userName="user.name"
-            :userAvatarUrl="user.avatar_url"
+            :userAvatarUrl="user.avatar_path"
             btn-text="移除粉丝"
             @click-btn="removeFollower(user.id)"
           />
@@ -47,8 +46,8 @@
   import type { paths } from '@/api/gen.ts';
   import { EnhancedList } from '@/lib/structure.ts';
   import { globalFollowModal } from '../global.ts';
-import { ElMessage } from 'element-plus';
-import { storage } from '@/storage.ts';
+  import { ElMessage } from 'element-plus';
+  import { storage } from '@/storage.ts';
 
   const users = ref<EnhancedList<
       paths["/get/user/follows"]["post"]["responses"]["200"]["content"]["application/json"]["users"][number]

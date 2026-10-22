@@ -16,6 +16,7 @@
           <ImageSlider
             class="image"
             v-for="(file, index) in files"
+            type="local"
             :key="index"
             :src="file.url"
             :is-upload-image="false"
@@ -78,8 +79,8 @@
     permission: 1,
   })
   const rules = {
-    title: z.string(),
-    content: z.string(),
+    title: z.string().min(1, "请输入作品标题").max(20, "作品标题长度不能超过20"),
+    content: z.string().min(1, "请输入作品内容").max(200, "作品内容长度不能超过200"),
   }
 
   // 分段器当前选中项
@@ -102,9 +103,6 @@
     form.value.title = '';
     form.value.content = '';
     form.value.permission = 1;
-    for (const file of files.value) {
-      URL.revokeObjectURL(file.url);
-    }
     files.value = [];
   }
 
@@ -115,16 +113,15 @@
       if (!files.value.find((item) => item.file.name === file.name)) {
         files.value.push({file, url: URL.createObjectURL(file)});
       } else {
-        throw new Error('同名文件已存在')
+        throw new AppError('同名文件已存在')
       }
   }
 
-  // 注意url对象需要手动释放内存,否则导致内存泄漏
+  // 内存URL对象由子组件释放
   const deleteFile = (index: number) => {
     const file = files.value[index];
     if (!file) { return }
     files.value.splice(index, 1);
-    URL.revokeObjectURL(file.url);
   }
   
   // 后端约定formData第一张图片是封面图片

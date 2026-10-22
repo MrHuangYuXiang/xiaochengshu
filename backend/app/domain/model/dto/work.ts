@@ -146,8 +146,8 @@ export const likeWorkCommentInput = objectType({
 
 // 创建作品公共字段
 export const createWorkFields = {
-    title: stringType,
-    content: stringType,
+    title: stringType.min(1, "请输入作品标题").max(20, "作品标题长度不能超过20"),
+    content: stringType.min(1, "请输入作品内容").max(200, "作品内容长度不能超过200"),
     permission: numberType.refine((value) => {
         if (WorkPermissionEnum[value]) return true
         else return false

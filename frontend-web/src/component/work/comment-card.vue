@@ -1,6 +1,10 @@
 <template>
   <div class="comment-card">
-    <UserAvatar class="avatar" :img-url="props.userAvatarUrl"/>
+    <UserAvatar 
+      class="avatar"
+      :userId="props.userId" 
+      :imgUrl="props.userAvatarUrl"
+    />
     <div class="text">
       <div class="top">
         <div> {{ props.userName }} </div>
@@ -39,6 +43,7 @@
       commentContent: string;
       commentCreatedAt: string;
       userName: string;
+      userId: string;
       userAvatarUrl: string;
       parentUserName: string;
       isLiked: number;
@@ -52,8 +57,9 @@
     display: flex;
     gap: 10px;
     .avatar {
-      width: 40px;
-      height: 40px;
+      flex: 0 0 auto;
+      width: 2rem;
+      height: 2rem;
     }
     .text {
       width: 100%;
