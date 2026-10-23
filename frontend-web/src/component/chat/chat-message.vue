@@ -91,7 +91,7 @@
     import type { paths } from '@/api/gen.ts';
     import { useAttrs } from 'vue';
     import { formatTime } from '@/helper/format.ts';
-import { computed } from 'vue';
+    import { computed } from 'vue';
 
     const props = defineProps<{
         userId: string;

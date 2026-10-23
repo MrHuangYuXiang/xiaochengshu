@@ -76,9 +76,15 @@
       await axiosProxy.post<
           paths["/delete/work"]["post"]["requestBody"]["content"]["application/json"],
           paths["/delete/work"]["post"]["responses"]["200"]["content"]["application/json"]
-      >("/delete/work", {
+      >(
+        "/delete/work",
+        {
           workId: workId
-      })
+        },
+        {
+          showLoading: 'circle'
+        }
+      )
       works.value.delete(workId)
       ElMessage("删除成功")
   }

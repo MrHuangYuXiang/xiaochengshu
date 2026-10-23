@@ -116,7 +116,19 @@ class GlobalFollowModal extends GlobalBase {
   }
 }
 
+// 修改用户信息弹窗
 class GlobalUpdateUserModal extends GlobalBase {
+}
+
+// 加载弹窗
+class GlobalLoadingModal extends GlobalBase {
+  show() {
+    this.isShow.value = true
+  }
+
+  close() {
+    this.isShow.value = false
+  }
 }
 
 export const globalUpdateUserModal = new GlobalUpdateUserModal()
@@ -126,3 +138,4 @@ export const globalWorkModal = new GlobalWorkModal()
 export const globalReportModal = new GlobalReportModal()
 export const globalWorkReportModal = new GlobalWorkReportModal()
 export const globalFollowModal = new GlobalFollowModal()
+export const globalLoadingModal = new GlobalLoadingModal()

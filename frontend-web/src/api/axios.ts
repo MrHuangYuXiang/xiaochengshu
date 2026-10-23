@@ -2,6 +2,7 @@ import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse 
 import { storage } from '@/storage';
 import { BackendError } from '@/error';
 import { logger } from "@/logger";
+import { globalLoadingModal } from "@/component/global";
 
 class AxiosProxy {
   axiosInstance: AxiosInstance
@@ -33,14 +34,24 @@ class AxiosProxy {
     })
   }
 
-  async post<T, Q>(url: string, bodyData: T, config: AxiosRequestConfig = {}): Promise<Q> {
+  async post<T, Q>(url: string, bodyData: T, ext: ExtArg = {}): Promise<Q> {
+    if (ext.showLoading) {
+      globalLoadingModal.show()
+    }
+
     let body = {}
     if (bodyData) {
       body = bodyData
     }
-
-    return await this.axiosInstance.post(url, body, config) as Q
+    const data = await this.axiosInstance.post(url, body) as Q
+    globalLoadingModal.close()
+    return data
   }
+}
+
+// post扩展参数类型
+type ExtArg = {
+  showLoading?: 'circle'
 }
 
 export const axiosProxy = new AxiosProxy(import.meta.env.VITE_API_URL) // 后端api axios代理

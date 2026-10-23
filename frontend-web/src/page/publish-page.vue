@@ -153,12 +153,12 @@
       for (const item of files.value) {
         formData.append(`workImage`, item.file);
       }
-      await axiosProxy.post("/create/image/work", formData)
+      await axiosProxy.post("/create/image/work", formData, { showLoading: 'circle' })
     } else {
       const formData = new FormData();
       formData.append("json", JSON.stringify(form.value));
       formData.append("video", files.value[0].file);
-      await axiosProxy.post("/create/video/work", formData)
+      await axiosProxy.post("/create/video/work", formData, { showLoading: 'circle' })
     }
 
     clear();

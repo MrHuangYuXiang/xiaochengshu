@@ -1,7 +1,7 @@
 <template>
   <BaseModal v-model:show="globalUpdateUserModal.isShow.value" v-if="formValues">
     <div class="form-body">
-      <div class="title">更新用户信息</div>
+      <div class="title">修改信息</div>
       <UserAvatar 
         v-if="storage.initData.value" 
         class="avatar"

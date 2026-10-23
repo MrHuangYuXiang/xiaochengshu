@@ -7,6 +7,7 @@
   <UpdateUserModal v-if="globalUpdateUserModal.isShow.value"></UpdateUserModal>
   <WorkReportModal v-if="globalWorkReportModal.isShow.value"></WorkReportModal>
   <FollowModal v-if="globalFollowModal.isShow.value"></FollowModal>
+  <LoadingModal v-if="globalLoadingModal.isShow.value"></LoadingModal>
 
   <!-- 初始化用户弹窗 -->
   <InitUserModal v-model:show="enableInitUserModalShow" v-if="enableInitUserModalShow"></InitUserModal>
@@ -30,13 +31,14 @@
   import ReportModal from '@/component/report/report-modal.vue';
   import WorkReportModal from '@/component/work/work-report-modal.vue';
   import FollowModal from '@/component/user/follow-modal.vue';
+  import LoadingModal from '@/component/common/loading-modal.vue';
   import { onBeforeMount, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { storage } from '@/storage';
   import { clientEvent } from '@/api/event';
   import type { components, paths } from '@/api/gen';
   import { axiosProxy } from '@/api/axios';
-  import { globalWorkModal, globalReportModal, globalUpdateUserModal, globalWorkReportModal, globalFollowModal, globalErrorDialog } from '@/component/global';
+  import { globalWorkModal, globalReportModal, globalUpdateUserModal, globalWorkReportModal, globalFollowModal, globalErrorDialog, globalLoadingModal } from '@/component/global';
 
   const router = useRouter();
   const enableInitUserModalShow = ref(false)
