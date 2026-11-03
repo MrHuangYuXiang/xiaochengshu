@@ -7,7 +7,7 @@
       @click="redirectUserPage"
     >
       <div v-if="props.isUploadable" class="upload-text" @click="uploadAvatar">点击上传</div>
-      <input type="file" accept="image/jpeg" @change="change" style="display: none;" ref="inputRef"/>
+      <input type="file" accept="image/jpeg, image/png" @change="change" style="display: none;" ref="inputRef"/>
     </ImageSlider>
 </template>
 

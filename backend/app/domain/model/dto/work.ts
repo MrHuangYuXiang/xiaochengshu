@@ -38,16 +38,12 @@ export const getWorkDetailOutput = objectType({
 // 获取用户作品列表输入
 export const getWorksInput = objectType({
     ...page,
-
-    // 类型枚举字段: 
-    // "recommend": 推荐作品
-    // "self": 获取用户发布的作品
-    // "like": 获取用户点赞的作品
-    // "collect": 获取用户收藏的作品
-    // "following": 获取当前用户关注的作者的作品
-    type: stringType,
-
-    // 目标用户id,type为"self","like","collect"时必填
+    // 查询类型
+    type: stringType.refine((value) => {
+        const validTypes = ["recommend", "self-public", "self-private", "like", "collect", "following"]
+        return validTypes.includes(value)
+    }, { message: "type参数非法" }),
+    // 目标用户id
     targetUserId: stringType,
 })
 

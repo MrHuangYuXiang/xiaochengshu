@@ -51,6 +51,7 @@
         workTitle: string
         workType: number
         workCoverUrl: string
+        workPermission: number
         userId: string
         userName: string
         userAvatarUrl: string

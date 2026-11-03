@@ -4,7 +4,7 @@
       {text: '作品', key: 'self'}, 
       {text: '点赞', key: 'like'},
       {text: '收藏', key: 'collect'}
-    ]" 
+    ]"
     v-if="user"
     :targetUserId="user.user.id"
     class="user-page"

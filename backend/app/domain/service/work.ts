@@ -28,7 +28,7 @@ import { v4 as uuidv4 } from "uuid";
 import { handleRawSqlRes } from "../../helper/sql.js";
 import { FormParser, getFormJsonData } from "../../lib/framework-ext.js";
 import { AppError, throwServerError, throwServerBusy } from "../../lib/app-error.js";
-import { WorkAttachmentPriorityEnum, WorkAttachmentTypeEnum, WorkTypeEnum } from "../model/enum/work.js";
+import { WorkAttachmentPriorityEnum, WorkAttachmentTypeEnum, WorkPermissionEnum, WorkTypeEnum } from "../model/enum/work.js";
 import { FileExtEnum } from "../model/enum/file.js";
 import { getTableConfig } from "drizzle-orm/mysql-core";
 import { ClientChatMessageTypeEnum } from "../model/enum/chat.js";
@@ -97,18 +97,20 @@ export class WorkService extends BaseService {
    * 获取作品
    * 所有获取多作品都统一请求该接口,避免sql,作品权限过滤等重复逻辑
    * 散落在多个接口函数中
+   * 输入type字段: 
+      - "recommend": 推荐作品
+      - "self-public": 获取用户发布的公开作品
+      - "self-private": 获取用户发布的私密作品
+      - "like": 获取用户点赞的作品
+      - "collect": 获取用户收藏的作品
+      - "following": 获取当前用户关注的作者的作品
    */
   async getWorks(req: Request, res: Response) {
     const current = getCurrent()
     const body = getRequestBody<typeof getWorksInput>(res)
     const targetUserId = body.targetUserId
     const { offset, limit } = getRequestPage(res)
-    let whereStmt: any[] = []
-
-    // // 当目标用户不是当前用户时,过滤私密作品
-    // if (targetUserId !== current.payload.userId) {
-    //   whereStmt.push(eq(WorkTable.permission, 1))
-    // }
+    let whereStmt: any[] = [eq(WorkTable.permission, WorkPermissionEnum.PUBLIC)]
 
     switch (body.type) {
       /**
@@ -118,9 +120,15 @@ export class WorkService extends BaseService {
       case "recommend":
         break
 
-      // 获取用户发布的作品
-      case "self":
+      // 获取用户发布的公开作品
+      case "self-public":
         whereStmt.push(eq(WorkTable.user_id, targetUserId))
+        break
+
+      // 获取用户发布的私密作品
+      case "self-private":
+        whereStmt.pop()
+        whereStmt.push(eq(WorkTable.user_id, targetUserId), eq(WorkTable.permission, WorkPermissionEnum.PRIVATE))
         break
 
       // 获取用户点赞的作品
@@ -161,9 +169,6 @@ export class WorkService extends BaseService {
           map((item) => item.followingUserId)
         whereStmt.push(inArray(WorkTable.user_id, followingUserIds))
         break
-
-      default:
-        throw new Error("type参数非法")
     }
 
     const likeSubQuery = this.workShareService.getLikeSubQuery()

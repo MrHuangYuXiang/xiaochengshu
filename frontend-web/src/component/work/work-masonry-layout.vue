@@ -1,6 +1,5 @@
 <template>
   <ScrollContainer
-    v-if="worksType"
     :targetUserId="targetUserId"
     triggerType="bottom"
     :loadMoreCallback="getWorks"
@@ -10,7 +9,12 @@
       <slot name="header"></slot>
       <AppSegment
         :fields="props.fields"
-        @changeField="changeWorksType"
+        @changeField="changeParentType"
+      />
+      <AppSegment
+        :fields="subSegmentFields"
+        type="background"
+        @changeField="changeType"
       />
       <div class="masonry-box">
         <WorkCard
@@ -21,6 +25,7 @@
           :workType="work.work.type"
           :workTitle="work.work.title"
           :workCoverUrl="work.cover_image.path"
+          :workPermission="work.work.permission"
           :userId="work.user.id"
           :userName="work.user.name"
           :userAvatarUrl="work.user.avatar_path"
@@ -37,10 +42,11 @@
   import AppSegment from '../common/app-segment.vue';
   import { EnhancedList } from '@/lib/structure.ts';
   import type { WorksSchema } from '@/api/type.ext';
-  import { onMounted, ref, useTemplateRef } from 'vue';
+  import { ref, useTemplateRef } from 'vue';
   import type { paths } from '@/api/gen.ts';
   import { axiosProxy } from '@/api/axios.ts';
   import { ElMessage } from 'element-plus';
+  import { storage } from '@/storage.ts';
 
   const props = withDefaults(defineProps<{
     fields: {text: string, key: string}[]
@@ -51,12 +57,16 @@
 
   const works = ref(new EnhancedList<WorksSchema>((work) => work.work.id, 10))
   const targetUserId = ref(props.targetUserId)
-  const worksType = ref("")
+  const worksType = ref<string>()
   const scrollRef = useTemplateRef("scrollRef")
-  
+  // 子分段器字段
+  const subSegmentFields = ref<{text: string, key: string}[]>([])
+
   // 获取作品
   const getWorks = async () => {
     await works.value.pagePush(async (current: number, size: number) => {
+      if (!worksType.value) return []
+
       const data = (await axiosProxy.post<
         paths["/get/works"]["post"]["requestBody"]["content"]["application/json"],
         paths["/get/works"]["post"]["responses"]["200"]["content"]["application/json"]
@@ -89,26 +99,38 @@
       ElMessage("删除成功")
   }
 
-  // 切换作品类型
-  const changeWorksType = (type: string) => {
+  // 更换作品父类型
+  const changeParentType = (type: string) => {
+    subSegmentFields.value = []
+    switch (type) {
+      case "self":
+        subSegmentFields.value  = [
+          {text: '作品', key: 'self-public'},
+        ]
+        // 当前用户为自己时，显示私密作品
+        if (targetUserId.value === storage.initData.value?.user.id) {
+          subSegmentFields.value.push({text: '私密作品', key: 'self-private'})
+        }
+        break
+      default:
+        changeType(type)
+        break
+      }
+  }
+
+  // 更换作品查询类型
+  const changeType = (type: string) => {
     worksType.value = type
     works.value.clear()
     scrollRef.value?.reset()
   }
-
-  onMounted(() => {
-    if (props.fields[0]) {
-      worksType.value = props.fields[0].key
-    } else {
-      throw new Error("props.fields为空")
-    }
-  })
 </script>
 
 <style scoped lang="scss">
   .base-box {
     display: grid;
     grid-template-columns: 100%;
+    row-gap: 1rem;
     .masonry-box {
       display: grid;
       grid-template-columns: repeat(auto-fill, 13rem);
